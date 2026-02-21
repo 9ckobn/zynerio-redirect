@@ -30,36 +30,60 @@ Example: `https://zynerio.com/add_sub?sub=https://panel.example.com/api/sub/abc1
 
 ## Deployment
 
-### 1. Clone & configure
+No extra container needed — just mount `index.html` into the existing Caddy.
+
+### 1. Clone
 
 ```bash
-git clone <repo-url> && cd ZynerioConnect
-cp .env.example .env
-# Edit .env if you need a different port
+cd /root
+git clone <repo-url> zynerio-redirect
 ```
 
-### 2. Start
+### 2. Mount into Caddy
 
-```bash
-docker compose up -d
+Add a volume to the Caddy service in Remnawave's `docker-compose.yml`:
+
+```yaml
+volumes:
+  - /root/zynerio-redirect/index.html:/srv/connect/index.html:ro
 ```
 
-The service listens on port **8070** (configurable via `PORT` in `.env`).
+### 3. Update Caddyfile
 
-### 3. Reverse proxy (main Caddy)
-
-Add to your site's Caddyfile:
+Replace the `https://zynerio.com` block:
 
 ```caddyfile
-handle /add_sub* {
-    reverse_proxy localhost:8070
+https://zynerio.com {
+    handle /add_sub* {
+        root * /srv/connect
+        try_files {path} /index.html
+        file_server
+    }
+    respond "OK" 200
 }
 ```
 
-Then `caddy reload`.
+### 4. Restart Caddy
+
+```bash
+docker compose restart caddy
+```
+
+### 5. Verify
+
+```bash
+curl https://zynerio.com/health        # → still served by respond block
+curl https://zynerio.com/add_sub?sub=x  # → HTML page
+```
+
+## Updating
+
+```bash
+cd /root/zynerio-redirect && git pull
+docker compose restart caddy
+```
 
 ## Stack
 
-- **Caddy 2** (Alpine) — static file server
 - **Single HTML file** — no build step, no dependencies
-- **Docker Compose** — deploy and forget
+- Served by the existing Caddy instance
