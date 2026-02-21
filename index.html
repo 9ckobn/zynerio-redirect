@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zynerio VPN — Connect</title>
+<style>
+  :root {
+    --bg: #0f0f14;
+    --card: #1a1a24;
+    --accent: #6c5ce7;
+    --accent-hover: #7f70f0;
+    --text: #e8e8ef;
+    --muted: #8888a0;
+    --success: #00b894;
+    --warn: #fdcb6e;
+    --danger: #e17055;
+    --radius: 16px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .container {
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+  }
+  .logo {
+    font-size: 48px;
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .subtitle {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 28px;
+  }
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    margin-bottom: 16px;
+  }
+  .status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 16px;
+  }
+  .spinner {
+    width: 20px;
+    height: 20px;
+    border: 3px solid var(--muted);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .status-icon { font-size: 22px; }
+  .attempt-list {
+    text-align: left;
+    margin: 16px 0 0;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .attempt-list .row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255,255,255,.05);
+  }
+  .attempt-list .row:last-child { border-bottom: none; }
+  .attempt-list .icon { width: 18px; text-align: center; }
+  .attempt-list .active { color: var(--text); font-weight: 500; }
+  .btn {
+    display: inline-block;
+    width: 100%;
+    padding: 14px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background .2s, transform .1s;
+    color: #fff;
+  }
+  .btn:active { transform: scale(.97); }
+  .btn-primary { background: var(--accent); }
+  .btn-primary:hover { background: var(--accent-hover); }
+  .btn-secondary {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,.12);
+    color: var(--muted);
+    margin-top: 10px;
+    font-size: 13px;
+    padding: 10px 20px;
+  }
+  .btn-secondary:hover { border-color: rgba(255,255,255,.25); color: var(--text); }
+  .hidden { display: none !important; }
+  .manual-section {
+    margin-top: 20px;
+    text-align: left;
+  }
+  .manual-section h3 {
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: var(--muted);
+  }
+  .key-box {
+    background: rgba(255,255,255,.06);
+    border-radius: 10px;
+    padding: 12px;
+    font-family: 'SF Mono', Monaco, Consolas, monospace;
+    font-size: 11px;
+    word-break: break-all;
+    color: var(--muted);
+    position: relative;
+    cursor: pointer;
+    max-height: 80px;
+    overflow: hidden;
+    transition: max-height .3s;
+  }
+  .key-box.expanded { max-height: 400px; }
+  .copy-toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--success);
+    color: #fff;
+    padding: 10px 24px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    opacity: 0;
+    transition: opacity .3s;
+    pointer-events: none;
+    z-index: 100;
+  }
+  .copy-toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="logo">🔐</div>
+  <h1>Zynerio VPN</h1>
+  <p class="subtitle" id="subtitle">Connecting to your VPN app…</p>
+
+  <div class="card">
+    <div class="status" id="status">
+      <div class="spinner" id="spinner"></div>
+      <span id="statusText">Trying apps…</span>
+    </div>
+    <div class="attempt-list" id="attemptList"></div>
+  </div>
+
+  <!-- Shown when all attempts fail -->
+  <div id="fallbackSection" class="hidden">
+    <a id="storeBtn" class="btn btn-primary" href="#">
+      📥 <span id="storeBtnText">Download App</span>
+    </a>
+    <button class="btn btn-secondary" onclick="copyKey()">
+      📋 Copy subscription key
+    </button>
+  </div>
+
+  <!-- Manual key section -->
+  <div class="manual-section hidden" id="manualSection">
+    <h3>Subscription key (tap to copy):</h3>
+    <div class="key-box" id="keyBox" onclick="copyKey()"></div>
+  </div>
+</div>
+
+<div class="copy-toast" id="copyToast">✅ Copied!</div>
+
+<script>
+(function() {
+  'use strict';
+
+  /* ── Deep-link scheme registry ─────────────────────────── */
+
+  // Each entry: [appName, buildUri(subUrl)]
+  // Order matters — first match wins. Grouped by platform affinity.
+  const SCHEMES = {
+    happ: [
+      ['Happ',        u => 'happ://add/' + u],
+    ],
+    flclash: [
+      ['FLClash',     u => 'clash://install-config?url=' + encodeURIComponent(u)],
+      ['Hiddify',     u => 'hiddify://import/' + u],
+      ['V2RayNG',     u => 'v2rayng://install-config?url=' + encodeURIComponent(u)],
+      ['Sing-Box',    u => 'sing-box://import-remote-profile?url=' + encodeURIComponent(u)],
+      ['Happ',        u => 'happ://add/' + u],
+    ],
+    v2raytun: [
+      ['V2RayNG',     u => 'v2rayng://install-config?url=' + encodeURIComponent(u)],
+      ['Hiddify',     u => 'hiddify://import/' + u],
+      ['Happ',        u => 'happ://add/' + u],
+      ['Sing-Box',    u => 'sing-box://import-remote-profile?url=' + encodeURIComponent(u)],
+    ],
+    _default: [
+      ['Happ',        u => 'happ://add/' + u],
+      ['Hiddify',     u => 'hiddify://import/' + u],
+      ['FLClash',     u => 'clash://install-config?url=' + encodeURIComponent(u)],
+      ['V2RayNG',     u => 'v2rayng://install-config?url=' + encodeURIComponent(u)],
+      ['Sing-Box',    u => 'sing-box://import-remote-profile?url=' + encodeURIComponent(u)],
+    ],
+  };
+
+  /* ── Fallback store links per app slug ─────────────────── */
+
+  const STORE_LINKS = {
+    happ: {
+      ios:     'https://apps.apple.com/app/happ-proxy-utility/id6504885958',
+      android: 'https://play.google.com/store/apps/details?id=com.happproxy',
+      desktop: 'https://github.com/nicetoolkit/Happ_Windows/releases/latest',
+    },
+    flclash: {
+      ios:     'https://apps.apple.com/app/happ-proxy-utility/id6504885958', // no FlClash on iOS
+      android: 'https://github.com/chen08209/FlClash/releases/latest',
+      desktop: 'https://github.com/chen08209/FlClash/releases/latest',
+    },
+    v2raytun: {
+      android: 'https://play.google.com/store/apps/details?id=free.v2ray.proxy.VPN',
+      ios:     'https://apps.apple.com/app/happ-proxy-utility/id6504885958',
+      desktop: 'https://github.com/chen08209/FlClash/releases/latest',
+    },
+  };
+
+  /* ── Parse URL params ──────────────────────────────────── */
+
+  const params = new URLSearchParams(window.location.search);
+  const subUrl = params.get('sub') || '';
+  const appSlug = params.get('app') || '_default';
+
+  if (!subUrl) {
+    document.getElementById('statusText').textContent = 'Error: no subscription URL';
+    document.getElementById('spinner').classList.add('hidden');
+    return;
+  }
+
+  /* ── Detect platform ───────────────────────────────────── */
+
+  function detectPlatform() {
+    const ua = navigator.userAgent.toLowerCase();
+    if (/iphone|ipad|ipod/.test(ua)) return 'ios';
+    if (/android/.test(ua)) return 'android';
+    if (/macintosh|mac os/.test(ua)) return 'macos';
+    if (/windows/.test(ua)) return 'windows';
+    if (/linux/.test(ua)) return 'linux';
+    return 'desktop';
+  }
+
+  const platform = detectPlatform();
+
+  /* ── Build attempt list ────────────────────────────────── */
+
+  const candidates = SCHEMES[appSlug] || SCHEMES._default;
+  const listEl = document.getElementById('attemptList');
+  const statusText = document.getElementById('statusText');
+  const spinner = document.getElementById('spinner');
+
+  // Render rows
+  candidates.forEach(([name], i) => {
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.id = 'row-' + i;
+    row.innerHTML = '<span class="icon" id="icon-' + i + '">⏳</span><span>' + name + '</span>';
+    listEl.appendChild(row);
+  });
+
+  /* ── Deep-link attempt logic ───────────────────────────── */
+
+  let currentIdx = 0;
+  let appOpened = false;
+
+  function setRowStatus(idx, icon, active) {
+    const iconEl = document.getElementById('icon-' + idx);
+    const rowEl = document.getElementById('row-' + idx);
+    if (iconEl) iconEl.textContent = icon;
+    if (rowEl) {
+      rowEl.classList.toggle('active', !!active);
+    }
+  }
+
+  function onAppOpened(name) {
+    appOpened = true;
+    spinner.classList.add('hidden');
+    statusText.innerHTML = '<span class="status-icon">✅</span> Opening ' + name + '…';
+    document.getElementById('subtitle').textContent = 'Your VPN is being configured';
+
+    // Show manual key after a delay in case user comes back
+    setTimeout(() => {
+      document.getElementById('manualSection').classList.remove('hidden');
+      document.getElementById('keyBox').textContent = subUrl;
+    }, 3000);
+  }
+
+  function onAllFailed() {
+    spinner.classList.add('hidden');
+    statusText.innerHTML = '<span class="status-icon">📲</span> No app detected';
+    document.getElementById('subtitle').textContent = 'Install a VPN app to continue';
+
+    // Show fallback
+    document.getElementById('fallbackSection').classList.remove('hidden');
+    document.getElementById('manualSection').classList.remove('hidden');
+    document.getElementById('keyBox').textContent = subUrl;
+
+    // Set store link
+    const stores = STORE_LINKS[appSlug] || STORE_LINKS.happ;
+    let storeUrl;
+    if (platform === 'ios') {
+      storeUrl = stores.ios;
+      document.getElementById('storeBtnText').textContent = 'Download from App Store';
+    } else if (platform === 'android') {
+      storeUrl = stores.android;
+      document.getElementById('storeBtnText').textContent = 'Download from Google Play';
+    } else {
+      storeUrl = stores.desktop;
+      document.getElementById('storeBtnText').textContent = 'Download App';
+    }
+    document.getElementById('storeBtn').href = storeUrl || '#';
+  }
+
+  function tryNext() {
+    if (appOpened || currentIdx >= candidates.length) {
+      if (!appOpened) onAllFailed();
+      return;
+    }
+
+    const [name, buildUri] = candidates[currentIdx];
+    const uri = buildUri(subUrl);
+    const idx = currentIdx;
+
+    setRowStatus(idx, '🔄', true);
+    statusText.textContent = 'Trying ' + name + '…';
+
+    let detected = false;
+    function onBlur() {
+      detected = true;
+      cleanup();
+      setRowStatus(idx, '✅', true);
+      onAppOpened(name);
+    }
+    function onVisChange() {
+      if (document.hidden) {
+        detected = true;
+        cleanup();
+        setRowStatus(idx, '✅', true);
+        onAppOpened(name);
+      }
+    }
+    function cleanup() {
+      window.removeEventListener('blur', onBlur);
+      document.removeEventListener('visibilitychange', onVisChange);
+    }
+
+    window.addEventListener('blur', onBlur);
+    document.addEventListener('visibilitychange', onVisChange);
+
+    // Try opening the URI via hidden iframe
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = uri;
+    document.body.appendChild(iframe);
+
+    // Also try window.location as backup for some platforms
+    setTimeout(() => {
+      if (!detected && !appOpened) {
+        window.location.href = uri;
+      }
+    }, 200);
+
+    // Wait and check
+    setTimeout(() => {
+      cleanup();
+      if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+
+      if (!detected && !appOpened) {
+        setRowStatus(idx, '❌', false);
+        currentIdx++;
+        tryNext();
+      }
+    }, 1500);
+  }
+
+  /* ── Copy key helper ───────────────────────────────────── */
+
+  window.copyKey = function() {
+    navigator.clipboard.writeText(subUrl).then(() => {
+      const toast = document.getElementById('copyToast');
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }).catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = subUrl;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+      const toast = document.getElementById('copyToast');
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    });
+  };
+
+  /* ── Start ─────────────────────────────────────────────── */
+
+  setTimeout(tryNext, 300);
+
+})();
+</script>
+</body>
+</html>
