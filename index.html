@@ -166,16 +166,14 @@
   <div class="card">
     <div class="status" id="status">
       <div class="spinner" id="spinner"></div>
-      <span id="statusText">Trying apps…</span>
+      <span id="statusText">Loading config…</span>
     </div>
     <div class="attempt-list" id="attemptList"></div>
   </div>
 
   <!-- Shown when all attempts fail -->
   <div id="fallbackSection" class="hidden">
-    <a id="storeBtn" class="btn btn-primary" href="#">
-      📥 <span id="storeBtnText">Download App</span>
-    </a>
+    <div id="storeButtons"></div>
     <button class="btn btn-secondary" onclick="copyKey()">
       📋 Copy subscription key
     </button>
@@ -194,61 +192,46 @@
 (function() {
   'use strict';
 
-  /* ── Deep-link scheme registry ─────────────────────────── */
+  /* ── Config endpoint (proxied through Caddy to subscription-page) ── */
 
-  // Each entry: [appName, buildUri(subUrl)]
-  // Order matters — first match wins. Grouped by platform affinity.
-  const SCHEMES = {
-    happ: [
-      ['Happ',        u => 'happ://add/' + u],
-    ],
-    flclash: [
-      ['FLClash',     u => 'clash://install-config?url=' + encodeURIComponent(u)],
-      ['Hiddify',     u => 'hiddify://import/' + u],
-      ['V2RayNG',     u => 'v2rayng://install-config?url=' + encodeURIComponent(u)],
-      ['Sing-Box',    u => 'sing-box://import-remote-profile?url=' + encodeURIComponent(u)],
-      ['Happ',        u => 'happ://add/' + u],
-    ],
-    v2raytun: [
-      ['V2RayNG',     u => 'v2rayng://install-config?url=' + encodeURIComponent(u)],
-      ['Hiddify',     u => 'hiddify://import/' + u],
-      ['Happ',        u => 'happ://add/' + u],
-      ['Sing-Box',    u => 'sing-box://import-remote-profile?url=' + encodeURIComponent(u)],
-    ],
-    _default: [
-      ['Happ',        u => 'happ://add/' + u],
-      ['Hiddify',     u => 'hiddify://import/' + u],
-      ['FLClash',     u => 'clash://install-config?url=' + encodeURIComponent(u)],
-      ['V2RayNG',     u => 'v2rayng://install-config?url=' + encodeURIComponent(u)],
-      ['Sing-Box',    u => 'sing-box://import-remote-profile?url=' + encodeURIComponent(u)],
-    ],
-  };
+  const CONFIG_URL = '/add_sub/config';
 
-  /* ── Fallback store links per app slug ─────────────────── */
+  /* ── Hardcoded fallback (used when config fetch fails) ────────────── */
 
-  const STORE_LINKS = {
-    happ: {
-      ios:     'https://apps.apple.com/app/happ-proxy-utility/id6504885958',
-      android: 'https://play.google.com/store/apps/details?id=com.happproxy',
-      desktop: 'https://github.com/nicetoolkit/Happ_Windows/releases/latest',
-    },
-    flclash: {
-      ios:     'https://apps.apple.com/app/happ-proxy-utility/id6504885958', // no FlClash on iOS
-      android: 'https://github.com/chen08209/FlClash/releases/latest',
-      desktop: 'https://github.com/chen08209/FlClash/releases/latest',
-    },
-    v2raytun: {
-      android: 'https://play.google.com/store/apps/details?id=free.v2ray.proxy.VPN',
-      ios:     'https://apps.apple.com/app/happ-proxy-utility/id6504885958',
-      desktop: 'https://github.com/chen08209/FlClash/releases/latest',
-    },
+  const FALLBACK_APPS = {
+    ios: [
+      { name: 'Happ',         deepLink: 'happ://add/{{SUB}}',                                      storeLink: 'https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973' },
+      { name: 'Streisand',    deepLink: 'streisand://import/{{SUB}}',                               storeLink: 'https://apps.apple.com/ru/app/streisand/id6450534064' },
+      { name: 'Stash',        deepLink: 'stash://install-config?url={{ENC}}',                       storeLink: 'https://apps.apple.com/us/app/stash-rule-based-proxy/id1596063349' },
+      { name: 'Shadowrocket', deepLink: 'shadowrocket://add/{{SUB}}',                              storeLink: 'https://apps.apple.com/ru/app/shadowrocket/id932747118' },
+    ],
+    android: [
+      { name: 'Happ',         deepLink: 'happ://add/{{SUB}}',                                      storeLink: 'https://play.google.com/store/apps/details?id=com.happproxy' },
+      { name: 'FlClashX',     deepLink: 'flclashx://install-config?url={{ENC}}',                    storeLink: 'https://github.com/pluralplay/FlClashX/releases/latest/download/FlClashX-android-universal.apk' },
+      { name: 'Clash Meta',   deepLink: 'clashmeta://install-config?url={{ENC}}',                   storeLink: 'https://github.com/MetaCubeX/ClashMetaForAndroid/releases/download/v2.11.20/cmfa-2.11.20-meta-universal-release.apk' },
+      { name: 'V2RayNG',      deepLink: 'v2rayng://install-config?url={{ENC}}',                     storeLink: 'https://github.com/2dust/v2rayNG/releases/latest' },
+    ],
+    macos: [
+      { name: 'Happ',         deepLink: 'happ://add/{{SUB}}',                                      storeLink: 'https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973' },
+      { name: 'FlClashX',     deepLink: 'flclashx://install-config?url={{ENC}}',                    storeLink: 'https://github.com/pluralplay/FlClashX/releases/latest' },
+      { name: 'Koala Clash',  deepLink: 'koala-clash://install-config?url={{ENC}}',                 storeLink: 'https://github.com/coolcoala/clash-verge-rev-lite/releases/latest' },
+    ],
+    windows: [
+      { name: 'Happ',         deepLink: 'happ://add/{{SUB}}',                                      storeLink: 'https://github.com/Happ-proxy/happ-desktop/releases/latest/download/setup-Happ.x64.exe' },
+      { name: 'FlClashX',     deepLink: 'flclashx://install-config?url={{ENC}}',                    storeLink: 'https://github.com/pluralplay/FlClashX/releases/latest/download/FlClashX-windows-amd64-setup.exe' },
+      { name: 'Koala Clash',  deepLink: 'koala-clash://install-config?url={{ENC}}',                 storeLink: 'https://github.com/coolcoala/clash-verge-rev-lite/releases/latest/download/Koala.Clash_x64-setup.exe' },
+    ],
+    linux: [
+      { name: 'FlClashX',     deepLink: 'flclashx://install-config?url={{ENC}}',                    storeLink: 'https://github.com/pluralplay/FlClashX/releases/latest' },
+      { name: 'Koala Clash',  deepLink: 'koala-clash://install-config?url={{ENC}}',                 storeLink: 'https://github.com/coolcoala/clash-verge-rev-lite/releases/latest' },
+    ],
   };
 
   /* ── Parse URL params ──────────────────────────────────── */
 
-  const params = new URLSearchParams(window.location.search);
-  const subUrl = params.get('sub') || '';
-  const appSlug = params.get('app') || '_default';
+  const params  = new URLSearchParams(window.location.search);
+  const subUrl  = params.get('sub') || '';
+  const appHint = (params.get('app') || '').toLowerCase();
 
   if (!subUrl) {
     document.getElementById('statusText').textContent = 'Error: no subscription URL';
@@ -261,43 +244,108 @@
   function detectPlatform() {
     const ua = navigator.userAgent.toLowerCase();
     if (/iphone|ipad|ipod/.test(ua)) return 'ios';
-    if (/android/.test(ua)) return 'android';
-    if (/macintosh|mac os/.test(ua)) return 'macos';
-    if (/windows/.test(ua)) return 'windows';
-    if (/linux/.test(ua)) return 'linux';
-    return 'desktop';
+    if (/android/.test(ua))           return 'android';
+    if (/macintosh|mac os/.test(ua))  return 'macos';
+    if (/windows/.test(ua))           return 'windows';
+    if (/linux/.test(ua))             return 'linux';
+    return 'windows'; // safe desktop fallback
   }
 
   const platform = detectPlatform();
 
-  /* ── Build attempt list ────────────────────────────────── */
+  /* ── Parse Remnawave subscription-page config ──────────── */
 
-  const candidates = SCHEMES[appSlug] || SCHEMES._default;
-  const listEl = document.getElementById('attemptList');
+  function parseRemnaConfig(cfg) {
+    // cfg is the full .app-config-v2.json
+    // Structure: { platforms: { ios: { apps: [ { name, featured, blocks: [ { buttons: [...] } ] } ] } } }
+    const platformCfg = cfg?.platforms?.[platform];
+    if (!platformCfg?.apps?.length) return null;
+
+    const apps = [];
+    for (const app of platformCfg.apps) {
+      const name = app.name || 'Unknown';
+      let deepLink  = null;
+      let storeLink = null;
+      const storeLinks = [];
+
+      for (const block of (app.blocks || [])) {
+        for (const btn of (block.buttons || [])) {
+          if (btn.type === 'subscriptionLink' && btn.link && !deepLink) {
+            deepLink = btn.link;
+          }
+          if (btn.type === 'external' && btn.link) {
+            if (!storeLink) storeLink = btn.link;
+            storeLinks.push({ text: btn.text || 'Download', link: btn.link });
+          }
+        }
+      }
+
+      if (deepLink) {
+        apps.push({ name, deepLink, storeLink, storeLinks, featured: !!app.featured });
+      }
+    }
+
+    return apps.length ? apps : null;
+  }
+
+  /* ── Build URI from deep-link template ─────────────────── */
+
+  function buildUri(template, sub) {
+    return template
+      .replace('{{SUBSCRIPTION_LINK}}', sub)
+      .replace('{{USERNAME}}', '')
+      .replace('{{HAPP_CRYPT3_LINK}}', sub)
+      .replace('{{HAPP_CRYPT4_LINK}}', sub)
+      .replace('{{SUB}}', sub)
+      .replace('{{ENC}}', encodeURIComponent(sub));
+  }
+
+  /* ── Prioritize apps: move appHint match to front ──────── */
+
+  function prioritize(apps) {
+    if (!appHint || appHint === '_default') return apps;
+    const hint = appHint.replace(/[-_\s]/g, '').toLowerCase();
+    const idx = apps.findIndex(a =>
+      a.name.replace(/[-_\s]/g, '').toLowerCase().includes(hint) ||
+      hint.includes(a.name.replace(/[-_\s]/g, '').toLowerCase())
+    );
+    if (idx > 0) {
+      const [match] = apps.splice(idx, 1);
+      apps.unshift(match);
+    }
+    return apps;
+  }
+
+  /* ── DOM refs ──────────────────────────────────────────── */
+
+  const listEl     = document.getElementById('attemptList');
   const statusText = document.getElementById('statusText');
-  const spinner = document.getElementById('spinner');
+  const spinner    = document.getElementById('spinner');
 
-  // Render rows
-  candidates.forEach(([name], i) => {
-    const row = document.createElement('div');
-    row.className = 'row';
-    row.id = 'row-' + i;
-    row.innerHTML = '<span class="icon" id="icon-' + i + '">⏳</span><span>' + name + '</span>';
-    listEl.appendChild(row);
-  });
+  /* ── Render attempt rows ───────────────────────────────── */
 
-  /* ── Deep-link attempt logic ───────────────────────────── */
+  function renderRows(apps) {
+    listEl.innerHTML = '';
+    apps.forEach((app, i) => {
+      const row = document.createElement('div');
+      row.className = 'row';
+      row.id = 'row-' + i;
+      row.innerHTML = '<span class="icon" id="icon-' + i + '">⏳</span><span>' + app.name + '</span>';
+      listEl.appendChild(row);
+    });
+  }
+
+  /* ── Deep-link attempt engine ──────────────────────────── */
 
   let currentIdx = 0;
-  let appOpened = false;
+  let appOpened  = false;
+  let candidates = [];
 
   function setRowStatus(idx, icon, active) {
     const iconEl = document.getElementById('icon-' + idx);
-    const rowEl = document.getElementById('row-' + idx);
+    const rowEl  = document.getElementById('row-' + idx);
     if (iconEl) iconEl.textContent = icon;
-    if (rowEl) {
-      rowEl.classList.toggle('active', !!active);
-    }
+    if (rowEl) rowEl.classList.toggle('active', !!active);
   }
 
   function onAppOpened(name) {
@@ -305,8 +353,6 @@
     spinner.classList.add('hidden');
     statusText.innerHTML = '<span class="status-icon">✅</span> Opening ' + name + '…';
     document.getElementById('subtitle').textContent = 'Your VPN is being configured';
-
-    // Show manual key after a delay in case user comes back
     setTimeout(() => {
       document.getElementById('manualSection').classList.remove('hidden');
       document.getElementById('keyBox').textContent = subUrl;
@@ -318,25 +364,37 @@
     statusText.innerHTML = '<span class="status-icon">📲</span> No app detected';
     document.getElementById('subtitle').textContent = 'Install a VPN app to continue';
 
-    // Show fallback
     document.getElementById('fallbackSection').classList.remove('hidden');
     document.getElementById('manualSection').classList.remove('hidden');
     document.getElementById('keyBox').textContent = subUrl;
 
-    // Set store link
-    const stores = STORE_LINKS[appSlug] || STORE_LINKS.happ;
-    let storeUrl;
-    if (platform === 'ios') {
-      storeUrl = stores.ios;
-      document.getElementById('storeBtnText').textContent = 'Download from App Store';
-    } else if (platform === 'android') {
-      storeUrl = stores.android;
-      document.getElementById('storeBtnText').textContent = 'Download from Google Play';
-    } else {
-      storeUrl = stores.desktop;
-      document.getElementById('storeBtnText').textContent = 'Download App';
+    // Render download buttons for ALL apps with store links
+    const container = document.getElementById('storeButtons');
+    const seen = new Set();
+    for (const app of candidates) {
+      const links = app.storeLinks && app.storeLinks.length ? app.storeLinks : (app.storeLink ? [{ text: 'Download ' + app.name, link: app.storeLink }] : []);
+      for (const sl of links) {
+        if (seen.has(sl.link)) continue;
+        seen.add(sl.link);
+        const a = document.createElement('a');
+        a.className = 'btn btn-primary';
+        a.style.marginBottom = '8px';
+        a.href = sl.link;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.textContent = '📥 ' + (sl.text || ('Download ' + app.name));
+        container.appendChild(a);
+      }
     }
-    document.getElementById('storeBtn').href = storeUrl || '#';
+    // If no store links at all, show generic
+    if (!container.children.length) {
+      const a = document.createElement('a');
+      a.className = 'btn btn-primary';
+      a.href = 'https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973';
+      a.target = '_blank';
+      a.textContent = '📥 Download Happ';
+      container.appendChild(a);
+    }
   }
 
   function tryNext() {
@@ -345,26 +403,27 @@
       return;
     }
 
-    const [name, buildUri] = candidates[currentIdx];
-    const uri = buildUri(subUrl);
+    const app = candidates[currentIdx];
+    const uri = buildUri(app.deepLink, subUrl);
     const idx = currentIdx;
 
     setRowStatus(idx, '🔄', true);
-    statusText.textContent = 'Trying ' + name + '…';
+    statusText.textContent = 'Trying ' + app.name + '…';
 
     let detected = false;
+
     function onBlur() {
       detected = true;
       cleanup();
       setRowStatus(idx, '✅', true);
-      onAppOpened(name);
+      onAppOpened(app.name);
     }
     function onVisChange() {
       if (document.hidden) {
         detected = true;
         cleanup();
         setRowStatus(idx, '✅', true);
-        onAppOpened(name);
+        onAppOpened(app.name);
       }
     }
     function cleanup() {
@@ -375,24 +434,23 @@
     window.addEventListener('blur', onBlur);
     document.addEventListener('visibilitychange', onVisChange);
 
-    // Try opening the URI via hidden iframe
+    // Try via hidden iframe
     const iframe = document.createElement('iframe');
     iframe.style.display = 'none';
     iframe.src = uri;
     document.body.appendChild(iframe);
 
-    // Also try window.location as backup for some platforms
+    // Also try window.location for platforms where iframe doesn't work
     setTimeout(() => {
       if (!detected && !appOpened) {
         window.location.href = uri;
       }
     }, 200);
 
-    // Wait and check
+    // Check result after timeout
     setTimeout(() => {
       cleanup();
       if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
-
       if (!detected && !appOpened) {
         setRowStatus(idx, '❌', false);
         currentIdx++;
@@ -421,9 +479,39 @@
     });
   };
 
-  /* ── Start ─────────────────────────────────────────────── */
+  /* ── Main: fetch config → try deep-links ───────────────── */
 
-  setTimeout(tryNext, 300);
+  async function main() {
+    let apps = null;
+
+    // 1. Try to load dynamic config from Remnawave
+    try {
+      const res = await fetch(CONFIG_URL, { signal: AbortSignal.timeout(4000) });
+      if (res.ok) {
+        const cfg = await res.json();
+        apps = parseRemnaConfig(cfg);
+        if (apps) console.log('[connect] Loaded', apps.length, 'apps from Remnawave config');
+      }
+    } catch (e) {
+      console.warn('[connect] Config fetch failed, using fallback:', e.message);
+    }
+
+    // 2. Fallback to hardcoded list
+    if (!apps) {
+      apps = FALLBACK_APPS[platform] || FALLBACK_APPS.windows;
+      console.log('[connect] Using fallback apps for', platform);
+    }
+
+    // 3. Prioritize if app hint is given
+    candidates = prioritize([...apps]);
+
+    // 4. Render and start
+    renderRows(candidates);
+    statusText.textContent = 'Trying apps…';
+    setTimeout(tryNext, 300);
+  }
+
+  main();
 
 })();
 </script>

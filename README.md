@@ -54,6 +54,10 @@ Replace the `https://zynerio.com` block:
 
 ```caddyfile
 https://zynerio.com {
+    handle /add_sub/config {
+        rewrite * /assets/.app-config-v2.json
+        reverse_proxy remnawave-subscription-page:3010
+    }
     handle /add_sub* {
         root * /srv/connect
         try_files {path} /index.html
@@ -62,6 +66,9 @@ https://zynerio.com {
     respond "OK" 200
 }
 ```
+
+The `/add_sub/config` route proxies to the Remnawave subscription page to fetch
+the latest app deep-link schemes and store links dynamically.
 
 ### 4. Restart Caddy
 
@@ -72,8 +79,9 @@ docker compose restart caddy
 ### 5. Verify
 
 ```bash
-curl https://zynerio.com/health        # → still served by respond block
-curl https://zynerio.com/add_sub?sub=x  # → HTML page
+curl https://zynerio.com/health
+curl "https://zynerio.com/add_sub?sub=test"
+curl https://zynerio.com/add_sub/config | head -c 200
 ```
 
 ## Updating
