@@ -71,6 +71,17 @@
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-8px); }
   }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: .7; transform: scale(1.08); }
+  }
+  .search-emoji.pulse { animation: pulse 1.5s ease infinite; }
+  .poll-hint {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 6px;
+    opacity: .7;
+  }
   .status-icon { font-size: 22px; }
   .fun-text {
     font-size: 15px;
@@ -228,6 +239,18 @@
       download:       'Скачать {name}',
       otherApps:      '📋 Другие приложения',
       hideApps:       '▲ Скрыть',
+      waitingInstall: 'Ждём установку приложения…',
+      waitingSub:     'Скачайте и откройте — мы сделаем всё сами',
+      waitingSubtitle:'Установите приложение и вернитесь сюда',
+      waitingPoll:    'Автоматически подключим, как только установите',
+      waitingMessages: [
+        { text: 'Ждём, пока установится…',     emoji: '⏳', sub: 'Не закрывайте эту страничку' },
+        { text: 'Всё ещё ждём…',               emoji: '👀', sub: 'Скачали? Откройте приложение' },
+        { text: 'Проверяем, на месте ли…',      emoji: '🔄', sub: 'Как только установите — подключим' },
+        { text: 'Терпение — наше всё…',         emoji: '🧘', sub: 'Мы никуда не торопимся' },
+        { text: 'Мониторим ситуацию…',          emoji: '📡', sub: 'Приложение пока не найдено' },
+        { text: 'Секундочку…',                  emoji: '⏱️', sub: 'Проверяем каждую секунду' },
+      ],
       funMessages: [
         { text: 'Копаемся на вашем устройстве…', emoji: '🔍', sub: 'Не волнуйтесь, мы аккуратно' },
         { text: 'Ищем шпионов…',                emoji: '🕵️', sub: 'Пока чисто, продолжаем' },
@@ -257,6 +280,18 @@
       download:       'Download {name}',
       otherApps:      '📋 Other apps',
       hideApps:       '▲ Hide',
+      waitingInstall: 'Waiting for app to install…',
+      waitingSub:     'Download and open it — we\'ll do the rest',
+      waitingSubtitle:'Install the app and come back here',
+      waitingPoll:    'We\'ll auto-connect once you install it',
+      waitingMessages: [
+        { text: 'Waiting for installation…',    emoji: '⏳', sub: 'Don\'t close this page' },
+        { text: 'Still waiting…',               emoji: '👀', sub: 'Downloaded? Open the app' },
+        { text: 'Checking if it\'s ready…',     emoji: '🔄', sub: 'We\'ll connect once installed' },
+        { text: 'Patience is a virtue…',        emoji: '🧘', sub: 'We\'re in no rush' },
+        { text: 'Monitoring the situation…',    emoji: '📡', sub: 'App not found yet' },
+        { text: 'One moment…',                  emoji: '⏱️', sub: 'Checking every second' },
+      ],
       funMessages: [
         { text: 'Digging through your device…',  emoji: '🔍', sub: 'Don\'t worry, we\'re gentle' },
         { text: 'Looking for spies…',            emoji: '🕵️', sub: 'All clear so far' },
@@ -466,13 +501,17 @@
   function onAppOpened(name) {
     appOpened = true;
     stopFunMessages();
+    stopPostDownloadPolling();
     progressFill.style.width = '100%';
     searchEmoji.textContent = '✅';
+    searchEmoji.className = 'search-emoji';
     searchEmoji.style.animation = 'none';
     funTextEl.textContent = t('opening', { name });
     funSubEl.textContent = t('openingSub');
     document.getElementById('subtitle').textContent = t('openingSubtitle');
     document.getElementById('progressBar').style.display = 'none';
+    // Hide fallback download buttons since we succeeded
+    document.getElementById('fallbackSection').classList.add('hidden');
     setTimeout(() => {
       document.getElementById('manualSection').classList.remove('hidden');
       document.getElementById('keyBox').textContent = subUrl;
@@ -517,6 +556,9 @@
     primary.target = '_blank';
     primary.rel = 'noopener';
     primary.textContent = '📥 ' + allLinks[0].text;
+    primary.addEventListener('click', function() {
+      setTimeout(startPostDownloadPolling, 500);
+    });
     container.appendChild(primary);
 
     // If there are more apps, add "Other apps" toggle
@@ -534,6 +576,9 @@
         a.target = '_blank';
         a.rel = 'noopener';
         a.textContent = '📥 ' + allLinks[i].text;
+        a.addEventListener('click', function() {
+          setTimeout(startPostDownloadPolling, 500);
+        });
         moreWrap.appendChild(a);
       }
 
@@ -613,6 +658,141 @@
         tryNext();
       }
     }, 1500);
+  }
+
+  /* ── Post-download polling ──────────────────────────────── */
+
+  let pollInterval = null;
+  let pollCandIdx  = 0;
+  let pollMsgIdx   = 0;
+  let pollMsgInterval = null;
+  let pollIgnoreBlurUntil = 0; // timestamp: ignore blur events until this time
+
+  function startPostDownloadPolling() {
+    if (pollInterval || appOpened) return; // already polling or done
+
+    // Ignore blur/visibility events for 3s (the store/browser tab is opening)
+    pollIgnoreBlurUntil = Date.now() + 3000;
+
+    // Switch UI to "waiting for install" state
+    const card = document.querySelector('.card');
+    card.classList.remove('hidden');
+    searchEmoji.className = 'search-emoji pulse';
+    searchEmoji.textContent = '⏳';
+    funTextEl.textContent = t('waitingInstall');
+    funSubEl.textContent = t('waitingSub');
+    document.getElementById('subtitle').textContent = t('waitingSubtitle');
+
+    // Show progress bar in indeterminate/pulse mode
+    const pb = document.getElementById('progressBar');
+    pb.style.display = '';
+    progressFill.style.width = '100%';
+    progressFill.style.opacity = '0.4';
+    progressFill.style.animation = 'pulse 1.5s ease infinite';
+
+    // Add hint below the card
+    let hint = document.getElementById('pollHint');
+    if (!hint) {
+      hint = document.createElement('div');
+      hint.id = 'pollHint';
+      hint.className = 'poll-hint';
+      hint.textContent = t('waitingPoll');
+      card.appendChild(hint);
+    }
+
+    // Rotate waiting messages
+    const waitMsgs = L.waitingMessages;
+    pollMsgInterval = setInterval(() => {
+      pollMsgIdx = (pollMsgIdx + 1) % waitMsgs.length;
+      showFunMessage(waitMsgs[pollMsgIdx]);
+    }, 3000);
+
+    // Listen for app opening (but with grace period)
+    window.addEventListener('blur', onPollBlur);
+    document.addEventListener('visibilitychange', onPollVisChange);
+
+    // Also: when user returns from the store, immediately try all links fast
+    window.addEventListener('focus', onPollFocusReturn);
+
+    // Start gentle background polling after the grace period
+    setTimeout(() => {
+      if (appOpened) return;
+      pollInterval = setInterval(() => {
+        if (appOpened) { stopPostDownloadPolling(); return; }
+        // Don't try while page is hidden (user is in store)
+        if (document.hidden) return;
+
+        const app = candidates[pollCandIdx % candidates.length];
+        const uri = buildUri(app.deepLink, subUrl);
+
+        // Try via hidden iframe only (no location.href — that would navigate away)
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = uri;
+        document.body.appendChild(iframe);
+        setTimeout(() => { if (iframe.parentNode) iframe.parentNode.removeChild(iframe); }, 1500);
+
+        pollCandIdx++;
+      }, 2500);
+    }, 3000);
+
+    console.log('[connect] Post-download polling started');
+  }
+
+  // When user returns from the store → immediately try all apps quickly
+  function onPollFocusReturn() {
+    if (appOpened || !pollInterval && pollIgnoreBlurUntil > Date.now()) return;
+    // Small delay to let the page settle
+    setTimeout(() => {
+      if (appOpened) return;
+      pollIgnoreBlurUntil = 0; // clear grace period, now blur = real detection
+      // Try each candidate rapidly
+      let i = 0;
+      function tryPollCandidate() {
+        if (appOpened || i >= candidates.length) return;
+        const app = candidates[i];
+        const uri = buildUri(app.deepLink, subUrl);
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = uri;
+        document.body.appendChild(iframe);
+        setTimeout(() => { if (iframe.parentNode) iframe.parentNode.removeChild(iframe); }, 1200);
+        i++;
+        setTimeout(tryPollCandidate, 300);
+      }
+      tryPollCandidate();
+    }, 500);
+  }
+
+  function onPollBlur() {
+    if (appOpened) return;
+    if (Date.now() < pollIgnoreBlurUntil) return; // ignore blur from store open
+    const app = candidates[Math.max(0, (pollCandIdx - 1)) % candidates.length] || candidates[0];
+    stopPostDownloadPolling();
+    onAppOpened(app.name);
+  }
+
+  function onPollVisChange() {
+    if (appOpened) return;
+    if (document.hidden) {
+      if (Date.now() < pollIgnoreBlurUntil) return; // ignore from store open
+      const app = candidates[Math.max(0, (pollCandIdx - 1)) % candidates.length] || candidates[0];
+      stopPostDownloadPolling();
+      onAppOpened(app.name);
+    }
+  }
+
+  function stopPostDownloadPolling() {
+    if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
+    if (pollMsgInterval) { clearInterval(pollMsgInterval); pollMsgInterval = null; }
+    window.removeEventListener('blur', onPollBlur);
+    document.removeEventListener('visibilitychange', onPollVisChange);
+    window.removeEventListener('focus', onPollFocusReturn);
+    progressFill.style.animation = 'none';
+    progressFill.style.opacity = '1';
+    const hint = document.getElementById('pollHint');
+    if (hint) hint.remove();
+    console.log('[connect] Post-download polling stopped');
   }
 
   /* ── Copy key helper ───────────────────────────────────── */
