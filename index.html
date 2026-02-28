@@ -55,39 +55,50 @@
   }
   .status {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 14px;
     font-size: 16px;
     font-weight: 500;
-    margin-bottom: 16px;
+    margin-bottom: 8px;
   }
-  .spinner {
-    width: 20px;
-    height: 20px;
-    border: 3px solid var(--muted);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin .8s linear infinite;
+  .search-emoji {
+    font-size: 40px;
+    animation: bounce 1s ease infinite;
   }
-  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
   .status-icon { font-size: 22px; }
-  .attempt-list {
-    text-align: left;
-    margin: 16px 0 0;
-    font-size: 13px;
+  .fun-text {
+    font-size: 15px;
+    color: var(--text);
+    min-height: 24px;
+    transition: opacity .3s;
+  }
+  .fun-text.fade { opacity: 0; }
+  .fun-sub {
+    font-size: 12px;
     color: var(--muted);
+    margin-top: 2px;
   }
-  .attempt-list .row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 0;
-    border-bottom: 1px solid rgba(255,255,255,.05);
+  .progress-bar {
+    width: 100%;
+    height: 4px;
+    background: rgba(255,255,255,.08);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 8px;
   }
-  .attempt-list .row:last-child { border-bottom: none; }
-  .attempt-list .icon { width: 18px; text-align: center; }
-  .attempt-list .active { color: var(--text); font-weight: 500; }
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width .4s ease;
+  }
   .btn {
     display: inline-block;
     width: 100%;
@@ -161,14 +172,15 @@
 <div class="container">
   <div class="logo">🔐</div>
   <h1>Zynerio VPN</h1>
-  <p class="subtitle" id="subtitle">Connecting to your VPN app…</p>
+  <p class="subtitle" id="subtitle">Секундочку…</p>
 
   <div class="card">
     <div class="status" id="status">
-      <div class="spinner" id="spinner"></div>
-      <span id="statusText">Loading config…</span>
+      <div class="search-emoji" id="searchEmoji">🔍</div>
+      <div class="fun-text" id="funText">Загружаем конфиг…</div>
+      <div class="fun-sub" id="funSub"></div>
+      <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
     </div>
-    <div class="attempt-list" id="attemptList"></div>
   </div>
 
   <!-- Shown when all attempts fail -->
@@ -234,8 +246,11 @@
   const appHint = (params.get('app') || '').toLowerCase();
 
   if (!subUrl) {
-    document.getElementById('statusText').textContent = 'Error: no subscription URL';
-    document.getElementById('spinner').classList.add('hidden');
+    document.getElementById('funText').textContent = 'Ошибка: нет ссылки подписки';
+    document.getElementById('searchEmoji').textContent = '⚠️';
+    document.getElementById('searchEmoji').style.animation = 'none';
+    document.getElementById('funSub').textContent = '';
+    document.getElementById('progressBar').style.display = 'none';
     return;
   }
 
@@ -318,21 +333,53 @@
 
   /* ── DOM refs ──────────────────────────────────────────── */
 
-  const listEl     = document.getElementById('attemptList');
-  const statusText = document.getElementById('statusText');
-  const spinner    = document.getElementById('spinner');
+  const funTextEl    = document.getElementById('funText');
+  const funSubEl     = document.getElementById('funSub');
+  const searchEmoji  = document.getElementById('searchEmoji');
+  const progressFill = document.getElementById('progressFill');
 
-  /* ── Render attempt rows ───────────────────────────────── */
+  /* ── Fun loading messages ──────────────────────────────── */
 
-  function renderRows(apps) {
-    listEl.innerHTML = '';
-    apps.forEach((app, i) => {
-      const row = document.createElement('div');
-      row.className = 'row';
-      row.id = 'row-' + i;
-      row.innerHTML = '<span class="icon" id="icon-' + i + '">⏳</span><span>' + app.name + '</span>';
-      listEl.appendChild(row);
-    });
+  const FUN_MESSAGES = [
+    { text: 'Копаемся на вашем устройстве…', emoji: '🔍', sub: 'Не волнуйтесь, мы аккуратно' },
+    { text: 'Ищем шпионов…',                emoji: '🕵️', sub: 'Пока чисто, продолжаем' },
+    { text: 'Заглядываем под капот…',        emoji: '🔧', sub: 'Тут столько всего интересного' },
+    { text: 'Проверяем тайные папки…',       emoji: '📂', sub: 'Обещаем — не подглядываем' },
+    { text: 'Стучимся в приложения…',        emoji: '🚪', sub: 'Тук-тук, есть кто дома?' },
+    { text: 'Допрашиваем иконки…',           emoji: '🧐', sub: 'Молчат, но мы найдём' },
+    { text: 'Сканируем окрестности…',        emoji: '📡', sub: 'Почти нашли, кажется…' },
+    { text: 'Спрашиваем у Siri… шутка',      emoji: '🤖', sub: 'Она бы не помогла' },
+    { text: 'Проверяем последнее…',          emoji: '🎯', sub: 'Ещё чуть-чуть' },
+  ];
+
+  let funMsgIdx = 0;
+  let funInterval = null;
+
+  function showFunMessage(msg) {
+    funTextEl.classList.add('fade');
+    setTimeout(() => {
+      funTextEl.textContent = msg.text;
+      funSubEl.textContent = msg.sub || '';
+      searchEmoji.textContent = msg.emoji || '🔍';
+      funTextEl.classList.remove('fade');
+    }, 300);
+  }
+
+  function startFunMessages() {
+    showFunMessage(FUN_MESSAGES[0]);
+    funInterval = setInterval(() => {
+      funMsgIdx = (funMsgIdx + 1) % FUN_MESSAGES.length;
+      showFunMessage(FUN_MESSAGES[funMsgIdx]);
+    }, 2000);
+  }
+
+  function stopFunMessages() {
+    if (funInterval) { clearInterval(funInterval); funInterval = null; }
+  }
+
+  function updateProgress(current, total) {
+    const pct = Math.min(100, Math.round(((current + 1) / total) * 100));
+    progressFill.style.width = pct + '%';
   }
 
   /* ── Deep-link attempt engine ──────────────────────────── */
@@ -341,18 +388,16 @@
   let appOpened  = false;
   let candidates = [];
 
-  function setRowStatus(idx, icon, active) {
-    const iconEl = document.getElementById('icon-' + idx);
-    const rowEl  = document.getElementById('row-' + idx);
-    if (iconEl) iconEl.textContent = icon;
-    if (rowEl) rowEl.classList.toggle('active', !!active);
-  }
-
   function onAppOpened(name) {
     appOpened = true;
-    spinner.classList.add('hidden');
-    statusText.innerHTML = '<span class="status-icon">✅</span> Opening ' + name + '…';
-    document.getElementById('subtitle').textContent = 'Your VPN is being configured';
+    stopFunMessages();
+    progressFill.style.width = '100%';
+    searchEmoji.textContent = '✅';
+    searchEmoji.style.animation = 'none';
+    funTextEl.textContent = 'Открываем ' + name + '…';
+    funSubEl.textContent = 'VPN уже настраивается';
+    document.getElementById('subtitle').textContent = 'Настраиваем ваш VPN';
+    document.getElementById('progressBar').style.display = 'none';
     setTimeout(() => {
       document.getElementById('manualSection').classList.remove('hidden');
       document.getElementById('keyBox').textContent = subUrl;
@@ -360,40 +405,80 @@
   }
 
   function onAllFailed() {
-    spinner.classList.add('hidden');
-    statusText.innerHTML = '<span class="status-icon">📲</span> No app detected';
-    document.getElementById('subtitle').textContent = 'Install a VPN app to continue';
+    stopFunMessages();
+    searchEmoji.textContent = '📲';
+    searchEmoji.style.animation = 'none';
+    funTextEl.textContent = 'Приложение не найдено';
+    funSubEl.textContent = 'Но это легко исправить!';
+    document.getElementById('subtitle').textContent = 'Установите VPN-приложение';
+    document.getElementById('progressBar').style.display = 'none';
 
     document.getElementById('fallbackSection').classList.remove('hidden');
     document.getElementById('manualSection').classList.remove('hidden');
     document.getElementById('keyBox').textContent = subUrl;
 
-    // Render download buttons for ALL apps with store links
+    // Collect all unique store links
     const container = document.getElementById('storeButtons');
+    const allLinks = [];
     const seen = new Set();
     for (const app of candidates) {
       const links = app.storeLinks && app.storeLinks.length ? app.storeLinks : (app.storeLink ? [{ text: 'Download ' + app.name, link: app.storeLink }] : []);
       for (const sl of links) {
         if (seen.has(sl.link)) continue;
         seen.add(sl.link);
+        allLinks.push({ text: sl.text || ('Download ' + app.name), link: sl.link });
+      }
+    }
+    // Fallback if no store links at all
+    if (!allLinks.length) {
+      allLinks.push({ text: 'Download Happ', link: 'https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973' });
+    }
+
+    // Show the first (primary) download button
+    const primary = document.createElement('a');
+    primary.className = 'btn btn-primary';
+    primary.style.marginBottom = '8px';
+    primary.href = allLinks[0].link;
+    primary.target = '_blank';
+    primary.rel = 'noopener';
+    primary.textContent = '📥 ' + allLinks[0].text;
+    container.appendChild(primary);
+
+    // If there are more apps, add "Other apps" toggle
+    if (allLinks.length > 1) {
+      const moreWrap = document.createElement('div');
+      moreWrap.id = 'moreApps';
+      moreWrap.style.display = 'none';
+      moreWrap.style.marginTop = '8px';
+
+      for (let i = 1; i < allLinks.length; i++) {
         const a = document.createElement('a');
         a.className = 'btn btn-primary';
         a.style.marginBottom = '8px';
-        a.href = sl.link;
+        a.href = allLinks[i].link;
         a.target = '_blank';
         a.rel = 'noopener';
-        a.textContent = '📥 ' + (sl.text || ('Download ' + app.name));
-        container.appendChild(a);
+        a.textContent = '📥 ' + allLinks[i].text;
+        moreWrap.appendChild(a);
       }
-    }
-    // If no store links at all, show generic
-    if (!container.children.length) {
-      const a = document.createElement('a');
-      a.className = 'btn btn-primary';
-      a.href = 'https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973';
-      a.target = '_blank';
-      a.textContent = '📥 Download Happ';
-      container.appendChild(a);
+
+      const toggleBtn = document.createElement('button');
+      toggleBtn.className = 'btn btn-secondary';
+      toggleBtn.style.marginBottom = '8px';
+      toggleBtn.textContent = '📋 Другие приложения';
+      toggleBtn.addEventListener('click', function() {
+        const wrap = document.getElementById('moreApps');
+        if (wrap.style.display === 'none') {
+          wrap.style.display = 'block';
+          toggleBtn.textContent = '▲ Скрыть';
+        } else {
+          wrap.style.display = 'none';
+          toggleBtn.textContent = '📋 Другие приложения';
+        }
+      });
+
+      container.appendChild(toggleBtn);
+      container.appendChild(moreWrap);
     }
   }
 
@@ -407,22 +492,19 @@
     const uri = buildUri(app.deepLink, subUrl);
     const idx = currentIdx;
 
-    setRowStatus(idx, '🔄', true);
-    statusText.textContent = 'Trying ' + app.name + '…';
+    updateProgress(idx, candidates.length);
 
     let detected = false;
 
     function onBlur() {
       detected = true;
       cleanup();
-      setRowStatus(idx, '✅', true);
       onAppOpened(app.name);
     }
     function onVisChange() {
       if (document.hidden) {
         detected = true;
         cleanup();
-        setRowStatus(idx, '✅', true);
         onAppOpened(app.name);
       }
     }
@@ -452,7 +534,6 @@
       cleanup();
       if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
       if (!detected && !appOpened) {
-        setRowStatus(idx, '❌', false);
         currentIdx++;
         tryNext();
       }
@@ -505,9 +586,8 @@
     // 3. Prioritize if app hint is given
     candidates = prioritize([...apps]);
 
-    // 4. Render and start
-    renderRows(candidates);
-    statusText.textContent = 'Trying apps…';
+    // 4. Start fun messages and begin trying
+    startFunMessages();
     setTimeout(tryNext, 300);
   }
 
