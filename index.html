@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" id="htmlRoot">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -172,12 +172,12 @@
 <div class="container">
   <div class="logo">🔐</div>
   <h1>Zynerio VPN</h1>
-  <p class="subtitle" id="subtitle">Секундочку…</p>
+  <p class="subtitle" id="subtitle"></p>
 
   <div class="card">
     <div class="status" id="status">
       <div class="search-emoji" id="searchEmoji">🔍</div>
-      <div class="fun-text" id="funText">Загружаем конфиг…</div>
+      <div class="fun-text" id="funText"></div>
       <div class="fun-sub" id="funSub"></div>
       <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
     </div>
@@ -186,19 +186,19 @@
   <!-- Shown when all attempts fail -->
   <div id="fallbackSection" class="hidden">
     <div id="storeButtons"></div>
-    <button class="btn btn-secondary" onclick="copyKey()">
-      📋 Copy subscription key
+    <button class="btn btn-secondary" onclick="copyKey()" id="copyKeyBtn">
+      📋
     </button>
   </div>
 
   <!-- Manual key section -->
   <div class="manual-section hidden" id="manualSection">
-    <h3>Subscription key (tap to copy):</h3>
+    <h3 id="manualKeyTitle"></h3>
     <div class="key-box" id="keyBox" onclick="copyKey()"></div>
   </div>
 </div>
 
-<div class="copy-toast" id="copyToast">✅ Copied!</div>
+<div class="copy-toast" id="copyToast"></div>
 
 <script>
 (function() {
@@ -207,6 +207,91 @@
   /* ── Config endpoint (proxied through Caddy to subscription-page) ── */
 
   const CONFIG_URL = '/add_sub/config';
+
+  /* ── Localization ───────────────────────────────────────── */
+
+  const LANGS = {
+    ru: {
+      title:          'Zynerio VPN — Подключение',
+      subtitle:       'Секундочку…',
+      loading:        'Загружаем конфиг…',
+      errorNoSub:     'Ошибка: нет ссылки подписки',
+      copyKeyBtn:     '📋 Скопировать ключ подписки',
+      manualKeyTitle: 'Ключ подписки (нажмите, чтобы скопировать):',
+      copied:         '✅ Скопировано!',
+      opening:        'Открываем {name}…',
+      openingSub:     'VPN уже настраивается',
+      openingSubtitle:'Настраиваем ваш VPN',
+      notFound:       'Приложение не найдено',
+      notFoundSub:    'Но это легко исправить!',
+      notFoundSubtitle:'Установите VPN-приложение',
+      download:       'Скачать {name}',
+      otherApps:      '📋 Другие приложения',
+      hideApps:       '▲ Скрыть',
+      funMessages: [
+        { text: 'Копаемся на вашем устройстве…', emoji: '🔍', sub: 'Не волнуйтесь, мы аккуратно' },
+        { text: 'Ищем шпионов…',                emoji: '🕵️', sub: 'Пока чисто, продолжаем' },
+        { text: 'Заглядываем под капот…',        emoji: '🔧', sub: 'Тут столько всего интересного' },
+        { text: 'Проверяем тайные папки…',       emoji: '📂', sub: 'Обещаем — не подглядываем' },
+        { text: 'Стучимся в приложения…',        emoji: '🚪', sub: 'Тук-тук, есть кто дома?' },
+        { text: 'Допрашиваем иконки…',           emoji: '🧐', sub: 'Молчат, но мы найдём' },
+        { text: 'Сканируем окрестности…',        emoji: '📡', sub: 'Почти нашли, кажется…' },
+        { text: 'Спрашиваем у Siri… шутка',      emoji: '🤖', sub: 'Она бы не помогла' },
+        { text: 'Проверяем последнее…',          emoji: '🎯', sub: 'Ещё чуть-чуть' },
+      ],
+    },
+    en: {
+      title:          'Zynerio VPN — Connect',
+      subtitle:       'One moment…',
+      loading:        'Loading config…',
+      errorNoSub:     'Error: no subscription URL',
+      copyKeyBtn:     '📋 Copy subscription key',
+      manualKeyTitle: 'Subscription key (tap to copy):',
+      copied:         '✅ Copied!',
+      opening:        'Opening {name}…',
+      openingSub:     'Your VPN is being configured',
+      openingSubtitle:'Configuring your VPN',
+      notFound:       'App not found',
+      notFoundSub:    'But that\'s an easy fix!',
+      notFoundSubtitle:'Install a VPN app to continue',
+      download:       'Download {name}',
+      otherApps:      '📋 Other apps',
+      hideApps:       '▲ Hide',
+      funMessages: [
+        { text: 'Digging through your device…',  emoji: '🔍', sub: 'Don\'t worry, we\'re gentle' },
+        { text: 'Looking for spies…',            emoji: '🕵️', sub: 'All clear so far' },
+        { text: 'Peeking under the hood…',       emoji: '🔧', sub: 'So many interesting things here' },
+        { text: 'Checking secret folders…',      emoji: '📂', sub: 'Promise we won\'t peek' },
+        { text: 'Knocking on apps…',             emoji: '🚪', sub: 'Knock-knock, anyone home?' },
+        { text: 'Interrogating icons…',          emoji: '🧐', sub: 'They\'re silent, but we\'ll find it' },
+        { text: 'Scanning the area…',            emoji: '📡', sub: 'Almost found it, maybe…' },
+        { text: 'Asking Siri… just kidding',     emoji: '🤖', sub: 'She wouldn\'t help anyway' },
+        { text: 'Checking the last one…',        emoji: '🎯', sub: 'Almost there' },
+      ],
+    },
+  };
+
+  // Detect language: URL param > browser language > default 'en'
+  const _params0 = new URLSearchParams(window.location.search);
+  const langParam = (_params0.get('lang_code') || '').toLowerCase();
+  const browserLang = (navigator.language || '').slice(0, 2).toLowerCase();
+  const lang = LANGS[langParam] ? langParam : (LANGS[browserLang] ? browserLang : 'en');
+  const L = LANGS[lang];
+
+  function t(key, vars) {
+    let s = L[key] || LANGS.en[key] || key;
+    if (vars) for (const [k, v] of Object.entries(vars)) s = s.replace('{' + k + '}', v);
+    return s;
+  }
+
+  // Apply static locale
+  document.getElementById('htmlRoot').lang = lang;
+  document.title = t('title');
+  document.getElementById('subtitle').textContent = t('subtitle');
+  document.getElementById('funText').textContent = t('loading');
+  document.getElementById('copyKeyBtn').textContent = t('copyKeyBtn');
+  document.getElementById('manualKeyTitle').textContent = t('manualKeyTitle');
+  document.getElementById('copyToast').textContent = t('copied');
 
   /* ── Hardcoded fallback (used when config fetch fails) ────────────── */
 
@@ -246,7 +331,7 @@
   const appHint = (params.get('app') || '').toLowerCase();
 
   if (!subUrl) {
-    document.getElementById('funText').textContent = 'Ошибка: нет ссылки подписки';
+    document.getElementById('funText').textContent = t('errorNoSub');
     document.getElementById('searchEmoji').textContent = '⚠️';
     document.getElementById('searchEmoji').style.animation = 'none';
     document.getElementById('funSub').textContent = '';
@@ -290,7 +375,7 @@
           }
           if (btn.type === 'external' && btn.link) {
             if (!storeLink) storeLink = btn.link;
-            storeLinks.push({ text: btn.text || 'Download', link: btn.link });
+            storeLinks.push({ text: btn.text || t('download', { name }), link: btn.link });
           }
         }
       }
@@ -340,17 +425,7 @@
 
   /* ── Fun loading messages ──────────────────────────────── */
 
-  const FUN_MESSAGES = [
-    { text: 'Копаемся на вашем устройстве…', emoji: '🔍', sub: 'Не волнуйтесь, мы аккуратно' },
-    { text: 'Ищем шпионов…',                emoji: '🕵️', sub: 'Пока чисто, продолжаем' },
-    { text: 'Заглядываем под капот…',        emoji: '🔧', sub: 'Тут столько всего интересного' },
-    { text: 'Проверяем тайные папки…',       emoji: '📂', sub: 'Обещаем — не подглядываем' },
-    { text: 'Стучимся в приложения…',        emoji: '🚪', sub: 'Тук-тук, есть кто дома?' },
-    { text: 'Допрашиваем иконки…',           emoji: '🧐', sub: 'Молчат, но мы найдём' },
-    { text: 'Сканируем окрестности…',        emoji: '📡', sub: 'Почти нашли, кажется…' },
-    { text: 'Спрашиваем у Siri… шутка',      emoji: '🤖', sub: 'Она бы не помогла' },
-    { text: 'Проверяем последнее…',          emoji: '🎯', sub: 'Ещё чуть-чуть' },
-  ];
+  const FUN_MESSAGES = L.funMessages;
 
   let funMsgIdx = 0;
   let funInterval = null;
@@ -394,9 +469,9 @@
     progressFill.style.width = '100%';
     searchEmoji.textContent = '✅';
     searchEmoji.style.animation = 'none';
-    funTextEl.textContent = 'Открываем ' + name + '…';
-    funSubEl.textContent = 'VPN уже настраивается';
-    document.getElementById('subtitle').textContent = 'Настраиваем ваш VPN';
+    funTextEl.textContent = t('opening', { name });
+    funSubEl.textContent = t('openingSub');
+    document.getElementById('subtitle').textContent = t('openingSubtitle');
     document.getElementById('progressBar').style.display = 'none';
     setTimeout(() => {
       document.getElementById('manualSection').classList.remove('hidden');
@@ -408,9 +483,9 @@
     stopFunMessages();
     searchEmoji.textContent = '📲';
     searchEmoji.style.animation = 'none';
-    funTextEl.textContent = 'Приложение не найдено';
-    funSubEl.textContent = 'Но это легко исправить!';
-    document.getElementById('subtitle').textContent = 'Установите VPN-приложение';
+    funTextEl.textContent = t('notFound');
+    funSubEl.textContent = t('notFoundSub');
+    document.getElementById('subtitle').textContent = t('notFoundSubtitle');
     document.getElementById('progressBar').style.display = 'none';
 
     document.getElementById('fallbackSection').classList.remove('hidden');
@@ -422,16 +497,16 @@
     const allLinks = [];
     const seen = new Set();
     for (const app of candidates) {
-      const links = app.storeLinks && app.storeLinks.length ? app.storeLinks : (app.storeLink ? [{ text: 'Download ' + app.name, link: app.storeLink }] : []);
+      const links = app.storeLinks && app.storeLinks.length ? app.storeLinks : (app.storeLink ? [{ text: t('download', { name: app.name }), link: app.storeLink }] : []);
       for (const sl of links) {
         if (seen.has(sl.link)) continue;
         seen.add(sl.link);
-        allLinks.push({ text: sl.text || ('Download ' + app.name), link: sl.link });
+        allLinks.push({ text: sl.text || t('download', { name: app.name }), link: sl.link });
       }
     }
     // Fallback if no store links at all
     if (!allLinks.length) {
-      allLinks.push({ text: 'Download Happ', link: 'https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973' });
+      allLinks.push({ text: t('download', { name: 'Happ' }), link: 'https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973' });
     }
 
     // Show the first (primary) download button
@@ -465,15 +540,15 @@
       const toggleBtn = document.createElement('button');
       toggleBtn.className = 'btn btn-secondary';
       toggleBtn.style.marginBottom = '8px';
-      toggleBtn.textContent = '📋 Другие приложения';
+      toggleBtn.textContent = t('otherApps');
       toggleBtn.addEventListener('click', function() {
         const wrap = document.getElementById('moreApps');
         if (wrap.style.display === 'none') {
           wrap.style.display = 'block';
-          toggleBtn.textContent = '▲ Скрыть';
+          toggleBtn.textContent = t('hideApps');
         } else {
           wrap.style.display = 'none';
-          toggleBtn.textContent = '📋 Другие приложения';
+          toggleBtn.textContent = t('otherApps');
         }
       });
 
