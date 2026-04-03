@@ -1,851 +1,263 @@
 <!DOCTYPE html>
-<html lang="en" id="htmlRoot">
+<html lang="en" id="root">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Zynerio VPN — Connect</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Zynerio VPN &#x2014; Connect</title>
 <style>
-  :root {
-    --bg: #0f0f14;
-    --card: #1a1a24;
-    --accent: #6c5ce7;
-    --accent-hover: #7f70f0;
-    --text: #e8e8ef;
-    --muted: #8888a0;
-    --success: #00b894;
-    --danger: #e17055;
-    --radius: 16px;
-  }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: var(--bg); color: var(--text);
-    min-height: 100dvh; display: flex; align-items: center;
-    justify-content: center; padding: 20px;
-  }
-  .container { max-width: 420px; width: 100%; text-align: center; }
-  .logo { font-size: 48px; margin-bottom: 8px; }
-  h1 { font-size: 22px; font-weight: 600; margin-bottom: 4px; }
-  .subtitle { color: var(--muted); font-size: 14px; margin-bottom: 28px; }
-
-  .card {
-    background: var(--card); border-radius: var(--radius);
-    padding: 28px 24px; margin-bottom: 16px;
-  }
-  .status {
-    display: flex; flex-direction: column; align-items: center;
-    gap: 14px; font-size: 16px; font-weight: 500; margin-bottom: 8px;
-  }
-  .search-emoji { font-size: 40px; animation: bounce 1s ease infinite; }
-  @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
-  .fun-text {
-    font-size: 15px; color: var(--text); min-height: 24px;
-    transition: opacity .3s;
-  }
-  .fun-text.fade { opacity: 0; }
-  .fun-sub { font-size: 12px; color: var(--muted); margin-top: 2px; min-height: 16px; }
-  .progress-bar {
-    width: 100%; height: 4px; background: rgba(255,255,255,.08);
-    border-radius: 2px; overflow: hidden; margin-top: 8px;
-  }
-  .progress-fill {
-    height: 100%; width: 0%; background: var(--accent);
-    border-radius: 2px; transition: width .5s ease;
-  }
-
-  /* App cards (failure state) */
-  .app-card {
-    background: rgba(255,255,255,.03); border-radius: 14px;
-    padding: 16px; margin-bottom: 10px; text-align: left;
-    border: 1px solid rgba(255,255,255,.06);
-  }
-  .app-card.top { border-color: rgba(108,92,231,.3); background: rgba(108,92,231,.05); }
-  .app-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-  .app-name { font-size: 15px; font-weight: 600; }
-  .app-tag {
-    font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 8px;
-    background: rgba(108,92,231,.2); color: #a29bfe;
-  }
-  .btn-row { display: flex; gap: 8px; }
-  .btn-act {
-    display: flex; align-items: center; justify-content: center;
-    flex: 1; padding: 11px; font-size: 14px; font-weight: 600;
-    border: none; border-radius: 10px; cursor: pointer; color: #fff;
-    text-decoration: none; text-align: center; transition: transform .1s;
-  }
-  .btn-act:active { transform: scale(.96); }
-  .btn-green { background: linear-gradient(135deg, var(--success), #00a383); }
-  .btn-purple { background: rgba(108,92,231,.2); color: var(--accent); }
-  .dl-links { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-  .dl-link {
-    font-size: 12px; color: var(--muted); text-decoration: none;
-    padding: 5px 12px; border-radius: 8px;
-    background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.06);
-    transition: all .2s;
-  }
-  .dl-link:hover { background: rgba(255,255,255,.08); color: var(--text); }
-
-  .btn {
-    display: block; width: 100%; padding: 14px 24px;
-    font-size: 15px; font-weight: 600; border: none; border-radius: 12px;
-    cursor: pointer; text-decoration: none; color: #fff;
-    transition: background .2s, transform .1s; text-align: center;
-  }
-  .btn:active { transform: scale(.97); }
-  .btn-primary { background: var(--accent); margin-bottom: 8px; }
-  .btn-primary:hover { background: var(--accent-hover); }
-  .btn-success { background: linear-gradient(135deg, var(--success), #00a383); margin-bottom: 8px; }
-  .btn-secondary {
-    background: transparent; border: 1px solid rgba(255,255,255,.12);
-    color: var(--muted); margin-top: 10px; font-size: 13px; padding: 10px 20px;
-  }
-  .btn-secondary:hover { border-color: rgba(255,255,255,.25); color: var(--text); }
-  .other-toggle {
-    display: block; width: 100%; padding: 12px; font-size: 13px; font-weight: 500;
-    border: 1px solid rgba(108,92,231,.15); border-radius: 12px;
-    cursor: pointer; margin: 10px 0; background: transparent; color: var(--accent);
-  }
-  .other-toggle:hover { border-color: rgba(108,92,231,.4); }
-
-  .key-section {
-    margin-top: 20px; text-align: left;
-    background: var(--card); border-radius: var(--radius); padding: 16px;
-  }
-  .key-section h3 { font-size: 14px; margin-bottom: 8px; color: var(--muted); }
-  .key-box {
-    background: rgba(255,255,255,.06); border-radius: 10px; padding: 12px;
-    font-family: 'SF Mono', Monaco, Consolas, monospace; font-size: 11px;
-    word-break: break-all; color: var(--muted); cursor: pointer;
-    max-height: 80px; overflow: hidden;
-  }
-  .copy-toast {
-    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-    background: var(--success); color: #fff; padding: 10px 24px;
-    border-radius: 10px; font-size: 14px; font-weight: 500;
-    opacity: 0; transition: opacity .3s; pointer-events: none; z-index: 100;
-  }
-  .copy-toast.show { opacity: 1; }
-  .hidden { display: none !important; }
-
-  /* Wait mode */
-  .wait-status { text-align: center; }
-  .wait-emoji { font-size: 40px; margin-bottom: 12px; animation: bounce 1.5s ease infinite; }
-  .wait-text { font-size: 15px; font-weight: 500; margin-bottom: 6px; }
-  .wait-sub { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
-  .btn-cancel {
-    padding: 10px 28px; font-size: 13px; font-weight: 500;
-    border: 1px solid rgba(255,255,255,.1); border-radius: 10px;
-    cursor: pointer; background: transparent; color: var(--muted);
-  }
+:root{--bg:#0b0b10;--card:#15151e;--card-border:rgba(255,255,255,.05);--accent:#6c5ce7;--accent-soft:rgba(108,92,231,.12);--text:#e8e8ef;--muted:#6e6e84;--success:#00b894;--radius:14px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:16px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:400px;width:100%}
+.hdr{text-align:center;margin-bottom:20px}
+.hdr-icon{font-size:40px;margin-bottom:6px}
+.hdr h1{font-size:20px;font-weight:700;letter-spacing:-.3px}
+.hdr .sub{color:var(--muted);font-size:13px;margin-top:3px}
+.card{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:24px 20px;margin-bottom:10px}
+.scan{text-align:center}
+.pulse-ring{width:52px;height:52px;border-radius:50%;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 14px;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.08);opacity:.7}}
+.scan .msg{font-size:15px;font-weight:500;min-height:22px;transition:opacity .2s}
+.scan .msg.fade{opacity:0}
+.scan .msg-sub{font-size:12px;color:var(--muted);margin-top:3px;min-height:16px}
+.bar{height:3px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden;margin-top:14px}
+.bar-fill{height:100%;border-radius:2px;background:var(--accent);width:30%;animation:slide 1.4s ease-in-out infinite}
+@keyframes slide{0%{transform:translateX(-100%)}50%{transform:translateX(250%)}100%{transform:translateX(-100%)}}
+.ok{text-align:center}
+.ok-icon{font-size:48px;margin-bottom:10px}
+.ok .title{font-size:17px;font-weight:600;margin-bottom:3px}
+.ok .detail{font-size:13px;color:var(--muted);margin-bottom:18px}
+.ac{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:14px 16px;margin-bottom:8px}
+.ac.feat{border-color:rgba(108,92,231,.22);background:linear-gradient(135deg,rgba(108,92,231,.05),transparent)}
+.ac-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.ac-name{font-size:15px;font-weight:600}
+.ac-badge{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent)}
+.ac-btns{display:flex;gap:8px}
+.btn{display:flex;align-items:center;justify-content:center;padding:10px 14px;font-size:13px;font-weight:600;border:none;border-radius:10px;cursor:pointer;text-decoration:none;color:#fff;transition:opacity .15s,transform .1s;-webkit-tap-highlight-color:transparent}
+.btn:active{transform:scale(.97)}
+.btn-c{flex:1;background:linear-gradient(135deg,var(--success),#00a383)}
+.btn-d{flex:1;background:var(--accent-soft);color:var(--accent)}
+.btn-open{width:100%;padding:13px;font-size:15px;background:linear-gradient(135deg,var(--success),#00a383)}
+.btn-copy{width:100%;padding:10px;font-size:12px;font-weight:500;background:transparent;border:1px solid var(--card-border);color:var(--muted);margin-top:8px;border-radius:10px;cursor:pointer}
+.btn-copy:hover{border-color:rgba(255,255,255,.12);color:var(--text)}
+.btn-tog{width:100%;padding:10px;font-size:12px;font-weight:500;background:transparent;border:1px solid rgba(108,92,231,.12);border-radius:10px;color:var(--accent);cursor:pointer;margin:6px 0}
+.btn-x{padding:8px 22px;font-size:12px;font-weight:500;background:transparent;border:1px solid var(--card-border);border-radius:8px;color:var(--muted);cursor:pointer}
+.dls{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.dl{font-size:11px;color:var(--muted);text-decoration:none;padding:4px 10px;border-radius:6px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.04);transition:color .15s,background .15s}
+.dl:hover{color:var(--text);background:rgba(255,255,255,.06)}
+.wt{text-align:center}
+.wt-icon{font-size:36px;margin-bottom:10px;animation:pulse 2s ease-in-out infinite}
+.wt .title{font-size:15px;font-weight:500;margin-bottom:4px}
+.wt .detail{font-size:12px;color:var(--muted);margin-bottom:14px}
+.lh{text-align:center;margin-bottom:12px}
+.lh-icon{font-size:36px;margin-bottom:8px}
+.lh .title{font-size:16px;font-weight:600;margin-bottom:3px}
+.lh .detail{font-size:12px;color:var(--muted)}
+.ks{margin-top:10px;background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:14px}
+.ks-lbl{font-size:11px;color:var(--muted);margin-bottom:6px}
+.ks-box{background:rgba(255,255,255,.04);border-radius:8px;padding:10px;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:11px;word-break:break-all;color:var(--muted);cursor:pointer;max-height:56px;overflow:hidden;transition:color .15s}
+.ks-box:hover{color:var(--text)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(8px);background:var(--success);color:#fff;padding:10px 24px;border-radius:10px;font-size:13px;font-weight:500;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;z-index:100}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.hidden{display:none!important}
 </style>
 </head>
 <body>
-<div class="container">
-  <div class="logo">🔐</div>
-  <h1>Zynerio VPN</h1>
-  <p class="subtitle" id="subtitle">Секундочку…</p>
-
-  <div class="card" id="scanCard">
-    <div class="status">
-      <div class="search-emoji" id="searchEmoji">🔍</div>
-      <div class="fun-text" id="funText">Загружаем конфиг…</div>
-      <div class="fun-sub" id="funSub"></div>
-      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-    </div>
-  </div>
-
-  <div class="card hidden" id="waitCard">
-    <div class="wait-status">
-      <div class="wait-emoji">⏳</div>
-      <div class="wait-text" id="waitText"></div>
-      <div class="wait-sub" id="waitSub"></div>
-      <button class="btn-cancel" id="waitCancel" type="button">Отмена</button>
-    </div>
-  </div>
-
-  <div id="resultSection" class="hidden">
-    <div id="appList"></div>
-    <button class="btn btn-secondary" id="copyBtn" type="button">📋 Скопировать ключ подписки</button>
-  </div>
-
-  <div class="key-section hidden" id="keySection">
-    <h3>Ключ подписки (нажмите, чтобы скопировать):</h3>
-    <div class="key-box" id="keyBox"></div>
-  </div>
+<div class="wrap">
+  <div class="hdr"><div class="hdr-icon">&#x1F510;</div><h1>Zynerio VPN</h1><p class="sub" id="subtitle"></p></div>
+  <div class="card" id="scanCard"><div class="scan"><div class="pulse-ring"><span id="scanEmoji">&#x1F50D;</span></div><div class="msg" id="scanMsg"></div><div class="msg-sub" id="scanSub"></div><div class="bar"><div class="bar-fill" id="barFill"></div></div></div></div>
+  <div class="card hidden" id="successCard"><div class="ok"><div class="ok-icon">&#x2705;</div><div class="title" id="okTitle"></div><div class="detail" id="okDetail"></div><a class="btn btn-open" id="openBtn" href="#"></a></div></div>
+  <div class="hidden" id="listSection"><div class="lh"><div class="lh-icon" id="lhIcon">&#x1F4F2;</div><div class="title" id="listTitle"></div><div class="detail" id="listDetail"></div></div><div id="appCards"></div></div>
+  <div class="card hidden" id="waitCard"><div class="wt"><div class="wt-icon">&#x23F3;</div><div class="title" id="wtTitle"></div><div class="detail" id="wtDetail"></div><button class="btn-x" id="wtCancel" type="button"></button></div></div>
+  <div class="hidden" id="keySection"><div class="ks"><div class="ks-lbl" id="keyLabel"></div><div class="ks-box" id="keyBox"></div></div><button class="btn btn-copy" id="copyBtn" type="button"></button></div>
 </div>
-
-<div class="copy-toast" id="copyToast">✅ Скопировано!</div>
-
+<div class="toast" id="toast"></div>
 <script>
-(function() {
+(function(){
   'use strict';
-
-  var CONFIG_URL = '/add_sub/config';
-
-  /* ── i18n ──────────────────────────────────────────────── */
-
-  var LANGS = {
-    ru: {
-      subtitle_scan: 'Секундочку…',
-      subtitle_found: 'Настраиваем ваш VPN',
-      subtitle_fail: 'Установите VPN-приложение',
-      error_no_sub: 'Ошибка: нет ссылки подписки',
-      loading: 'Загружаем конфиг…',
-      found: 'Открываем {name}…',
-      found_sub: 'VPN уже настраивается',
-      not_found: 'Приложение не найдено',
-      not_found_sub: 'Но это легко исправить!',
-      open_app: 'Открыть {name}',
-      connect: 'Подключить',
-      download: 'Скачать',
-      recommended: 'Рекомендуем',
-      other_apps: 'Другие приложения ({count})',
-      hide_apps: 'Скрыть',
-      copy_btn: '📋 Скопировать ключ подписки',
-      copied: '✅ Скопировано!',
-      key_title: 'Ключ подписки (нажмите, чтобы скопировать):',
-      waiting: 'Ожидаем установку {name}…',
-      wait_sub: 'Установите приложение и вернитесь сюда',
-      cancel: 'Отмена',
-      choose_app: 'Выберите ваше приложение',
-      choose_sub: 'Нажмите «Подключить» рядом с установленным приложением'
-    },
-    en: {
-      subtitle_scan: 'Just a moment…',
-      subtitle_found: 'Configuring your VPN',
-      subtitle_fail: 'Install a VPN app',
-      error_no_sub: 'Error: no subscription URL',
-      loading: 'Loading config…',
-      found: 'Opening {name}…',
-      found_sub: 'VPN is being configured',
-      not_found: 'No VPN app found',
-      not_found_sub: 'But that\'s easy to fix!',
-      open_app: 'Open {name}',
-      connect: 'Connect',
-      download: 'Download',
-      recommended: 'Recommended',
-      other_apps: 'Other apps ({count})',
-      hide_apps: 'Hide',
-      copy_btn: '📋 Copy subscription key',
-      copied: '✅ Copied!',
-      key_title: 'Subscription key (tap to copy):',
-      waiting: 'Waiting for {name}…',
-      wait_sub: 'Install the app and come back here',
-      cancel: 'Cancel',
-      choose_app: 'Choose your app',
-      choose_sub: 'Tap Connect next to your installed app'
-    }
-  };
-
-  var _p = new URLSearchParams(window.location.search);
-  var langParam = (_p.get('lang_code') || '').toLowerCase();
-  var browserLang = (navigator.language || '').slice(0, 2).toLowerCase();
-  var lang = LANGS[langParam] ? langParam : (LANGS[browserLang] ? browserLang : 'en');
-  var L = LANGS[lang];
-
-  function t(key, vars) {
-    var s = L[key] || LANGS.en[key] || key;
-    if (vars) { for (var k in vars) s = s.replace('{' + k + '}', vars[k]); }
-    return s;
-  }
-
-  document.getElementById('htmlRoot').lang = lang;
-  document.getElementById('subtitle').textContent = t('subtitle_scan');
-  document.getElementById('funText').textContent = t('loading');
-  document.getElementById('copyBtn').textContent = t('copy_btn');
-  document.getElementById('copyToast').textContent = t('copied');
-  document.getElementById('waitCancel').textContent = t('cancel');
-  document.querySelector('.key-section h3').textContent = t('key_title');
-
-  /* ── Fun messages ──────────────────────────────────────── */
-
-  var FUN = {
-    ru: [
-      { text: 'Копаемся на вашем устройстве…', emoji: '🔍', sub: 'Не волнуйтесь, мы аккуратно' },
-      { text: 'Ищем шпионов…', emoji: '🕵️', sub: 'Пока чисто, продолжаем' },
-      { text: 'Заглядываем под капот…', emoji: '🔧', sub: 'Тут столько всего интересного' },
-      { text: 'Стучимся в приложения…', emoji: '🚪', sub: 'Тук-тук, есть кто дома?' },
-      { text: 'Допрашиваем иконки…', emoji: '🧐', sub: 'Молчат, но мы найдём' },
-      { text: 'Сканируем окрестности…', emoji: '📡', sub: 'Почти нашли, кажется…' },
-      { text: 'Проверяем последнее…', emoji: '🎯', sub: 'Ещё чуть-чуть' }
+  var CONFIG_URL='/add_sub/config',PROBE_TIMEOUT=2500;
+  var LANG={ru:{scanning:'\u0421\u0435\u043a\u0443\u043d\u0434\u043e\u0447\u043a\u0443\u2026',loading:'\u0417\u0430\u0433\u0440\u0443\u0436\u0430\u0435\u043c \u043a\u043e\u043d\u0444\u0438\u0433\u2026',found_title:'\u0413\u043e\u0442\u043e\u0432\u043e!',found_detail:'{name} \u0438\u043c\u043f\u043e\u0440\u0442\u0438\u0440\u0443\u0435\u0442 \u0432\u0430\u0448\u0443 \u043f\u043e\u0434\u043f\u0438\u0441\u043a\u0443',found_sub:'VPN \u043d\u0430\u0441\u0442\u0440\u0430\u0438\u0432\u0430\u0435\u0442\u0441\u044f',open_app:'\u041e\u0442\u043a\u0440\u044b\u0442\u044c {name}',not_found_title:'\u0423\u0441\u0442\u0430\u043d\u043e\u0432\u0438\u0442\u0435 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u0435',not_found_sub:'\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u0435 \u0438 \u043d\u0430\u0436\u043c\u0438\u0442\u0435 \u00ab\u041f\u043e\u0434\u043a\u043b\u044e\u0447\u0438\u0442\u044c\u00bb',choose_title:'\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u0435',choose_sub:'\u041d\u0430\u0436\u043c\u0438\u0442\u0435 \u00ab\u041f\u043e\u0434\u043a\u043b\u044e\u0447\u0438\u0442\u044c\u00bb \u043d\u0430\u043f\u0440\u043e\u0442\u0438\u0432 \u0432\u0430\u0448\u0435\u0433\u043e \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f',connect:'\u041f\u043e\u0434\u043a\u043b\u044e\u0447\u0438\u0442\u044c',download:'\u0421\u043a\u0430\u0447\u0430\u0442\u044c',recommended:'\u0420\u0435\u043a\u043e\u043c\u0435\u043d\u0434\u0443\u0435\u043c',other_apps:'\u0415\u0449\u0451 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f ({count})',hide_other:'\u0421\u043a\u0440\u044b\u0442\u044c',copy_key:'📋 \u0421\u043a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u0441\u0441\u044b\u043b\u043a\u0443 \u043f\u043e\u0434\u043f\u0438\u0441\u043a\u0438',copied:'\u2705 \u0421\u043a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u043d\u043e!',key_label:'\u0421\u0441\u044b\u043b\u043a\u0430 \u043f\u043e\u0434\u043f\u0438\u0441\u043a\u0438:',wait_title:'\u041e\u0436\u0438\u0434\u0430\u0435\u043c \u0443\u0441\u0442\u0430\u043d\u043e\u0432\u043a\u0443 {name}\u2026',wait_detail:'\u0423\u0441\u0442\u0430\u043d\u043e\u0432\u0438\u0442\u0435 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u0435 \u0438 \u0432\u0435\u0440\u043d\u0438\u0442\u0435\u0441\u044c \u0441\u044e\u0434\u0430',cancel:'\u041e\u0442\u043c\u0435\u043d\u0430',error_no_sub:'\u041e\u0448\u0438\u0431\u043a\u0430: \u043d\u0435\u0442 \u0441\u0441\u044b\u043b\u043a\u0438 \u043f\u043e\u0434\u043f\u0438\u0441\u043a\u0438'},en:{scanning:'Just a moment\u2026',loading:'Loading config\u2026',found_title:'Done!',found_detail:'{name} is importing your subscription',found_sub:'VPN is being configured',open_app:'Open {name}',not_found_title:'Install a VPN app',not_found_sub:'Choose an app and tap Connect',choose_title:'Choose your app',choose_sub:'Tap Connect next to your installed app',connect:'Connect',download:'Download',recommended:'Recommended',other_apps:'More apps ({count})',hide_other:'Hide',copy_key:'📋 Copy subscription link',copied:'\u2705 Copied!',key_label:'Subscription link:',wait_title:'Waiting for {name}\u2026',wait_detail:'Install the app and come back here',cancel:'Cancel',error_no_sub:'Error: no subscription URL'}};
+  var params=new URLSearchParams(location.search);
+  var lc=(params.get('lang_code')||'').slice(0,2).toLowerCase();
+  var bl=(navigator.language||'').slice(0,2).toLowerCase();
+  var lang=LANG[lc]?lc:(LANG[bl]?bl:'en');
+  var S=LANG[lang];
+  function t(k,v){var s=S[k]||LANG.en[k]||k;if(v)for(var p in v)s=s.replace('{'+p+'}',v[p]);return s}
+  document.getElementById('root').lang=lang;
+  var FUN={ru:[{t:'\u0418\u0449\u0435\u043c VPN-\u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f\u2026',e:'🔍',s:''},{t:'\u0421\u0442\u0443\u0447\u0438\u043c\u0441\u044f \u0432 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f\u2026',e:'🚪',s:'\u0422\u0443\u043a-\u0442\u0443\u043a!'},{t:'\u0421\u043a\u0430\u043d\u0438\u0440\u0443\u0435\u043c \u0443\u0441\u0442\u0440\u043e\u0439\u0441\u0442\u0432\u043e\u2026',e:'📡',s:'\u041f\u043e\u0447\u0442\u0438 \u0433\u043e\u0442\u043e\u0432\u043e\u2026'},{t:'\u041f\u0440\u043e\u0432\u0435\u0440\u044f\u0435\u043c \u043f\u043e\u0441\u043b\u0435\u0434\u043d\u0435\u0435\u2026',e:'🎯',s:'\u0415\u0449\u0451 \u0447\u0443\u0442\u044c-\u0447\u0443\u0442\u044c'}],en:[{t:'Looking for VPN apps\u2026',e:'🔍',s:''},{t:'Knocking on apps\u2026',e:'🚪',s:'Knock knock!'},{t:'Scanning device\u2026',e:'📡',s:'Almost there\u2026'},{t:'Checking the last one\u2026',e:'🎯',s:'Just a moment'}]};
+  function detectPlatform(){var ua=navigator.userAgent;if(/iphone|ipad|ipod/i.test(ua))return'ios';if(/android/i.test(ua)&&/tv|television|aft/i.test(ua))return'androidTV';if(/android/i.test(ua))return'android';if(/apple\s*tv/i.test(ua))return'appleTV';if(/macintosh|mac os/i.test(ua))return'macos';if(/windows/i.test(ua))return'windows';if(/linux/i.test(ua))return'linux';return'windows'}
+  var platform=detectPlatform();
+  var isFirefoxMobile=/firefox/i.test(navigator.userAgent)&&/mobile|android|iphone/i.test(navigator.userAgent);
+  var FALLBACK={
+    ios:[
+      {name:'Happ',deepLink:'happ://add/{{SUB}}',featured:true,storeLinks:[{text:'App Store (RU)',link:'https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973'},{text:'App Store (Global)',link:'https://apps.apple.com/us/app/happ-proxy-utility/id6504287215'}]},
+      {name:'Streisand',deepLink:'streisand://import/{{SUB}}',featured:true,storeLinks:[{text:'App Store',link:'https://apps.apple.com/ru/app/streisand/id6450534064'}]},
+      {name:'Stash',deepLink:'stash://install-config?url={{ENC}}',featured:false,storeLinks:[{text:'App Store',link:'https://apps.apple.com/us/app/stash-rule-based-proxy/id1596063349'}]},
+      {name:'Shadowrocket',deepLink:'sub://{{SUB}}',featured:false,storeLinks:[{text:'App Store',link:'https://apps.apple.com/ru/app/shadowrocket/id932747118'}]},
+      {name:'Clash Mi',deepLink:'clash://install-config?overwrite=no&name=Remnawave&url={{ENC}}',featured:false,storeLinks:[{text:'App Store',link:'https://apps.apple.com/us/app/clash-mi/id6744321968'}]}
     ],
-    en: [
-      { text: 'Searching your device…', emoji: '🔍', sub: "Don't worry, we're gentle" },
-      { text: 'Looking for spies…', emoji: '🕵️', sub: 'All clear so far' },
-      { text: 'Peeking under the hood…', emoji: '🔧', sub: 'So many things in here' },
-      { text: 'Knocking on apps…', emoji: '🚪', sub: 'Knock knock, anyone home?' },
-      { text: 'Interrogating icons…', emoji: '🧐', sub: "They're quiet, but we'll find them" },
-      { text: 'Scanning the area…', emoji: '📡', sub: 'Almost found something…' },
-      { text: 'Checking the last one…', emoji: '🎯', sub: 'Just a bit more' }
+    android:[
+      {name:'FlClashX',deepLink:'flclashx://install-config?url={{ENC}}',featured:true,storeLinks:[{text:'APK',link:'https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-android-arm64-v8a.apk'}]},
+      {name:'Clash Meta',deepLink:'clashmeta://install-config?name=Remnawave&url={{ENC}}',featured:true,storeLinks:[{text:'APK',link:'https://github.com/MetaCubeX/ClashMetaForAndroid/releases/download/v2.11.20/cmfa-2.11.20-meta-universal-release.apk'},{text:'F-Droid',link:'https://f-droid.org/packages/com.github.metacubex.clash.meta/'}]},
+      {name:'Happ',deepLink:'happ://add/{{SUB}}',featured:true,storeLinks:[{text:'Google Play',link:'https://play.google.com/store/apps/details?id=com.happproxy'},{text:'APK',link:'https://github.com/Happ-proxy/happ-android/releases/latest/download/Happ.apk'}]},
+      {name:'v2rayNG',deepLink:'v2rayng://install-config?name=Remnawave&url={{ENC}}',featured:false,storeLinks:[{text:'APK',link:'https://github.com/2dust/v2rayNG/releases/download/1.10.31/v2rayNG_1.10.31_universal.apk'}]},
+      {name:'Exclave',deepLink:'exclave://subscription?url={{ENC}}',featured:false,storeLinks:[{text:'APK',link:'https://github.com/dyhkwong/Exclave/releases/download/0.17.4/Exclave-0.17.4-arm64-v8a.apk'}]}
+    ],
+    macos:[
+      {name:'Happ',deepLink:'happ://add/{{SUB}}',featured:true,storeLinks:[{text:'App Store (RU)',link:'https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973'},{text:'App Store (Global)',link:'https://apps.apple.com/us/app/happ-proxy-utility/id6504287215'}]},
+      {name:'Koala Clash',deepLink:'koala-clash://install-config?url={{ENC}}',featured:true,storeLinks:[{text:'Apple Silicon',link:'https://github.com/coolcoala/clash-verge-rev-lite/releases/latest/download/Koala.Clash_aarch64.dmg'},{text:'Intel',link:'https://github.com/coolcoala/clash-verge-rev-lite/releases/latest/download/Koala.Clash_x64.dmg'}]},
+      {name:'FlClashX',deepLink:'flclashx://install-config?url={{ENC}}',featured:true,storeLinks:[{text:'Apple Silicon',link:'https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-macos-arm64.dmg'},{text:'Intel',link:'https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-macos-amd64.dmg'}]},
+      {name:'Prizrak-Box',deepLink:'prizrak-box://install-config?url={{ENC}}',featured:false,storeLinks:[{text:'Apple Silicon',link:'https://github.com/legiz-ru/Prizrak-Box/releases/latest/download/macos-arm64-dmg.zip'},{text:'Intel',link:'https://github.com/legiz-ru/Prizrak-Box/releases/latest/download/macos-amd64-dmg.zip'}]},
+      {name:'Clash Verge',deepLink:'clash://install-config?url={{ENC}}',featured:false,storeLinks:[{text:'Intel',link:'https://github.com/clash-verge-rev/clash-verge-rev/releases/download/v2.4.4-rc/Clash.Verge_2.4.4-rc_x64.dmg'},{text:'Apple Silicon',link:'https://github.com/clash-verge-rev/clash-verge-rev/releases/download/v2.4.4-rc/Clash.Verge_2.4.4-rc_aarch64.dmg'}]}
+    ],
+    windows:[
+      {name:'FlClashX',deepLink:'flclashx://install-config?url={{ENC}}',featured:true,storeLinks:[{text:'Installer',link:'https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-windows-amd64-setup.exe'},{text:'Portable',link:'https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-windows-amd64.zip'}]},
+      {name:'Koala Clash',deepLink:'koala-clash://install-config?url={{ENC}}',featured:true,storeLinks:[{text:'Installer',link:'https://github.com/coolcoala/clash-verge-rev-lite/releases/latest/download/Koala.Clash_x64-setup.exe'}]},
+      {name:'Prizrak-Box',deepLink:'prizrak-box://install-config?url={{ENC}}',featured:true,storeLinks:[{text:'Installer',link:'https://github.com/legiz-ru/Prizrak-Box/releases/latest/download/windows-amd64.msi'}]},
+      {name:'Happ',deepLink:'happ://add/{{SUB}}',featured:false,storeLinks:[{text:'Windows',link:'https://github.com/Happ-proxy/happ-desktop/releases/latest/download/setup-Happ.x64.exe'}]},
+      {name:'Clash Verge',deepLink:'clash://install-config?url={{ENC}}',featured:false,storeLinks:[{text:'Installer',link:'https://github.com/clash-verge-rev/clash-verge-rev/releases/download/v2.4.4-rc/Clash.Verge_2.4.4-rc_x64-setup.exe'}]}
+    ],
+    linux:[
+      {name:'FlClashX',deepLink:'flclashx://install-config?url={{ENC}}',featured:true,storeLinks:[{text:'.deb (amd64)',link:'https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-linux-amd64.deb'},{text:'AppImage',link:'https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-linux-amd64.AppImage'}]},
+      {name:'Koala Clash',deepLink:'koala-clash://install-config?url={{ENC}}',featured:true,storeLinks:[{text:'.deb (amd64)',link:'https://github.com/coolcoala/clash-verge-rev-lite/releases/latest/download/Koala.Clash_amd64.deb'}]},
+      {name:'Prizrak-Box',deepLink:'prizrak-box://install-config?url={{ENC}}',featured:true,storeLinks:[{text:'.deb (amd64)',link:'https://github.com/legiz-ru/Prizrak-Box/releases/latest/download/linux-amd64.deb'}]},
+      {name:'Clash Verge',deepLink:'clash://install-config?url={{ENC}}',featured:false,storeLinks:[{text:'.deb (amd64)',link:'https://github.com/clash-verge-rev/clash-verge-rev/releases/download/v2.4.4-rc/Clash.Verge_2.4.4-rc_amd64.deb'}]}
     ]
   };
-
-  /* ── Platform & browser ────────────────────────────────── */
-
-  function detectPlatform() {
-    var ua = navigator.userAgent.toLowerCase();
-    if (/iphone|ipad|ipod/.test(ua)) return 'ios';
-    if (/android/.test(ua)) return 'android';
-    if (/macintosh|mac os/.test(ua)) return 'macos';
-    if (/windows/.test(ua)) return 'windows';
-    if (/linux/.test(ua)) return 'linux';
-    return 'windows';
-  }
-
-  var platform = detectPlatform();
-  var isFirefoxMobile = /FxiOS|Firefox.*Mobile/i.test(navigator.userAgent);
-
-  /* ── Fallback apps ─────────────────────────────────────── */
-
-  var FALLBACK_APPS = {
-    ios: [
-      { name: 'Happ', deepLink: 'happ://add/{{SUB}}', featured: true, storeLinks: [{ text: 'App Store (RU)', link: 'https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973' }, { text: 'App Store (Global)', link: 'https://apps.apple.com/us/app/happ-proxy-utility/id6504287215' }] },
-      { name: 'Streisand', deepLink: 'streisand://import/{{SUB}}', featured: true, storeLinks: [{ text: 'App Store', link: 'https://apps.apple.com/ru/app/streisand/id6450534064' }] },
-      { name: 'Stash', deepLink: 'stash://install-config?url={{ENC}}', featured: false, storeLinks: [{ text: 'App Store', link: 'https://apps.apple.com/us/app/stash-rule-based-proxy/id1596063349' }] },
-      { name: 'Shadowrocket', deepLink: 'sub://{{SUB}}', featured: false, storeLinks: [{ text: 'App Store', link: 'https://apps.apple.com/ru/app/shadowrocket/id932747118' }] },
-      { name: 'Clash Mi', deepLink: 'clash://install-config?overwrite=no&name=Remnawave&url={{ENC}}', featured: false, storeLinks: [{ text: 'App Store', link: 'https://apps.apple.com/us/app/clash-mi/id6744321968' }] }
-    ],
-    android: [
-      { name: 'FlClashX', deepLink: 'flclashx://install-config?url={{ENC}}', featured: true, storeLinks: [{ text: 'Скачать APK', link: 'https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-android-arm64-v8a.apk' }] },
-      { name: 'Clash Meta', deepLink: 'clashmeta://install-config?name=Remnawave&url={{ENC}}', featured: true, storeLinks: [{ text: 'Скачать APK', link: 'https://github.com/MetaCubeX/ClashMetaForAndroid/releases/download/v2.11.20/cmfa-2.11.20-meta-universal-release.apk' }, { text: 'F-Droid', link: 'https://f-droid.org/packages/com.github.metacubex.clash.meta/' }] },
-      { name: 'Happ', deepLink: 'happ://add/{{SUB}}', featured: true, storeLinks: [{ text: 'Google Play', link: 'https://play.google.com/store/apps/details?id=com.happproxy' }, { text: 'Скачать APK', link: 'https://github.com/Happ-proxy/happ-android/releases/latest/download/Happ.apk' }] },
-      { name: 'v2rayNG', deepLink: 'v2rayng://install-config?name=Remnawave&url={{ENC}}', featured: false, storeLinks: [{ text: 'Скачать APK', link: 'https://github.com/2dust/v2rayNG/releases/download/1.10.31/v2rayNG_1.10.31_universal.apk' }] },
-      { name: 'Exclave', deepLink: 'exclave://subscription?url={{ENC}}', featured: false, storeLinks: [{ text: 'Скачать APK', link: 'https://github.com/dyhkwong/Exclave/releases/download/0.17.4/Exclave-0.17.4-arm64-v8a.apk' }] }
-    ],
-    macos: [
-      { name: 'Happ', deepLink: 'happ://add/{{SUB}}', featured: true, storeLinks: [{ text: 'App Store (RU)', link: 'https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973' }, { text: 'App Store (Global)', link: 'https://apps.apple.com/us/app/happ-proxy-utility/id6504287215' }] },
-      { name: 'Koala Clash', deepLink: 'koala-clash://install-config?url={{ENC}}', featured: true, storeLinks: [{ text: 'Apple Silicon', link: 'https://github.com/coolcoala/clash-verge-rev-lite/releases/latest/download/Koala.Clash_aarch64.dmg' }, { text: 'Intel', link: 'https://github.com/coolcoala/clash-verge-rev-lite/releases/latest/download/Koala.Clash_x64.dmg' }] },
-      { name: 'FlClashX', deepLink: 'flclashx://install-config?url={{ENC}}', featured: true, storeLinks: [{ text: 'Apple Silicon', link: 'https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-macos-arm64.dmg' }, { text: 'Intel', link: 'https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-macos-amd64.dmg' }] },
-      { name: 'Prizrak-Box', deepLink: 'prizrak-box://install-config?url={{ENC}}', featured: false, storeLinks: [{ text: 'Apple Silicon', link: 'https://github.com/legiz-ru/Prizrak-Box/releases/latest/download/macos-arm64-dmg.zip' }, { text: 'Intel', link: 'https://github.com/legiz-ru/Prizrak-Box/releases/latest/download/macos-amd64-dmg.zip' }] },
-      { name: 'Clash Verge', deepLink: 'clash://install-config?url={{ENC}}', featured: false, storeLinks: [{ text: 'Intel', link: 'https://github.com/clash-verge-rev/clash-verge-rev/releases/download/v2.4.4-rc/Clash.Verge_2.4.4-rc_x64.dmg' }, { text: 'Apple Silicon', link: 'https://github.com/clash-verge-rev/clash-verge-rev/releases/download/v2.4.4-rc/Clash.Verge_2.4.4-rc_aarch64.dmg' }] }
-    ],
-    windows: [
-      { name: 'FlClashX', deepLink: 'flclashx://install-config?url={{ENC}}', featured: true, storeLinks: [{ text: 'Установщик', link: 'https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-windows-amd64-setup.exe' }, { text: 'Портативная', link: 'https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-windows-amd64.zip' }] },
-      { name: 'Koala Clash', deepLink: 'koala-clash://install-config?url={{ENC}}', featured: true, storeLinks: [{ text: 'Установщик', link: 'https://github.com/coolcoala/clash-verge-rev-lite/releases/latest/download/Koala.Clash_x64-setup.exe' }] },
-      { name: 'Happ', deepLink: 'happ://add/{{SUB}}', featured: false, storeLinks: [{ text: 'Windows', link: 'https://github.com/Happ-proxy/happ-desktop/releases/latest/download/setup-Happ.x64.exe' }] },
-      { name: 'Prizrak-Box', deepLink: 'prizrak-box://install-config?url={{ENC}}', featured: true, storeLinks: [{ text: 'Установщик', link: 'https://github.com/legiz-ru/Prizrak-Box/releases/latest/download/windows-amd64.msi' }] },
-      { name: 'Clash Verge', deepLink: 'clash://install-config?url={{ENC}}', featured: false, storeLinks: [{ text: 'Установщик', link: 'https://github.com/clash-verge-rev/clash-verge-rev/releases/download/v2.4.4-rc/Clash.Verge_2.4.4-rc_x64-setup.exe' }] }
-    ],
-    linux: [
-      { name: 'FlClashX', deepLink: 'flclashx://install-config?url={{ENC}}', featured: true, storeLinks: [{ text: '.deb (amd64)', link: 'https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-linux-amd64.deb' }, { text: 'AppImage', link: 'https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-linux-amd64.AppImage' }] },
-      { name: 'Koala Clash', deepLink: 'koala-clash://install-config?url={{ENC}}', featured: true, storeLinks: [{ text: '.deb (amd64)', link: 'https://github.com/coolcoala/clash-verge-rev-lite/releases/latest/download/Koala.Clash_amd64.deb' }] },
-      { name: 'Prizrak-Box', deepLink: 'prizrak-box://install-config?url={{ENC}}', featured: true, storeLinks: [{ text: '.deb (amd64)', link: 'https://github.com/legiz-ru/Prizrak-Box/releases/latest/download/linux-amd64.deb' }] },
-      { name: 'Clash Verge', deepLink: 'clash://install-config?url={{ENC}}', featured: false, storeLinks: [{ text: '.deb (amd64)', link: 'https://github.com/clash-verge-rev/clash-verge-rev/releases/download/v2.4.4-rc/Clash.Verge_2.4.4-rc_amd64.deb' }] }
-    ]
-  };
-
-  /* ── URL params ────────────────────────────────────────── */
-
-  var params = new URLSearchParams(window.location.search);
-  var subUrl = params.get('sub') || '';
-  var appHint = (params.get('app') || '').toLowerCase();
-
-  if (!subUrl) {
-    document.getElementById('funText').textContent = t('error_no_sub');
-    document.getElementById('searchEmoji').textContent = '⚠️';
-    document.getElementById('searchEmoji').style.animation = 'none';
-    document.getElementById('funSub').textContent = '';
-    return;
-  }
-
-  /* ── Utilities ─────────────────────────────────────────── */
-
-  function buildUri(tpl, sub) {
-    return tpl.replace('{{SUB}}', sub).replace('{{ENC}}', encodeURIComponent(sub));
-  }
-
-  function parseRemnaConfig(cfg) {
-    var platformApps = cfg && cfg.platforms && cfg.platforms[platform];
-    if (!Array.isArray(platformApps) || !platformApps.length) return null;
-    var apps = [];
-    for (var i = 0; i < platformApps.length; i++) {
-      var app = platformApps[i];
-      var scheme = app.urlScheme;
-      if (!scheme) continue;
-      var tpl = scheme + (scheme.charAt(scheme.length - 1) === '=' ? '{{ENC}}' : '{{SUB}}');
-      var links = [];
-      if (app.installationStep && app.installationStep.buttons) {
-        for (var j = 0; j < app.installationStep.buttons.length; j++) {
-          var btn = app.installationStep.buttons[j];
-          if (btn.buttonLink) {
-            var txt = (btn.buttonText && (btn.buttonText[lang] || btn.buttonText.en || btn.buttonText.ru)) || app.name;
-            links.push({ text: txt, link: btn.buttonLink });
-          }
-        }
-      }
-      apps.push({ name: app.name || app.id, deepLink: tpl, featured: !!app.isFeatured, storeLinks: links });
+  var subUrl=params.get('sub')||'';
+  var appHint=(params.get('app')||'').toLowerCase();
+  var $sub=document.getElementById('subtitle'),$scan=document.getElementById('scanCard'),$success=document.getElementById('successCard'),$list=document.getElementById('listSection'),$wait=document.getElementById('waitCard'),$key=document.getElementById('keySection'),$scanMsg=document.getElementById('scanMsg'),$scanSub=document.getElementById('scanSub'),$scanE=document.getElementById('scanEmoji');
+  $sub.textContent=t('scanning');$scanMsg.textContent=t('loading');
+  document.getElementById('keyLabel').textContent=t('key_label');
+  document.getElementById('copyBtn').textContent=t('copy_key');
+  document.getElementById('wtCancel').textContent=t('cancel');
+  if(!subUrl){$scanE.textContent='\u26A0\uFE0F';document.querySelector('.pulse-ring').style.animation='none';$scanMsg.textContent=t('error_no_sub');$scanSub.textContent='';document.querySelector('.bar').style.display='none';return}
+  function buildLink(tpl,sub){return tpl.replace('{{SUB}}',sub).replace('{{ENC}}',encodeURIComponent(sub))}
+  function parseRemnaConfig(cfg){
+    var key=platform;var apps=cfg&&cfg.platforms&&cfg.platforms[key];
+    if(!Array.isArray(apps)||!apps.length){if(key==='androidTV')apps=cfg.platforms&&cfg.platforms.android;else if(key==='appleTV')apps=cfg.platforms&&cfg.platforms.ios}
+    if(!Array.isArray(apps)||!apps.length)return null;
+    var out=[];
+    for(var i=0;i<apps.length;i++){
+      var a=apps[i];if(!a.urlScheme)continue;
+      var scheme=a.urlScheme;
+      var tpl=scheme+(scheme.charAt(scheme.length-1)==='='?'{{ENC}}':'{{SUB}}');
+      var links=[];var btns=(a.installationStep&&a.installationStep.buttons)||[];
+      for(var j=0;j<btns.length;j++){if(btns[j].buttonLink){var txt=btns[j].buttonText&&(btns[j].buttonText[lang]||btns[j].buttonText.en||btns[j].buttonText.ru);links.push({text:txt||a.name,link:btns[j].buttonLink})}}
+      out.push({name:a.name||a.id||'App',deepLink:tpl,featured:!!a.isFeatured,storeLinks:links})
     }
-    apps.sort(function(a, b) { return (b.featured ? 1 : 0) - (a.featured ? 1 : 0); });
-    return apps.length ? apps : null;
+    out.sort(function(a,b){return(b.featured?1:0)-(a.featured?1:0)});
+    return out.length?out:null
+  }
+  function prioritize(apps){
+    if(!appHint||appHint==='_default')return apps;
+    var hint=appHint.replace(/[-_\s]/g,'');
+    for(var i=0;i<apps.length;i++){var n=apps[i].name.replace(/[-_\s]/g,'').toLowerCase();if(n.indexOf(hint)!==-1||hint.indexOf(n)!==-1){var m=apps.splice(i,1)[0];apps.unshift(m);return apps}}
+    return apps
+  }
+  var funMsgs=FUN[lang]||FUN.en,funIdx=0,funTimer=null;
+  function startFun(){showFM(funMsgs[0]);funTimer=setInterval(function(){funIdx=(funIdx+1)%funMsgs.length;showFM(funMsgs[funIdx])},1800)}
+  function showFM(m){$scanMsg.classList.add('fade');setTimeout(function(){$scanMsg.textContent=m.t;$scanSub.textContent=m.s;$scanE.textContent=m.e;$scanMsg.classList.remove('fade')},200)}
+  function stopFun(){if(funTimer){clearInterval(funTimer);funTimer=null}}
+
+  /* Detection: ONLY iframe + visibilitychange. No blur. No location.href. */
+  function probeApp(app){
+    return new Promise(function(resolve){
+      var done=false,uri=buildLink(app.deepLink,subUrl);
+      function finish(d){if(done)return;done=true;document.removeEventListener('visibilitychange',onVis);if(iframe&&iframe.parentNode)iframe.remove();clearTimeout(tmr);resolve(d)}
+      function onVis(){if(document.visibilityState==='hidden')finish(true)}
+      document.addEventListener('visibilitychange',onVis);
+      var iframe=document.createElement('iframe');
+      iframe.style.cssText='position:absolute;width:0;height:0;border:0;opacity:0;pointer-events:none;top:-9999px';
+      document.body.appendChild(iframe);
+      try{iframe.src=uri}catch(e){}
+      var tmr=setTimeout(function(){finish(false)},PROBE_TIMEOUT)
+    })
   }
 
-  function prioritize(apps) {
-    if (!appHint || appHint === '_default') return apps;
-    var hint = appHint.replace(/[-_\s]/g, '').toLowerCase();
-    for (var i = 1; i < apps.length; i++) {
-      var n = apps[i].name.replace(/[-_\s]/g, '').toLowerCase();
-      if (n.indexOf(hint) !== -1 || hint.indexOf(n) !== -1) {
-        var m = apps.splice(i, 1)[0];
-        apps.unshift(m);
-        break;
-      }
-    }
-    return apps;
+  var _waitApp=null,_waitApps=null,_connectingApp=null,_detectedAfterConnect=null;
+  function hideAll(){$scan.classList.add('hidden');$success.classList.add('hidden');$list.classList.add('hidden');$wait.classList.add('hidden');$key.classList.add('hidden')}
+  function showKeyBox(){$key.classList.remove('hidden');document.getElementById('keyBox').textContent=subUrl}
+  function showSuccess(app){stopFun();hideAll();$success.classList.remove('hidden');$sub.textContent=t('found_title');document.getElementById('okTitle').textContent=t('found_detail',{name:app.name});document.getElementById('okDetail').textContent=t('found_sub');var btn=document.getElementById('openBtn');btn.textContent=t('open_app',{name:app.name});btn.href=buildLink(app.deepLink,subUrl);showKeyBox()}
+  function showAppList(apps,isChoose){
+    stopFun();hideAll();$list.classList.remove('hidden');
+    if(isChoose){document.getElementById('lhIcon').textContent='📱';document.getElementById('listTitle').textContent=t('choose_title');document.getElementById('listDetail').textContent=t('choose_sub');$sub.textContent=t('choose_title')}
+    else{document.getElementById('lhIcon').textContent='📲';document.getElementById('listTitle').textContent=t('not_found_title');document.getElementById('listDetail').textContent=t('not_found_sub');$sub.textContent=t('not_found_title')}
+    renderApps(apps);showKeyBox()
   }
+  function enterWaitMode(app,allApps){hideAll();$wait.classList.remove('hidden');$sub.textContent=t('wait_title',{name:app.name});document.getElementById('wtTitle').textContent=t('wait_title',{name:app.name});document.getElementById('wtDetail').textContent=t('wait_detail');_waitApp=app;_waitApps=allApps}
+  function exitWaitMode(){_waitApp=null;if(_waitApps)showAppList(_waitApps,false)}
+  document.getElementById('wtCancel').addEventListener('click',exitWaitMode);
 
-  /* ── DOM refs ──────────────────────────────────────────── */
-
-  var funTextEl = document.getElementById('funText');
-  var funSubEl = document.getElementById('funSub');
-  var searchEmoji = document.getElementById('searchEmoji');
-  var progressFill = document.getElementById('progressFill');
-
-  /* ── Fun message rotation ──────────────────────────────── */
-
-  var funMsgs = FUN[lang] || FUN.en;
-  var funIdx = 0;
-  var funInterval = null;
-
-  function showFunMsg(msg) {
-    funTextEl.classList.add('fade');
-    setTimeout(function() {
-      funTextEl.textContent = msg.text;
-      funSubEl.textContent = msg.sub || '';
-      searchEmoji.textContent = msg.emoji || '🔍';
-      funTextEl.classList.remove('fade');
-    }, 300);
-  }
-
-  function startFun() {
-    showFunMsg(funMsgs[0]);
-    funInterval = setInterval(function() {
-      funIdx = (funIdx + 1) % funMsgs.length;
-      showFunMsg(funMsgs[funIdx]);
-    }, 1800);
-  }
-
-  function stopFun() {
-    if (funInterval) { clearInterval(funInterval); funInterval = null; }
-  }
-
-  /* ── Scanning engine ───────────────────────────────────── */
-  /*
-   * Two-phase parallel scan for speed:
-   *
-   * Phase 1 (t=0): Create hidden iframes for ALL apps at once.
-   *   Works on: Android Chrome, desktop browsers, TG WebView.
-   *
-   * Phase 2 (t=400ms): Sequential window.location.href fallback.
-   *   One app every 400ms. Works on: iOS Safari (where iframes
-   *   to custom schemes may be silently ignored).
-   *
-   * Detection: blur (with 200ms hidden-check) + visibilitychange.
-   *   blur fires when app opens; 200ms later we confirm page is
-   *   actually hidden (filters out Firefox system-prompt false positives).
-   *
-   * Total scan time: ~400 + N*400 + 300 buffer ≈ 3 seconds for 5 apps.
-   */
-
-  function scanApps(apps) {
-    return new Promise(function(resolve) {
-      var resolved = false;
-      var currentApp = apps[0];
-      var iframes = [];
-      var locTimers = [];
-
-      function finish(app) {
-        if (resolved) return;
-        resolved = true;
-        stopFun();
-        document.removeEventListener('visibilitychange', onVis);
-        window.removeEventListener('blur', onBlur);
-        for (var i = 0; i < iframes.length; i++) {
-          if (iframes[i].parentNode) iframes[i].remove();
-        }
-        for (var j = 0; j < locTimers.length; j++) clearTimeout(locTimers[j]);
-        clearTimeout(failTimer);
-        resolve(app);
-      }
-
-      function onVis() {
-        if (document.visibilityState === 'hidden' && !resolved) {
-          finish(currentApp);
-        }
-      }
-
-      function onBlur() {
-        if (resolved) return;
-        var cap = currentApp;
-        setTimeout(function() {
-          if (!resolved && document.visibilityState === 'hidden') {
-            finish(cap);
-          }
-        }, 200);
-      }
-
-      document.addEventListener('visibilitychange', onVis);
-      window.addEventListener('blur', onBlur);
-
-      /* Phase 1: all iframes at once */
-      for (var i = 0; i < apps.length; i++) {
-        var uri = buildUri(apps[i].deepLink, subUrl);
-        var iframe = document.createElement('iframe');
-        iframe.style.cssText = 'display:none;width:0;height:0;border:0;position:absolute;top:-9999px';
-        document.body.appendChild(iframe);
-        try { iframe.src = uri; } catch (e) { /* ignore */ }
-        iframes.push(iframe);
-      }
-
-      /* Phase 2: sequential window.location.href backup */
-      for (var k = 0; k < apps.length; k++) {
-        (function(idx) {
-          var tid = setTimeout(function() {
-            if (resolved) return;
-            currentApp = apps[idx];
-            var pct = Math.round(((idx + 1) / apps.length) * 100);
-            progressFill.style.width = pct + '%';
-            try { window.location.href = buildUri(apps[idx].deepLink, subUrl); } catch (e) { /* ignore */ }
-          }, 400 + idx * 400);
-          locTimers.push(tid);
-        })(k);
-      }
-
-      /* Fail timeout */
-      var totalMs = 400 + apps.length * 400 + 600;
-      var failTimer = setTimeout(function() { finish(null); }, totalMs);
-    });
-  }
-
-  /* ── Success state ─────────────────────────────────────── */
-
-  function showSuccess(app) {
-    document.getElementById('scanCard').classList.add('hidden');
-    document.getElementById('subtitle').textContent = t('subtitle_found');
-
-    var card = document.getElementById('scanCard');
-    card.classList.remove('hidden');
-    searchEmoji.textContent = '✅';
-    searchEmoji.style.animation = 'none';
-    funTextEl.textContent = t('found', { name: app.name });
-    funSubEl.textContent = t('found_sub');
-    progressFill.style.width = '100%';
-
-    /* Show open button + key after a delay */
-    setTimeout(function() {
-      var sec = document.getElementById('resultSection');
-      sec.classList.remove('hidden');
-      var list = document.getElementById('appList');
-      list.innerHTML = '';
-      var btn = document.createElement('a');
-      btn.className = 'btn btn-success';
-      btn.href = buildUri(app.deepLink, subUrl);
-      btn.textContent = t('open_app', { name: app.name });
-      list.appendChild(btn);
-      showKey();
-    }, 2000);
-  }
-
-  /* ── Failure state ─────────────────────────────────────── */
-
-  function showFailure(apps) {
-    searchEmoji.textContent = '📲';
-    searchEmoji.style.animation = 'none';
-    funTextEl.textContent = t('not_found');
-    funSubEl.textContent = t('not_found_sub');
-    document.getElementById('subtitle').textContent = t('subtitle_fail');
-    progressFill.style.width = '100%';
-
-    renderAppList(apps);
-    showKey();
-  }
-
-  /* ── Skip scan (Firefox mobile) ────────────────────────── */
-
-  function showSkipScan(apps) {
-    searchEmoji.textContent = '📱';
-    searchEmoji.style.animation = 'none';
-    funTextEl.textContent = t('choose_app');
-    funSubEl.textContent = t('choose_sub');
-    document.getElementById('subtitle').textContent = t('subtitle_fail');
-    progressFill.style.width = '100%';
-
-    renderAppList(apps);
-    showKey();
-  }
-
-  /* ── App list ──────────────────────────────────────────── */
-
-  function renderAppList(apps) {
-    var sec = document.getElementById('resultSection');
-    sec.classList.remove('hidden');
-    var list = document.getElementById('appList');
-    list.innerHTML = '';
-
-    var top = [], other = [];
-    for (var i = 0; i < apps.length; i++) {
-      if (apps[i].featured) top.push(apps[i]); else other.push(apps[i]);
-    }
-    if (!top.length) { top.push(apps[0]); other = apps.slice(1); }
-
-    for (var f = 0; f < top.length; f++) {
-      list.appendChild(makeCard(top[f], f === 0));
-    }
-
-    if (other.length) {
-      var togBtn = document.createElement('button');
-      togBtn.className = 'other-toggle';
-      togBtn.textContent = t('other_apps', { count: other.length });
-      togBtn.type = 'button';
-      var otherWrap = document.createElement('div');
-      otherWrap.className = 'hidden';
-      var shown = false;
-      togBtn.addEventListener('click', function() {
-        shown = !shown;
-        otherWrap.classList.toggle('hidden', !shown);
-        togBtn.textContent = shown ? t('hide_apps') : t('other_apps', { count: other.length });
-      });
-      list.appendChild(togBtn);
-      for (var o = 0; o < other.length; o++) otherWrap.appendChild(makeCard(other[o], false));
-      list.appendChild(otherWrap);
-    }
-  }
-
-  function makeCard(app, isTop) {
-    var card = document.createElement('div');
-    card.className = 'app-card' + (isTop ? ' top' : '');
-
-    var head = document.createElement('div');
-    head.className = 'app-head';
-    var nm = document.createElement('span');
-    nm.className = 'app-name';
-    nm.textContent = app.name;
-    head.appendChild(nm);
-    if (isTop) {
-      var tag = document.createElement('span');
-      tag.className = 'app-tag';
-      tag.textContent = t('recommended');
-      head.appendChild(tag);
-    }
-    card.appendChild(head);
-
-    var row = document.createElement('div');
-    row.className = 'btn-row';
-
-    if (app.storeLinks && app.storeLinks.length) {
-      var dlBtn = document.createElement('button');
-      dlBtn.className = 'btn-act btn-purple';
-      dlBtn.type = 'button';
-      dlBtn.textContent = t('download');
-      dlBtn.addEventListener('click', (function(a) {
-        return function() {
-          window.open(a.storeLinks[0].link, '_blank', 'noopener');
-          enterWaitMode(a);
-        };
-      })(app));
-      row.appendChild(dlBtn);
-    }
-
-    var connBtn = document.createElement('a');
-    connBtn.className = 'btn-act btn-green';
-    connBtn.href = buildUri(app.deepLink, subUrl);
-    connBtn.textContent = t('connect');
-    row.appendChild(connBtn);
-    card.appendChild(row);
-
-    if (app.storeLinks && app.storeLinks.length > 1) {
-      var dl = document.createElement('div');
-      dl.className = 'dl-links';
-      for (var i = 0; i < app.storeLinks.length; i++) {
-        var a = document.createElement('a');
-        a.className = 'dl-link';
-        a.href = app.storeLinks[i].link;
-        a.target = '_blank';
-        a.rel = 'noopener';
-        a.textContent = app.storeLinks[i].text;
-        dl.appendChild(a);
-      }
-      card.appendChild(dl);
-    }
-
-    return card;
-  }
-
-  /* ── Wait mode ─────────────────────────────────────────── */
-
-  var _waitApp = null;
-
-  function enterWaitMode(app) {
-    _waitApp = app;
-    document.getElementById('scanCard').classList.add('hidden');
-    document.getElementById('resultSection').classList.add('hidden');
-    document.getElementById('keySection').classList.add('hidden');
-    var wc = document.getElementById('waitCard');
-    wc.classList.remove('hidden');
-    document.getElementById('waitText').textContent = t('waiting', { name: app.name });
-    document.getElementById('waitSub').textContent = t('wait_sub');
-  }
-
-  function exitWaitMode() {
-    _waitApp = null;
-    document.getElementById('waitCard').classList.add('hidden');
-  }
-
-  document.getElementById('waitCancel').addEventListener('click', function() {
-    exitWaitMode();
-    document.getElementById('scanCard').classList.remove('hidden');
-    document.getElementById('resultSection').classList.remove('hidden');
-    showKey();
+  /* Re-detection on page return */
+  document.addEventListener('visibilitychange',function(){
+    if(document.visibilityState!=='visible'){if(_connectingApp){_detectedAfterConnect=_connectingApp;_connectingApp=null}return}
+    if(_detectedAfterConnect){var a=_detectedAfterConnect;_detectedAfterConnect=null;showSuccess(a);return}
+    if(_waitApp){var wa=_waitApp;setTimeout(function(){probeApp(wa).then(function(d){if(d&&_waitApp===wa){_waitApp=null;_waitApps=null;showSuccess(wa)}})},600)}
+  });
+  window.addEventListener('pageshow',function(e){
+    if(e.persisted&&_waitApp){var wa=_waitApp;setTimeout(function(){probeApp(wa).then(function(d){if(d){_waitApp=null;_waitApps=null;showSuccess(wa)}})},600)}
   });
 
-  /* Try a single app (wait mode re-check) */
-  function tryDetectSingle(app) {
-    if (!app) return;
-    var uri = buildUri(app.deepLink, subUrl);
-    var detected = false;
-
-    function onVis() {
-      if (document.visibilityState === 'hidden' && !detected) {
-        detected = true;
-        cleanup();
-        exitWaitMode();
-        document.getElementById('scanCard').classList.remove('hidden');
-        showSuccess(app);
-      }
+  /* App list rendering */
+  function renderApps(apps){
+    var c=document.getElementById('appCards');c.innerHTML='';
+    var feat=[],other=[];
+    for(var i=0;i<apps.length;i++){if(apps[i].featured)feat.push(apps[i]);else other.push(apps[i])}
+    if(!feat.length&&apps.length){feat.push(apps[0]);other=apps.slice(1)}
+    for(var f=0;f<feat.length;f++)c.appendChild(mkCard(feat[f],true,apps));
+    if(other.length){
+      var togBtn=document.createElement('button');togBtn.className='btn-tog';togBtn.type='button';togBtn.textContent=t('other_apps',{count:other.length});
+      var wrap=document.createElement('div');wrap.className='hidden';var isOpen=false;
+      togBtn.addEventListener('click',function(){isOpen=!isOpen;wrap.classList.toggle('hidden',!isOpen);togBtn.textContent=isOpen?t('hide_other'):t('other_apps',{count:other.length})});
+      for(var o=0;o<other.length;o++)wrap.appendChild(mkCard(other[o],false,apps));
+      c.appendChild(togBtn);c.appendChild(wrap)
     }
-    function onBlur() {
-      if (detected) return;
-      setTimeout(function() {
-        if (!detected && document.visibilityState === 'hidden') {
-          detected = true;
-          cleanup();
-          exitWaitMode();
-          document.getElementById('scanCard').classList.remove('hidden');
-          showSuccess(app);
-        }
-      }, 200);
+  }
+  function mkCard(app,isFeat,allApps){
+    var card=document.createElement('div');card.className='ac'+(isFeat?' feat':'');
+    var top=document.createElement('div');top.className='ac-top';
+    var nm=document.createElement('span');nm.className='ac-name';nm.textContent=app.name;top.appendChild(nm);
+    if(isFeat){var badge=document.createElement('span');badge.className='ac-badge';badge.textContent=t('recommended');top.appendChild(badge)}
+    card.appendChild(top);
+    var btns=document.createElement('div');btns.className='ac-btns';
+    if(app.storeLinks&&app.storeLinks.length){
+      var dlBtn=document.createElement('button');dlBtn.className='btn btn-d';dlBtn.type='button';dlBtn.textContent=t('download');
+      dlBtn.addEventListener('click',(function(a){return function(){window.open(a.storeLinks[0].link,'_blank','noopener');enterWaitMode(a,allApps)}})(app));
+      btns.appendChild(dlBtn)
     }
-    function cleanup() {
-      document.removeEventListener('visibilitychange', onVis);
-      window.removeEventListener('blur', onBlur);
-      if (iframe.parentNode) iframe.remove();
-      clearTimeout(ft);
+    var connBtn=document.createElement('button');connBtn.className='btn btn-c';connBtn.type='button';connBtn.textContent=t('connect');
+    connBtn.addEventListener('click',(function(a){return function(){_connectingApp=a;window.location.href=buildLink(a.deepLink,subUrl);setTimeout(function(){if(_connectingApp===a)_connectingApp=null},3000)}})(app));
+    btns.appendChild(connBtn);card.appendChild(btns);
+    if(app.storeLinks&&app.storeLinks.length>1){
+      var dls=document.createElement('div');dls.className='dls';
+      for(var i=0;i<app.storeLinks.length;i++){var dl=document.createElement('a');dl.className='dl';dl.href=app.storeLinks[i].link;dl.target='_blank';dl.rel='noopener';dl.textContent=app.storeLinks[i].text;dls.appendChild(dl)}
+      card.appendChild(dls)
     }
-
-    document.addEventListener('visibilitychange', onVis);
-    window.addEventListener('blur', onBlur);
-
-    var iframe = document.createElement('iframe');
-    iframe.style.cssText = 'display:none;width:0;height:0;border:0;position:absolute;top:-9999px';
-    document.body.appendChild(iframe);
-    try { iframe.src = uri; } catch (e) { /* ignore */ }
-
-    setTimeout(function() {
-      if (!detected) { try { window.location.href = uri; } catch (e) { /* ignore */ } }
-    }, 200);
-
-    var ft = setTimeout(function() { if (!detected) cleanup(); }, 1500);
+    return card
   }
 
-  /* Re-detect when user returns from store */
-  document.addEventListener('visibilitychange', function() {
-    if (document.visibilityState === 'visible' && _waitApp) {
-      setTimeout(function() { tryDetectSingle(_waitApp); }, 500);
-    }
-  });
-  window.addEventListener('pageshow', function(ev) {
-    if (_waitApp) {
-      setTimeout(function() { tryDetectSingle(_waitApp); }, 500);
-    } else if (ev.persisted && _scanDone) {
-      main();
-    }
-  });
+  /* Copy */
+  function doCopy(){if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(subUrl).then(showToast).catch(fallbackCopy)}else{fallbackCopy()}}
+  function fallbackCopy(){var ta=document.createElement('textarea');ta.value=subUrl;ta.style.cssText='position:fixed;top:-999px';document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();showToast()}
+  function showToast(){var el=document.getElementById('toast');el.textContent=t('copied');el.classList.add('show');setTimeout(function(){el.classList.remove('show')},2000)}
+  document.getElementById('copyBtn').addEventListener('click',doCopy);
+  document.getElementById('keyBox').addEventListener('click',doCopy);
 
-  /* ── Key & copy ────────────────────────────────────────── */
-
-  function showKey() {
-    var ks = document.getElementById('keySection');
-    ks.classList.remove('hidden');
-    document.getElementById('keyBox').textContent = subUrl;
-  }
-
-  function doCopy() {
-    navigator.clipboard.writeText(subUrl).then(showToast).catch(function() {
-      var ta = document.createElement('textarea');
-      ta.value = subUrl;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      ta.remove();
-      showToast();
-    });
-  }
-
-  function showToast() {
-    var toast = document.getElementById('copyToast');
-    toast.classList.add('show');
-    setTimeout(function() { toast.classList.remove('show'); }, 2000);
-  }
-
-  document.getElementById('copyBtn').addEventListener('click', doCopy);
-  document.getElementById('keyBox').addEventListener('click', doCopy);
-
-  /* ── Main ──────────────────────────────────────────────── */
-
-  var _running = false;
-  var _scanDone = false;
-
-  async function main() {
-    if (_running) return;
-    _running = true;
-
-    /* Reset UI */
-    document.getElementById('scanCard').classList.remove('hidden');
-    document.getElementById('resultSection').classList.add('hidden');
-    document.getElementById('keySection').classList.add('hidden');
-    document.getElementById('waitCard').classList.add('hidden');
-    searchEmoji.style.animation = '';
-    progressFill.style.width = '0';
-    document.getElementById('subtitle').textContent = t('subtitle_scan');
-
-    /* Load config */
-    var apps = null;
-    try {
-      var res = await fetch(CONFIG_URL, { signal: AbortSignal.timeout(4000) });
-      if (res.ok) {
-        apps = parseRemnaConfig(await res.json());
-        if (apps) console.log('[connect] Loaded', apps.length, 'apps from config');
-      }
-    } catch (e) {
-      console.warn('[connect] Config fetch failed:', e.message);
-    }
-    if (!apps) {
-      apps = FALLBACK_APPS[platform] || FALLBACK_APPS.windows;
-      console.log('[connect] Using fallback for', platform);
-    }
-    apps = prioritize(apps.slice());
-
-    /* Firefox mobile: skip scan (avoid annoying prompts) */
-    if (isFirefoxMobile) {
-      showSkipScan(apps);
-      _running = false;
-      _scanDone = true;
-      return;
-    }
-
-    /* Start fun messages + scan */
+  /* Main */
+  async function main(){
     startFun();
-    var foundApp = await scanApps(apps);
-    _scanDone = true;
-
-    if (foundApp) {
-      showSuccess(foundApp);
-    } else {
-      showFailure(apps);
-    }
-    _running = false;
+    var apps=null;
+    try{var res=await fetch(CONFIG_URL,{signal:AbortSignal.timeout(4000)});if(res.ok){apps=parseRemnaConfig(await res.json());if(apps)console.log('[connect] Loaded',apps.length,'apps from config')}}catch(e){console.warn('[connect] Config fetch failed:',e.message)}
+    if(!apps){apps=FALLBACK[platform]||FALLBACK.windows;console.log('[connect] Using fallback for',platform)}
+    apps=prioritize(apps.slice());
+    if(!apps.length){showAppList([],false);return}
+    if(isFirefoxMobile){showAppList(apps,true);return}
+    var target=apps[0];
+    var detected=await probeApp(target);
+    if(detected){showSuccess(target)}else{showAppList(apps,false)}
   }
-
-  setTimeout(main, 200);
+  setTimeout(main,150);
 })();
 </script>
 </body>
