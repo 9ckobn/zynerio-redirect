@@ -8,15 +8,16 @@
   :root {
     --bg: #0f0f14;
     --card: #1a1a24;
+    --card-border: rgba(255,255,255,.06);
     --accent: #6c5ce7;
-    --accent-hover: #7f70f0;
+    --accent-glow: rgba(108,92,231,.15);
     --text: #e8e8ef;
     --muted: #8888a0;
     --success: #00b894;
     --danger: #e17055;
     --radius: 16px;
   }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  * { margin:0; padding:0; box-sizing:border-box; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     background: var(--bg); color: var(--text);
@@ -26,87 +27,133 @@
   .container { max-width: 420px; width: 100%; }
   .header { text-align: center; margin-bottom: 24px; }
   .logo { font-size: 48px; margin-bottom: 8px; }
-  h1 { font-size: 22px; font-weight: 600; margin-bottom: 4px; }
+  h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
   .subtitle { color: var(--muted); font-size: 14px; }
   .platform-badge {
     display: inline-flex; align-items: center; gap: 6px;
-    background: rgba(108,92,231,.15); color: var(--accent);
+    background: var(--accent-glow); color: var(--accent);
     padding: 6px 14px; border-radius: 20px;
     font-size: 13px; font-weight: 500; margin-top: 12px;
   }
-  .scan-card {
+
+  .card {
     background: var(--card); border-radius: var(--radius);
-    padding: 28px 24px; text-align: center; margin-bottom: 16px;
+    padding: 28px 24px; margin-bottom: 16px;
+    border: 1px solid var(--card-border);
   }
+
+  /* Scan */
+  .scan-status { text-align: center; margin-bottom: 16px; }
   .scan-emoji { font-size: 40px; margin-bottom: 12px; animation: pulse 1.5s infinite; }
-  @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.15)} }
-  .scan-msg { font-size: 16px; font-weight: 500; margin-bottom: 6px; min-height: 24px; }
-  .scan-detail { font-size: 13px; color: var(--muted); margin-bottom: 14px; min-height: 18px; }
-  .progress-wrap { background: rgba(255,255,255,.08); border-radius: 6px; height: 6px; overflow: hidden; }
-  .progress-bar { height: 100%; background: var(--accent); border-radius: 6px; transition: width .4s ease; width: 0; }
-  .result-card {
-    background: var(--card); border-radius: var(--radius);
-    padding: 28px 24px; text-align: center; margin-bottom: 16px;
+  @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+  .scan-msg { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+  .scan-detail { font-size: 13px; color: var(--muted); min-height: 18px; }
+  .progress-wrap { background: rgba(255,255,255,.06); border-radius: 8px; height: 7px; overflow: hidden; margin: 16px 0; }
+  .progress-bar { height: 100%; background: linear-gradient(90deg, var(--accent), #a29bfe); border-radius: 8px; transition: width .4s ease; width: 0; }
+  .attempt-list { text-align: left; }
+  .attempt-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 10px; border-radius: 8px; font-size: 14px;
+    color: var(--muted); transition: all .2s;
   }
-  .result-emoji { font-size: 44px; margin-bottom: 10px; }
-  .result-msg { font-size: 17px; font-weight: 600; margin-bottom: 6px; }
-  .result-hint { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+  .attempt-row.active { color: var(--text); background: rgba(108,92,231,.07); font-weight: 500; }
+  .attempt-row.found { color: var(--success); font-weight: 500; }
+  .attempt-row.fail { opacity: .45; }
+  .attempt-icon { width: 22px; text-align: center; font-size: 15px; }
+
+  /* Result */
+  .result-emoji { font-size: 48px; margin-bottom: 12px; text-align: center; }
+  .result-msg { font-size: 18px; font-weight: 700; margin-bottom: 6px; text-align: center; }
+  .result-hint { font-size: 13px; color: var(--muted); text-align: center; line-height: 1.5; }
+  .result-btn {
+    display: block; width: 100%; padding: 14px; margin-top: 16px;
+    font-size: 15px; font-weight: 600; border: none; border-radius: 12px;
+    cursor: pointer; color: #fff; text-align: center; text-decoration: none;
+    background: linear-gradient(135deg, var(--success), #00a383);
+    transition: transform .1s;
+  }
+  .result-btn:active { transform: scale(.97); }
+
+  /* App cards */
   .app-card {
-    background: rgba(255,255,255,.04); border-radius: 12px;
-    padding: 14px; margin-bottom: 8px; text-align: left;
+    background: rgba(255,255,255,.03); border-radius: 14px;
+    padding: 16px; margin-bottom: 10px; text-align: left;
+    border: 1px solid var(--card-border);
   }
-  .app-card.featured { border: 1px solid rgba(108,92,231,.25); background: rgba(108,92,231,.06); }
-  .app-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .app-card.top { border-color: rgba(108,92,231,.3); background: rgba(108,92,231,.05); }
+  .app-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
   .app-name { font-size: 15px; font-weight: 600; }
-  .app-tag { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; background: rgba(108,92,231,.2); color: var(--accent); }
-  .btn-action {
-    display: block; width: 100%; padding: 11px; font-size: 14px; font-weight: 600;
+  .app-tag {
+    font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 8px;
+    background: linear-gradient(135deg, rgba(108,92,231,.25), rgba(162,155,254,.2));
+    color: #a29bfe;
+  }
+  .btn-row { display: flex; gap: 8px; }
+  .btn-act {
+    display: flex; align-items: center; justify-content: center; gap: 4px;
+    flex: 1; padding: 11px; font-size: 14px; font-weight: 600;
     border: none; border-radius: 10px; cursor: pointer; color: #fff;
     text-decoration: none; text-align: center; transition: transform .1s;
   }
-  .btn-action:active { transform: scale(.97); }
-  .btn-connect { background: linear-gradient(135deg, var(--success), #00a383); }
-  .btn-download { background: var(--accent); margin-bottom: 6px; }
-  .btn-row { display: flex; gap: 8px; }
-  .btn-row .btn-action { flex: 1; }
-  .dl-links { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .btn-act:active { transform: scale(.96); }
+  .btn-green { background: linear-gradient(135deg, var(--success), #00a383); }
+  .btn-purple { background: rgba(108,92,231,.2); color: var(--accent); border: 1px solid rgba(108,92,231,.15); }
+  .btn-purple:hover { background: rgba(108,92,231,.3); }
+  .dl-links { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
   .dl-link {
     font-size: 12px; color: var(--muted); text-decoration: none;
-    padding: 4px 10px; border-radius: 8px; background: rgba(255,255,255,.06); transition: background .2s;
+    padding: 5px 12px; border-radius: 8px;
+    background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.06);
+    transition: all .2s;
   }
-  .dl-link:hover { background: rgba(255,255,255,.12); color: var(--text); }
+  .dl-link:hover { background: rgba(255,255,255,.08); color: var(--text); }
   .other-toggle {
-    display: block; width: 100%; padding: 10px; font-size: 13px; font-weight: 500;
-    border: none; border-radius: 12px; cursor: pointer; margin: 8px 0;
-    background: transparent; color: var(--accent); border: 1px solid rgba(108,92,231,.2);
+    display: block; width: 100%; padding: 12px; font-size: 13px; font-weight: 500;
+    border: 1px solid rgba(108,92,231,.15); border-radius: 12px;
+    cursor: pointer; margin: 10px 0; background: transparent; color: var(--accent);
+    transition: all .2s;
   }
-  .other-toggle:hover { border-color: rgba(108,92,231,.5); }
+  .other-toggle:hover { border-color: rgba(108,92,231,.4); background: rgba(108,92,231,.05); }
+
+  /* Wait mode */
+  .wait-emoji { font-size: 44px; text-align: center; margin-bottom: 12px; animation: pulse 2s infinite; }
+  .wait-msg { font-size: 16px; font-weight: 600; text-align: center; margin-bottom: 6px; }
+  .wait-hint { font-size: 13px; color: var(--muted); text-align: center; line-height: 1.5; margin-bottom: 16px; }
+  .btn-cancel {
+    display: block; margin: 0 auto; padding: 10px 28px; font-size: 13px; font-weight: 500;
+    border: 1px solid rgba(255,255,255,.1); border-radius: 10px;
+    cursor: pointer; background: transparent; color: var(--muted); transition: all .2s;
+  }
+  .btn-cancel:hover { border-color: rgba(255,255,255,.2); color: var(--text); }
+
+  /* Key section */
   .key-section {
     background: var(--card); border-radius: var(--radius);
     padding: 16px; margin-top: 16px; text-align: center;
+    border: 1px solid var(--card-border);
   }
   .btn-copy {
     display: block; width: 100%; padding: 12px; font-size: 14px; font-weight: 600;
     border: none; border-radius: 12px; cursor: pointer; color: #fff;
-    background: var(--accent); transition: background .2s, transform .1s; margin-bottom: 10px;
+    background: var(--accent); transition: all .2s; margin-bottom: 10px;
   }
-  .btn-copy:hover { background: var(--accent-hover); }
+  .btn-copy:hover { background: #7f70f0; }
   .btn-copy:active { transform: scale(.97); }
   .key-box {
-    background: rgba(255,255,255,.06); border-radius: 10px; padding: 10px;
+    background: rgba(255,255,255,.04); border-radius: 10px; padding: 10px;
     font-family: "SF Mono", Monaco, Consolas, monospace; font-size: 11px;
     word-break: break-all; color: var(--muted); cursor: pointer;
-    max-height: 60px; overflow: hidden;
+    max-height: 60px; overflow: hidden; border: 1px solid rgba(255,255,255,.06);
   }
   .copy-toast {
     position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
     background: var(--success); color: #fff; padding: 10px 24px;
-    border-radius: 10px; font-size: 14px; font-weight: 500;
+    border-radius: 12px; font-size: 14px; font-weight: 500;
     opacity: 0; transition: opacity .3s; pointer-events: none; z-index: 100;
+    box-shadow: 0 4px 20px rgba(0,184,148,.3);
   }
   .copy-toast.show { opacity: 1; }
   .hidden { display: none !important; }
-  .error-msg { text-align: center; color: var(--danger); margin-top: 20px; }
 </style>
 </head>
 <body>
@@ -117,19 +164,33 @@
     <p class="subtitle" id="subtitle"></p>
     <div class="platform-badge" id="platformBadge"></div>
   </div>
-  <div class="scan-card" id="scanCard">
-    <div class="scan-emoji" id="scanEmoji">🔍</div>
-    <div class="scan-msg" id="scanMsg"></div>
-    <div class="scan-detail" id="scanDetail"></div>
+
+  <div class="card" id="scanCard">
+    <div class="scan-status">
+      <div class="scan-emoji" id="scanEmoji">🔍</div>
+      <div class="scan-msg" id="scanMsg"></div>
+      <div class="scan-detail" id="scanDetail"></div>
+    </div>
     <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+    <div class="attempt-list" id="attemptList"></div>
   </div>
-  <div class="result-card hidden" id="resultCard">
+
+  <div class="card hidden" id="resultCard">
     <div class="result-emoji" id="resultEmoji"></div>
     <div class="result-msg" id="resultMsg"></div>
     <div class="result-hint" id="resultHint"></div>
     <div id="resultActions"></div>
   </div>
+
+  <div class="card hidden" id="waitCard">
+    <div class="wait-emoji">⏳</div>
+    <div class="wait-msg" id="waitMsg"></div>
+    <div class="wait-hint" id="waitHint"></div>
+    <button class="btn-cancel" id="waitCancel" type="button"></button>
+  </div>
+
   <div id="appList" class="hidden"></div>
+
   <div class="key-section hidden" id="keySection">
     <button class="btn-copy" id="copyBtn" type="button"></button>
     <div class="key-box" id="keyBox"></div>
@@ -140,87 +201,112 @@
 <script>
 (function() {
   "use strict";
+
   var CONFIG_URL = "/add_sub/config";
-  var SCAN_TIMEOUT = 1200;
+  var SCAN_TIMEOUT = 2000;
+
+  /* ── i18n ─────────────────────────────────────────────── */
 
   var LANGS = {
     ru: {
       title: "Zynerio VPN — Подключение",
       subtitle: "Подключение в 1 клик",
       errorNoSub: "Ошибка: нет ссылки подписки",
-      scanning: "Ищем VPN-приложение...",
-      trying: "Проверяем {name}...",
-      found: "{name} найден! Открываем...",
-      foundHint: "Подписка настраивается автоматически",
+      scanning: "Ищем VPN-приложение…",
+      trying: "Проверяем {name}…",
+      found: "{name} найден!",
+      foundHint: "Подписка настраивается автоматически.\nЕсли приложение не открылось — нажмите кнопку ниже.",
+      openApp: "Открыть {name}",
       notFound: "Приложение не найдено",
-      notFoundHint: "Установите одно из приложений и нажмите Подключить",
-      connect: "🚀 Подключить",
-      download: "📥 Скачать",
+      notFoundHint: "Установите одно из приложений ниже, затем нажмите «Подключить»",
+      connect: "Подключить",
+      download: "Скачать",
       recommended: "Рекомендуем",
-      otherApps: "📋 Другие приложения ({count})",
-      hideApps: "▲ Скрыть",
+      otherApps: "Другие приложения ({count})",
+      hideApps: "Скрыть",
       copyBtn: "📋 Скопировать ключ подписки",
       copied: "✅ Скопировано!",
+      waiting: "Ожидаем установку {name}…",
+      waitHint: "Установите приложение и вернитесь на эту страницу — подписка подключится автоматически",
+      cancel: "Отмена",
+      skipScan: "Выберите ваше приложение",
+      skipHint: "Нажмите «Подключить» рядом с установленным приложением"
     },
     en: {
       title: "Zynerio VPN — Connect",
       subtitle: "1-click connect",
       errorNoSub: "Error: no subscription URL",
-      scanning: "Searching for VPN app...",
-      trying: "Checking {name}...",
-      found: "{name} found! Opening...",
-      foundHint: "Subscription is being configured automatically",
+      scanning: "Searching for VPN app…",
+      trying: "Checking {name}…",
+      found: "{name} found!",
+      foundHint: "Subscription is being configured automatically.\nIf the app didn't open, tap the button below.",
+      openApp: "Open {name}",
       notFound: "No VPN app found",
-      notFoundHint: "Install one of the apps below and tap Connect",
-      connect: "🚀 Connect",
-      download: "📥 Download",
+      notFoundHint: "Install one of the apps below, then tap Connect",
+      connect: "Connect",
+      download: "Download",
       recommended: "Recommended",
-      otherApps: "📋 Other apps ({count})",
-      hideApps: "▲ Hide",
+      otherApps: "Other apps ({count})",
+      hideApps: "Hide",
       copyBtn: "📋 Copy subscription key",
       copied: "✅ Copied!",
+      waiting: "Waiting for {name}…",
+      waitHint: "Install the app and come back — subscription will connect automatically",
+      cancel: "Cancel",
+      skipScan: "Choose your app",
+      skipHint: "Tap Connect next to your installed app"
     }
   };
 
   var FUN = {
     ru: [
-      "🔍 Ищем приложения...",
-      "🕵️ Проверяем, что установлено...",
-      "🚀 Почти нашли...",
-      "🔎 Сканируем устройство...",
-      "✨ Секундочку...",
+      "🔍 Ищем приложения…",
+      "🕵️ Проверяем, что установлено…",
+      "🚀 Почти нашли…",
+      "🔎 Сканируем устройство…",
+      "✨ Секундочку…"
     ],
     en: [
-      "🔍 Scanning for apps...",
-      "🕵️ Checking what's installed...",
-      "🚀 Almost there...",
-      "🔎 Scanning device...",
-      "✨ Just a moment...",
+      "🔍 Scanning for apps…",
+      "🕵️ Checking what's installed…",
+      "🚀 Almost there…",
+      "🔎 Scanning device…",
+      "✨ Just a moment…"
     ]
   };
 
+  /* ── Language ──────────────────────────────────────────── */
+
   var _p = new URLSearchParams(window.location.search);
   var langParam = (_p.get("lang_code") || "").toLowerCase();
-  var browserLang = (navigator.language || "").slice(0,2).toLowerCase();
+  var browserLang = (navigator.language || "").slice(0, 2).toLowerCase();
   var lang = LANGS[langParam] ? langParam : (LANGS[browserLang] ? browserLang : "en");
   var L = LANGS[lang];
+
   function t(key, vars) {
     var s = L[key] || LANGS.en[key] || key;
-    if (vars) for (var k in vars) s = s.replace("{" + k + "}", vars[k]);
+    if (vars) { for (var k in vars) s = s.replace("{" + k + "}", vars[k]); }
     return s;
   }
+
   document.getElementById("htmlRoot").lang = lang;
   document.title = t("title");
   document.getElementById("subtitle").textContent = t("subtitle");
   document.getElementById("scanMsg").textContent = t("scanning");
   document.getElementById("copyBtn").textContent = t("copyBtn");
   document.getElementById("copyToast").textContent = t("copied");
+  document.getElementById("waitCancel").textContent = t("cancel");
+
+  /* ── Platform & browser detection ──────────────────────── */
 
   var PLAT_META = {
-    ios:{emoji:"📱",name:"iOS"}, android:{emoji:"🤖",name:"Android"},
-    macos:{emoji:"🍎",name:"macOS"}, windows:{emoji:"💻",name:"Windows"},
-    linux:{emoji:"🐧",name:"Linux"}
+    ios: { emoji: "📱", name: "iOS" },
+    android: { emoji: "🤖", name: "Android" },
+    macos: { emoji: "🍎", name: "macOS" },
+    windows: { emoji: "💻", name: "Windows" },
+    linux: { emoji: "🐧", name: "Linux" }
   };
+
   function detectPlatform() {
     var ua = navigator.userAgent.toLowerCase();
     if (/iphone|ipad|ipod/.test(ua)) return "ios";
@@ -230,57 +316,69 @@
     if (/linux/.test(ua)) return "linux";
     return "windows";
   }
+
   var platform = detectPlatform();
   var pm = PLAT_META[platform] || PLAT_META.windows;
   document.getElementById("platformBadge").textContent = pm.emoji + " " + pm.name;
 
+  var isFirefox = /firefox|FxiOS/i.test(navigator.userAgent);
+  var isFirefoxMobile = /FxiOS|Firefox.*Mobile/i.test(navigator.userAgent);
+
+  /* ── Fallback app registry ─────────────────────────────── */
+
   var FALLBACK_APPS = {
     ios: [
-      {name:"Happ",deepLink:"happ://add/{{SUB}}",featured:true,storeLinks:[{text:"App Store (RU)",link:"https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973"},{text:"App Store (Global)",link:"https://apps.apple.com/us/app/happ-proxy-utility/id6504287215"}]},
-      {name:"Streisand",deepLink:"streisand://import/{{SUB}}",featured:false,storeLinks:[{text:"App Store",link:"https://apps.apple.com/ru/app/streisand/id6450534064"}]},
-      {name:"Stash",deepLink:"stash://install-config?url={{ENC}}",featured:false,storeLinks:[{text:"App Store",link:"https://apps.apple.com/us/app/stash-rule-based-proxy/id1596063349"}]},
-      {name:"Shadowrocket",deepLink:"sub://{{SUB}}",featured:false,storeLinks:[{text:"App Store",link:"https://apps.apple.com/ru/app/shadowrocket/id932747118"}]},
-      {name:"Clash Mi",deepLink:"clash://install-config?overwrite=no&name=Remnawave&url={{ENC}}",featured:false,storeLinks:[{text:"App Store",link:"https://apps.apple.com/us/app/clash-mi/id6744321968"}]}
+      { name: "Happ", deepLink: "happ://add/{{SUB}}", featured: true, storeLinks: [{ text: "App Store (RU)", link: "https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973" }, { text: "App Store (Global)", link: "https://apps.apple.com/us/app/happ-proxy-utility/id6504287215" }] },
+      { name: "Streisand", deepLink: "streisand://import/{{SUB}}", featured: true, storeLinks: [{ text: "App Store", link: "https://apps.apple.com/ru/app/streisand/id6450534064" }] },
+      { name: "Stash", deepLink: "stash://install-config?url={{ENC}}", featured: false, storeLinks: [{ text: "App Store", link: "https://apps.apple.com/us/app/stash-rule-based-proxy/id1596063349" }] },
+      { name: "Shadowrocket", deepLink: "sub://{{SUB}}", featured: false, storeLinks: [{ text: "App Store", link: "https://apps.apple.com/ru/app/shadowrocket/id932747118" }] },
+      { name: "Clash Mi", deepLink: "clash://install-config?overwrite=no&name=Remnawave&url={{ENC}}", featured: false, storeLinks: [{ text: "App Store", link: "https://apps.apple.com/us/app/clash-mi/id6744321968" }] }
     ],
     android: [
-      {name:"FlClashX",deepLink:"flclashx://install-config?url={{ENC}}",featured:true,storeLinks:[{text:"Скачать APK",link:"https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-android-arm64-v8a.apk"}]},
-      {name:"Clash Meta",deepLink:"clashmeta://install-config?name=Remnawave&url={{ENC}}",featured:true,storeLinks:[{text:"Скачать APK",link:"https://github.com/MetaCubeX/ClashMetaForAndroid/releases/download/v2.11.20/cmfa-2.11.20-meta-universal-release.apk"},{text:"F-Droid",link:"https://f-droid.org/packages/com.github.metacubex.clash.meta/"}]},
-      {name:"Happ",deepLink:"happ://add/{{SUB}}",featured:true,storeLinks:[{text:"Google Play",link:"https://play.google.com/store/apps/details?id=com.happproxy"},{text:"Скачать APK",link:"https://github.com/Happ-proxy/happ-android/releases/latest/download/Happ.apk"}]},
-      {name:"v2rayNG",deepLink:"v2rayng://install-config?name=Remnawave&url={{ENC}}",featured:false,storeLinks:[{text:"Скачать APK",link:"https://github.com/2dust/v2rayNG/releases/download/1.10.31/v2rayNG_1.10.31_universal.apk"}]},
-      {name:"Exclave",deepLink:"exclave://subscription?url={{ENC}}",featured:false,storeLinks:[{text:"Скачать APK",link:"https://github.com/dyhkwong/Exclave/releases/download/0.17.4/Exclave-0.17.4-arm64-v8a.apk"}]}
+      { name: "FlClashX", deepLink: "flclashx://install-config?url={{ENC}}", featured: true, storeLinks: [{ text: "Скачать APK", link: "https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-android-arm64-v8a.apk" }] },
+      { name: "Clash Meta", deepLink: "clashmeta://install-config?name=Remnawave&url={{ENC}}", featured: true, storeLinks: [{ text: "Скачать APK", link: "https://github.com/MetaCubeX/ClashMetaForAndroid/releases/download/v2.11.20/cmfa-2.11.20-meta-universal-release.apk" }, { text: "F-Droid", link: "https://f-droid.org/packages/com.github.metacubex.clash.meta/" }] },
+      { name: "Happ", deepLink: "happ://add/{{SUB}}", featured: true, storeLinks: [{ text: "Google Play", link: "https://play.google.com/store/apps/details?id=com.happproxy" }, { text: "Скачать APK", link: "https://github.com/Happ-proxy/happ-android/releases/latest/download/Happ.apk" }] },
+      { name: "v2rayNG", deepLink: "v2rayng://install-config?name=Remnawave&url={{ENC}}", featured: false, storeLinks: [{ text: "Скачать APK", link: "https://github.com/2dust/v2rayNG/releases/download/1.10.31/v2rayNG_1.10.31_universal.apk" }] },
+      { name: "Exclave", deepLink: "exclave://subscription?url={{ENC}}", featured: false, storeLinks: [{ text: "Скачать APK", link: "https://github.com/dyhkwong/Exclave/releases/download/0.17.4/Exclave-0.17.4-arm64-v8a.apk" }] }
     ],
     macos: [
-      {name:"Happ",deepLink:"happ://add/{{SUB}}",featured:true,storeLinks:[{text:"App Store (RU)",link:"https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973"},{text:"App Store (Global)",link:"https://apps.apple.com/us/app/happ-proxy-utility/id6504287215"}]},
-      {name:"Koala Clash",deepLink:"koala-clash://install-config?url={{ENC}}",featured:true,storeLinks:[{text:"Apple Silicon",link:"https://github.com/coolcoala/clash-verge-rev-lite/releases/latest/download/Koala.Clash_aarch64.dmg"},{text:"Intel",link:"https://github.com/coolcoala/clash-verge-rev-lite/releases/latest/download/Koala.Clash_x64.dmg"}]},
-      {name:"FlClashX",deepLink:"flclashx://install-config?url={{ENC}}",featured:true,storeLinks:[{text:"Apple Silicon",link:"https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-macos-arm64.dmg"},{text:"Intel",link:"https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-macos-amd64.dmg"}]},
-      {name:"Prizrak-Box",deepLink:"prizrak-box://install-config?url={{ENC}}",featured:false,storeLinks:[{text:"Apple Silicon",link:"https://github.com/legiz-ru/Prizrak-Box/releases/latest/download/macos-arm64-dmg.zip"},{text:"Intel",link:"https://github.com/legiz-ru/Prizrak-Box/releases/latest/download/macos-amd64-dmg.zip"}]},
-      {name:"Clash Verge",deepLink:"clash://install-config?url={{ENC}}",featured:false,storeLinks:[{text:"Intel",link:"https://github.com/clash-verge-rev/clash-verge-rev/releases/download/v2.4.4-rc/Clash.Verge_2.4.4-rc_x64.dmg"},{text:"Apple Silicon",link:"https://github.com/clash-verge-rev/clash-verge-rev/releases/download/v2.4.4-rc/Clash.Verge_2.4.4-rc_aarch64.dmg"}]}
+      { name: "Happ", deepLink: "happ://add/{{SUB}}", featured: true, storeLinks: [{ text: "App Store (RU)", link: "https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973" }, { text: "App Store (Global)", link: "https://apps.apple.com/us/app/happ-proxy-utility/id6504287215" }] },
+      { name: "Koala Clash", deepLink: "koala-clash://install-config?url={{ENC}}", featured: true, storeLinks: [{ text: "Apple Silicon", link: "https://github.com/coolcoala/clash-verge-rev-lite/releases/latest/download/Koala.Clash_aarch64.dmg" }, { text: "Intel", link: "https://github.com/coolcoala/clash-verge-rev-lite/releases/latest/download/Koala.Clash_x64.dmg" }] },
+      { name: "FlClashX", deepLink: "flclashx://install-config?url={{ENC}}", featured: true, storeLinks: [{ text: "Apple Silicon", link: "https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-macos-arm64.dmg" }, { text: "Intel", link: "https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-macos-amd64.dmg" }] },
+      { name: "Prizrak-Box", deepLink: "prizrak-box://install-config?url={{ENC}}", featured: false, storeLinks: [{ text: "Apple Silicon", link: "https://github.com/legiz-ru/Prizrak-Box/releases/latest/download/macos-arm64-dmg.zip" }, { text: "Intel", link: "https://github.com/legiz-ru/Prizrak-Box/releases/latest/download/macos-amd64-dmg.zip" }] },
+      { name: "Clash Verge", deepLink: "clash://install-config?url={{ENC}}", featured: false, storeLinks: [{ text: "Intel", link: "https://github.com/clash-verge-rev/clash-verge-rev/releases/download/v2.4.4-rc/Clash.Verge_2.4.4-rc_x64.dmg" }, { text: "Apple Silicon", link: "https://github.com/clash-verge-rev/clash-verge-rev/releases/download/v2.4.4-rc/Clash.Verge_2.4.4-rc_aarch64.dmg" }] }
     ],
     windows: [
-      {name:"FlClashX",deepLink:"flclashx://install-config?url={{ENC}}",featured:true,storeLinks:[{text:"Установщик",link:"https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-windows-amd64-setup.exe"},{text:"Портативная",link:"https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-windows-amd64.zip"}]},
-      {name:"Koala Clash",deepLink:"koala-clash://install-config?url={{ENC}}",featured:true,storeLinks:[{text:"Установщик",link:"https://github.com/coolcoala/clash-verge-rev-lite/releases/latest/download/Koala.Clash_x64-setup.exe"}]},
-      {name:"Happ",deepLink:"happ://add/{{SUB}}",featured:false,storeLinks:[{text:"Windows",link:"https://github.com/Happ-proxy/happ-desktop/releases/latest/download/setup-Happ.x64.exe"}]},
-      {name:"Prizrak-Box",deepLink:"prizrak-box://install-config?url={{ENC}}",featured:true,storeLinks:[{text:"Установщик",link:"https://github.com/legiz-ru/Prizrak-Box/releases/latest/download/windows-amd64.msi"}]},
-      {name:"Clash Verge",deepLink:"clash://install-config?url={{ENC}}",featured:false,storeLinks:[{text:"Установщик",link:"https://github.com/clash-verge-rev/clash-verge-rev/releases/download/v2.4.4-rc/Clash.Verge_2.4.4-rc_x64-setup.exe"}]}
+      { name: "FlClashX", deepLink: "flclashx://install-config?url={{ENC}}", featured: true, storeLinks: [{ text: "Установщик", link: "https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-windows-amd64-setup.exe" }, { text: "Портативная", link: "https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-windows-amd64.zip" }] },
+      { name: "Koala Clash", deepLink: "koala-clash://install-config?url={{ENC}}", featured: true, storeLinks: [{ text: "Установщик", link: "https://github.com/coolcoala/clash-verge-rev-lite/releases/latest/download/Koala.Clash_x64-setup.exe" }] },
+      { name: "Happ", deepLink: "happ://add/{{SUB}}", featured: false, storeLinks: [{ text: "Windows", link: "https://github.com/Happ-proxy/happ-desktop/releases/latest/download/setup-Happ.x64.exe" }] },
+      { name: "Prizrak-Box", deepLink: "prizrak-box://install-config?url={{ENC}}", featured: true, storeLinks: [{ text: "Установщик", link: "https://github.com/legiz-ru/Prizrak-Box/releases/latest/download/windows-amd64.msi" }] },
+      { name: "Clash Verge", deepLink: "clash://install-config?url={{ENC}}", featured: false, storeLinks: [{ text: "Установщик", link: "https://github.com/clash-verge-rev/clash-verge-rev/releases/download/v2.4.4-rc/Clash.Verge_2.4.4-rc_x64-setup.exe" }] }
     ],
     linux: [
-      {name:"FlClashX",deepLink:"flclashx://install-config?url={{ENC}}",featured:true,storeLinks:[{text:".deb (amd64)",link:"https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-linux-amd64.deb"},{text:"AppImage",link:"https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-linux-amd64.AppImage"}]},
-      {name:"Koala Clash",deepLink:"koala-clash://install-config?url={{ENC}}",featured:true,storeLinks:[{text:".deb (amd64)",link:"https://github.com/coolcoala/clash-verge-rev-lite/releases/latest/download/Koala.Clash_amd64.deb"}]},
-      {name:"Prizrak-Box",deepLink:"prizrak-box://install-config?url={{ENC}}",featured:true,storeLinks:[{text:".deb (amd64)",link:"https://github.com/legiz-ru/Prizrak-Box/releases/latest/download/linux-amd64.deb"}]},
-      {name:"Clash Verge",deepLink:"clash://install-config?url={{ENC}}",featured:false,storeLinks:[{text:".deb (amd64)",link:"https://github.com/clash-verge-rev/clash-verge-rev/releases/download/v2.4.4-rc/Clash.Verge_2.4.4-rc_amd64.deb"}]}
+      { name: "FlClashX", deepLink: "flclashx://install-config?url={{ENC}}", featured: true, storeLinks: [{ text: ".deb (amd64)", link: "https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-linux-amd64.deb" }, { text: "AppImage", link: "https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-linux-amd64.AppImage" }] },
+      { name: "Koala Clash", deepLink: "koala-clash://install-config?url={{ENC}}", featured: true, storeLinks: [{ text: ".deb (amd64)", link: "https://github.com/coolcoala/clash-verge-rev-lite/releases/latest/download/Koala.Clash_amd64.deb" }] },
+      { name: "Prizrak-Box", deepLink: "prizrak-box://install-config?url={{ENC}}", featured: true, storeLinks: [{ text: ".deb (amd64)", link: "https://github.com/legiz-ru/Prizrak-Box/releases/latest/download/linux-amd64.deb" }] },
+      { name: "Clash Verge", deepLink: "clash://install-config?url={{ENC}}", featured: false, storeLinks: [{ text: ".deb (amd64)", link: "https://github.com/clash-verge-rev/clash-verge-rev/releases/download/v2.4.4-rc/Clash.Verge_2.4.4-rc_amd64.deb" }] }
     ]
   };
+
+  /* ── URL params ────────────────────────────────────────── */
 
   var params = new URLSearchParams(window.location.search);
   var subUrl = params.get("sub") || "";
   var appHint = (params.get("app") || "").toLowerCase();
+
   if (!subUrl) {
     document.getElementById("scanCard").classList.add("hidden");
-    document.getElementById("resultCard").classList.remove("hidden");
+    var rc = document.getElementById("resultCard");
+    rc.classList.remove("hidden");
     document.getElementById("resultEmoji").textContent = "⚠️";
     document.getElementById("resultMsg").textContent = t("errorNoSub");
     return;
   }
+
+  /* ── Utilities ─────────────────────────────────────────── */
 
   function buildUri(tpl, sub) {
     return tpl.replace("{{SUB}}", sub).replace("{{ENC}}", encodeURIComponent(sub));
@@ -294,98 +392,185 @@
       var app = platformApps[i];
       var scheme = app.urlScheme;
       if (!scheme) continue;
-      var tpl = scheme + (scheme.charAt(scheme.length-1) === "=" ? "{{ENC}}" : "{{SUB}}");
+      var tpl = scheme + (scheme.charAt(scheme.length - 1) === "=" ? "{{ENC}}" : "{{SUB}}");
       var links = [];
       if (app.installationStep && app.installationStep.buttons) {
         for (var j = 0; j < app.installationStep.buttons.length; j++) {
           var btn = app.installationStep.buttons[j];
           if (btn.buttonLink) {
             var txt = (btn.buttonText && (btn.buttonText[lang] || btn.buttonText.en || btn.buttonText.ru)) || app.name;
-            links.push({text: txt, link: btn.buttonLink});
+            links.push({ text: txt, link: btn.buttonLink });
           }
         }
       }
-      apps.push({name: app.name||app.id, deepLink: tpl, featured: !!app.isFeatured, storeLinks: links});
+      apps.push({ name: app.name || app.id, deepLink: tpl, featured: !!app.isFeatured, storeLinks: links });
     }
-    apps.sort(function(a,b){return (b.featured?1:0)-(a.featured?1:0);});
+    apps.sort(function(a, b) { return (b.featured ? 1 : 0) - (a.featured ? 1 : 0); });
     return apps.length ? apps : null;
   }
 
   function prioritize(apps) {
     if (!appHint || appHint === "_default") return apps;
-    var hint = appHint.replace(/[-_\s]/g,"").toLowerCase();
-    for (var i=1; i<apps.length; i++) {
-      var n = apps[i].name.replace(/[-_\s]/g,"").toLowerCase();
-      if (n.indexOf(hint)!==-1 || hint.indexOf(n)!==-1) {
-        var m = apps.splice(i,1)[0]; apps.unshift(m); break;
+    var hint = appHint.replace(/[-_\s]/g, "").toLowerCase();
+    for (var i = 1; i < apps.length; i++) {
+      var n = apps[i].name.replace(/[-_\s]/g, "").toLowerCase();
+      if (n.indexOf(hint) !== -1 || hint.indexOf(n) !== -1) {
+        var m = apps.splice(i, 1)[0];
+        apps.unshift(m);
+        break;
       }
     }
     return apps;
   }
 
-  /* Auto-detection: uses ONLY visibilitychange (no blur = no false positives from system prompts) */
+  /* ── Auto-detection ────────────────────────────────────── */
+  /*
+   * Uses iframe.src + blur + visibilitychange.
+   *
+   * blur handler: waits 200ms, then checks visibilityState.
+   *   If "hidden" → app actually opened → detection confirmed.
+   *   If "visible" → false positive (Firefox prompt, notification) → ignored.
+   *
+   * visibilitychange: direct check for hidden → detection confirmed.
+   *
+   * This combo works on Safari (blur fires when app opens)
+   * and avoids Firefox false positives (blur from prompts doesn't set hidden).
+   *
+   * A SINGLE pair of handlers is registered before the scan starts.
+   * currentApp is updated before each iframe.src to track attribution.
+   */
+
   function scanApps(apps) {
     return new Promise(function(resolve) {
-      var found = false;
+      var currentApp = null;
+      var currentIdx = -1;
+      var resolved = false;
+
+      /* Fun messages rotation */
       var funMsgs = FUN[lang] || FUN.en;
       var funIdx = 0;
       var funTimer = setInterval(function() {
-        funIdx = (funIdx+1) % funMsgs.length;
+        funIdx = (funIdx + 1) % funMsgs.length;
         document.getElementById("scanMsg").textContent = funMsgs[funIdx];
       }, 2000);
 
+      /* Build per-app status rows */
+      var listEl = document.getElementById("attemptList");
+      listEl.innerHTML = "";
+      var rows = [];
+      for (var s = 0; s < apps.length; s++) {
+        var row = document.createElement("div");
+        row.className = "attempt-row";
+        var icon = document.createElement("span");
+        icon.className = "attempt-icon";
+        icon.textContent = "⏳";
+        var name = document.createElement("span");
+        name.textContent = apps[s].name;
+        row.appendChild(icon);
+        row.appendChild(name);
+        listEl.appendChild(row);
+        rows.push({ el: row, iconEl: icon });
+      }
+
+      function setRow(idx, emoji, cls) {
+        if (idx < 0 || idx >= rows.length) return;
+        rows[idx].iconEl.textContent = emoji;
+        rows[idx].el.className = "attempt-row " + cls;
+      }
+
+      function finish(app) {
+        if (resolved) return;
+        resolved = true;
+        clearInterval(funTimer);
+        document.removeEventListener("visibilitychange", onVis);
+        window.removeEventListener("blur", onBlur);
+        if (app && currentIdx >= 0) setRow(currentIdx, "✅", "found");
+        resolve(app);
+      }
+
+      function onVis() {
+        if (document.visibilityState === "hidden" && currentApp && !resolved) {
+          finish(currentApp);
+        }
+      }
+
+      function onBlur() {
+        if (resolved) return;
+        var capturedApp = currentApp;
+        var capturedIdx = currentIdx;
+        setTimeout(function() {
+          if (!resolved && document.visibilityState === "hidden" && capturedApp) {
+            currentApp = capturedApp;
+            currentIdx = capturedIdx;
+            finish(capturedApp);
+          }
+        }, 200);
+      }
+
+      /* Register ONCE before scanning */
+      document.addEventListener("visibilitychange", onVis);
+      window.addEventListener("blur", onBlur);
+
       function tryApp(i) {
-        if (i >= apps.length || found) {
-          clearInterval(funTimer);
-          if (!found) resolve(null);
+        if (i >= apps.length || resolved) {
+          /* Mark remaining as not found */
+          for (var r = (resolved ? i : 0); r < apps.length; r++) {
+            if (rows[r].el.className.indexOf("found") === -1) setRow(r, "❌", "fail");
+          }
+          if (!resolved) finish(null);
           return;
         }
-        var app = apps[i];
-        var uri = buildUri(app.deepLink, subUrl);
-        var pct = Math.round(((i+1)/apps.length)*100);
-        document.getElementById("scanDetail").textContent = t("trying",{name:app.name});
+
+        /* Mark previous as failed */
+        if (i > 0 && !resolved) setRow(i - 1, "❌", "fail");
+
+        /* Activate current */
+        currentApp = apps[i];
+        currentIdx = i;
+        setRow(i, "🔄", "active");
+
+        var uri = buildUri(currentApp.deepLink, subUrl);
+        var pct = Math.round(((i + 1) / apps.length) * 100);
+        document.getElementById("scanDetail").textContent = t("trying", { name: currentApp.name });
         document.getElementById("progressBar").style.width = pct + "%";
 
+        /* Create hidden iframe to trigger URL scheme */
         var iframe = document.createElement("iframe");
         iframe.style.cssText = "display:none;width:0;height:0;border:0;position:absolute;top:-9999px";
         document.body.appendChild(iframe);
+        try { iframe.src = uri; } catch (e) { /* ignore */ }
 
-        var visHandler = function() {
-          if (document.visibilityState === "hidden") {
-            found = true;
-            cleanup();
-            clearInterval(funTimer);
-            resolve(app);
-          }
-        };
-        document.addEventListener("visibilitychange", visHandler);
-
-        function cleanup() {
-          document.removeEventListener("visibilitychange", visHandler);
-          clearTimeout(timer);
+        setTimeout(function() {
           if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
-        }
-
-        try { iframe.src = uri; } catch(e) {}
-
-        var timer = setTimeout(function() {
-          if (!found) { cleanup(); tryApp(i+1); }
+          if (!resolved) tryApp(i + 1);
         }, SCAN_TIMEOUT);
       }
+
       tryApp(0);
     });
   }
+
+  /* ── Show success ──────────────────────────────────────── */
 
   function showSuccess(app) {
     document.getElementById("scanCard").classList.add("hidden");
     var rc = document.getElementById("resultCard");
     rc.classList.remove("hidden");
-    rc.style.border = "1px solid rgba(0,184,148,.3)";
+    rc.style.borderColor = "rgba(0,184,148,.3)";
     document.getElementById("resultEmoji").textContent = "✅";
-    document.getElementById("resultMsg").textContent = t("found",{name:app.name});
+    document.getElementById("resultMsg").textContent = t("found", { name: app.name });
     document.getElementById("resultHint").textContent = t("foundHint");
+
+    var btn = document.createElement("a");
+    btn.className = "result-btn";
+    btn.href = buildUri(app.deepLink, subUrl);
+    btn.textContent = t("openApp", { name: app.name });
+    document.getElementById("resultActions").appendChild(btn);
+
     showKey();
   }
+
+  /* ── Show failure (app list) ───────────────────────────── */
 
   function showFailure(apps) {
     document.getElementById("scanCard").classList.add("hidden");
@@ -395,74 +580,103 @@
     document.getElementById("resultMsg").textContent = t("notFound");
     document.getElementById("resultHint").textContent = t("notFoundHint");
 
+    renderAppList(apps);
+    showKey();
+  }
+
+  /* ── Skip scan (Firefox mobile) ────────────────────────── */
+
+  function showSkipScan(apps) {
+    document.getElementById("scanCard").classList.add("hidden");
+    var rc = document.getElementById("resultCard");
+    rc.classList.remove("hidden");
+    document.getElementById("resultEmoji").textContent = "📱";
+    document.getElementById("resultMsg").textContent = t("skipScan");
+    document.getElementById("resultHint").textContent = t("skipHint");
+
+    renderAppList(apps);
+    showKey();
+  }
+
+  /* ── Render app list ───────────────────────────────────── */
+
+  function renderAppList(apps) {
     var listEl = document.getElementById("appList");
     listEl.classList.remove("hidden");
     listEl.innerHTML = "";
 
-    var featured = [], other = [];
-    for (var i=0; i<apps.length; i++) {
-      if (apps[i].featured) featured.push(apps[i]); else other.push(apps[i]);
+    var top = [];
+    var other = [];
+    for (var i = 0; i < apps.length; i++) {
+      if (apps[i].featured) top.push(apps[i]);
+      else other.push(apps[i]);
     }
-    if (!featured.length) { featured.push(apps[0]); other = apps.slice(1); }
+    if (!top.length) { top.push(apps[0]); other = apps.slice(1); }
 
-    for (var f=0; f<featured.length; f++) listEl.appendChild(makeCard(featured[f], true));
+    for (var f = 0; f < top.length; f++) {
+      listEl.appendChild(makeCard(top[f], f === 0));
+    }
 
     if (other.length) {
       var togBtn = document.createElement("button");
       togBtn.className = "other-toggle";
-      togBtn.textContent = t("otherApps",{count:other.length});
+      togBtn.textContent = t("otherApps", { count: other.length });
       togBtn.type = "button";
       var otherWrap = document.createElement("div");
       otherWrap.className = "hidden";
       var shown = false;
       togBtn.addEventListener("click", function() {
         shown = !shown;
-        otherWrap.classList.toggle("hidden",!shown);
-        togBtn.textContent = shown ? t("hideApps") : t("otherApps",{count:other.length});
+        otherWrap.classList.toggle("hidden", !shown);
+        togBtn.textContent = shown ? t("hideApps") : t("otherApps", { count: other.length });
       });
       listEl.appendChild(togBtn);
-      for (var o=0; o<other.length; o++) otherWrap.appendChild(makeCard(other[o], false));
+      for (var o = 0; o < other.length; o++) {
+        otherWrap.appendChild(makeCard(other[o], false));
+      }
       listEl.appendChild(otherWrap);
-    }
-    showKey();
-
-    /* Auto-redirect: open first featured app download after 1.5s */
-    var topApp = featured[0];
-    if (topApp && topApp.storeLinks && topApp.storeLinks.length) {
-      setTimeout(function() {
-        window.location.href = topApp.storeLinks[0].link;
-      }, 1500);
     }
   }
 
-  function makeCard(app, isFeatured) {
+  /* ── Make app card ─────────────────────────────────────── */
+
+  function makeCard(app, isTop) {
     var card = document.createElement("div");
-    card.className = "app-card" + (isFeatured ? " featured" : "");
-    var header = document.createElement("div");
-    header.className = "app-header";
+    card.className = "app-card" + (isTop ? " top" : "");
+
+    var head = document.createElement("div");
+    head.className = "app-head";
     var nm = document.createElement("span");
-    nm.className = "app-name"; nm.textContent = app.name;
-    header.appendChild(nm);
-    if (isFeatured) {
+    nm.className = "app-name";
+    nm.textContent = app.name;
+    head.appendChild(nm);
+    if (isTop) {
       var tag = document.createElement("span");
-      tag.className = "app-tag"; tag.textContent = t("recommended");
-      header.appendChild(tag);
+      tag.className = "app-tag";
+      tag.textContent = t("recommended");
+      head.appendChild(tag);
     }
-    card.appendChild(header);
+    card.appendChild(head);
 
     var row = document.createElement("div");
     row.className = "btn-row";
+
     if (app.storeLinks && app.storeLinks.length) {
-      var dlBtn = document.createElement("a");
-      dlBtn.className = "btn-action btn-download";
-      dlBtn.href = app.storeLinks[0].link;
-      dlBtn.target = "_blank"; dlBtn.rel = "noopener";
+      var dlBtn = document.createElement("button");
+      dlBtn.className = "btn-act btn-purple";
+      dlBtn.type = "button";
       dlBtn.textContent = t("download");
-      dlBtn.style.marginBottom = "0";
+      dlBtn.addEventListener("click", (function(a) {
+        return function() {
+          window.open(a.storeLinks[0].link, "_blank", "noopener");
+          enterWaitMode(a);
+        };
+      })(app));
       row.appendChild(dlBtn);
     }
+
     var connBtn = document.createElement("a");
-    connBtn.className = "btn-action btn-connect";
+    connBtn.className = "btn-act btn-green";
     connBtn.href = buildUri(app.deepLink, subUrl);
     connBtn.textContent = t("connect");
     row.appendChild(connBtn);
@@ -471,17 +685,117 @@
     if (app.storeLinks && app.storeLinks.length > 1) {
       var dl = document.createElement("div");
       dl.className = "dl-links";
-      for (var i=0; i<app.storeLinks.length; i++) {
+      for (var i = 0; i < app.storeLinks.length; i++) {
         var a = document.createElement("a");
-        a.className = "dl-link"; a.href = app.storeLinks[i].link;
-        a.target = "_blank"; a.rel = "noopener";
+        a.className = "dl-link";
+        a.href = app.storeLinks[i].link;
+        a.target = "_blank";
+        a.rel = "noopener";
         a.textContent = app.storeLinks[i].text;
         dl.appendChild(a);
       }
       card.appendChild(dl);
     }
+
     return card;
   }
+
+  /* ── Wait mode ─────────────────────────────────────────── */
+
+  var _waitApp = null;
+  var _waitTimer = null;
+
+  function enterWaitMode(app) {
+    _waitApp = app;
+
+    document.getElementById("resultCard").classList.add("hidden");
+    document.getElementById("appList").classList.add("hidden");
+    document.getElementById("keySection").classList.add("hidden");
+
+    var wc = document.getElementById("waitCard");
+    wc.classList.remove("hidden");
+    document.getElementById("waitMsg").textContent = t("waiting", { name: app.name });
+    document.getElementById("waitHint").textContent = t("waitHint");
+  }
+
+  function exitWaitMode() {
+    _waitApp = null;
+    if (_waitTimer) { clearTimeout(_waitTimer); _waitTimer = null; }
+    document.getElementById("waitCard").classList.add("hidden");
+  }
+
+  document.getElementById("waitCancel").addEventListener("click", function() {
+    var app = _waitApp;
+    exitWaitMode();
+    /* Restore the failure view */
+    document.getElementById("resultCard").classList.remove("hidden");
+    document.getElementById("appList").classList.remove("hidden");
+    showKey();
+  });
+
+  /* Try detecting a single app (used in wait mode) */
+  function tryDetectSingle(app) {
+    if (!app) return;
+    var uri = buildUri(app.deepLink, subUrl);
+    var detected = false;
+
+    function onVis() {
+      if (document.visibilityState === "hidden" && !detected) {
+        detected = true;
+        cleanup();
+        exitWaitMode();
+        showSuccess(app);
+      }
+    }
+    function onBlur() {
+      if (detected) return;
+      setTimeout(function() {
+        if (!detected && document.visibilityState === "hidden") {
+          detected = true;
+          cleanup();
+          exitWaitMode();
+          showSuccess(app);
+        }
+      }, 200);
+    }
+    function cleanup() {
+      document.removeEventListener("visibilitychange", onVis);
+      window.removeEventListener("blur", onBlur);
+      if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+      clearTimeout(failTimer);
+    }
+
+    document.addEventListener("visibilitychange", onVis);
+    window.addEventListener("blur", onBlur);
+
+    var iframe = document.createElement("iframe");
+    iframe.style.cssText = "display:none;width:0;height:0;border:0;position:absolute;top:-9999px";
+    document.body.appendChild(iframe);
+    try { iframe.src = uri; } catch (e) { /* ignore */ }
+
+    var failTimer = setTimeout(function() {
+      if (!detected) {
+        cleanup();
+        /* Stay in wait mode, will retry on next visibility/focus */
+      }
+    }, SCAN_TIMEOUT);
+  }
+
+  /* Re-detect when user returns to page (from App Store etc) */
+  document.addEventListener("visibilitychange", function() {
+    if (document.visibilityState === "visible" && _waitApp) {
+      setTimeout(function() { tryDetectSingle(_waitApp); }, 500);
+    }
+  });
+  window.addEventListener("pageshow", function(ev) {
+    if (_waitApp) {
+      setTimeout(function() { tryDetectSingle(_waitApp); }, 500);
+    } else if (ev.persisted && _scanDone) {
+      main();
+    }
+  });
+
+  /* ── Key section & copy ────────────────────────────────── */
 
   function showKey() {
     var ks = document.getElementById("keySection");
@@ -492,38 +806,54 @@
   function doCopy() {
     navigator.clipboard.writeText(subUrl).then(showToast).catch(function() {
       var ta = document.createElement("textarea");
-      ta.value = subUrl; document.body.appendChild(ta); ta.select();
-      document.execCommand("copy"); ta.remove(); showToast();
+      ta.value = subUrl;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      ta.remove();
+      showToast();
     });
   }
+
   function showToast() {
     var toast = document.getElementById("copyToast");
     toast.classList.add("show");
-    setTimeout(function(){toast.classList.remove("show");}, 2000);
+    setTimeout(function() { toast.classList.remove("show"); }, 2000);
   }
+
   document.getElementById("copyBtn").addEventListener("click", doCopy);
   document.getElementById("keyBox").addEventListener("click", doCopy);
 
+  /* ── Main ──────────────────────────────────────────────── */
+
   var _running = false;
+  var _scanDone = false;
+  var _loadedApps = null;
+
   async function main() {
     if (_running) return;
     _running = true;
+
+    /* Reset UI */
     document.getElementById("scanCard").classList.remove("hidden");
     document.getElementById("resultCard").classList.add("hidden");
     document.getElementById("appList").classList.add("hidden");
     document.getElementById("keySection").classList.add("hidden");
+    document.getElementById("waitCard").classList.add("hidden");
     document.getElementById("progressBar").style.width = "0";
     document.getElementById("scanMsg").textContent = t("scanning");
     document.getElementById("scanDetail").textContent = "";
+    document.getElementById("attemptList").innerHTML = "";
 
+    /* Load app config */
     var apps = null;
     try {
-      var res = await fetch(CONFIG_URL, {signal: AbortSignal.timeout(4000)});
+      var res = await fetch(CONFIG_URL, { signal: AbortSignal.timeout(4000) });
       if (res.ok) {
         apps = parseRemnaConfig(await res.json());
         if (apps) console.log("[connect] Loaded", apps.length, "apps from config");
       }
-    } catch(e) {
+    } catch (e) {
       console.warn("[connect] Config fetch failed, using fallback:", e.message);
     }
     if (!apps) {
@@ -531,8 +861,19 @@
       console.log("[connect] Using fallback for", platform);
     }
     apps = prioritize(apps.slice());
+    _loadedApps = apps;
+
+    /* Firefox mobile: skip scan to avoid annoying prompts */
+    if (isFirefoxMobile) {
+      showSkipScan(apps);
+      _running = false;
+      _scanDone = true;
+      return;
+    }
 
     var foundApp = await scanApps(apps);
+    _scanDone = true;
+
     if (foundApp) {
       showSuccess(foundApp);
     } else {
@@ -540,11 +881,6 @@
     }
     _running = false;
   }
-
-  /* Re-scan when user returns from App Store / install */
-  window.addEventListener("pageshow", function(e) {
-    if (e.persisted) main();
-  });
 
   main();
 })();
