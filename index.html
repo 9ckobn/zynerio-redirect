@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Zynerio VPN \u2014 Connect</title>
+<title>Zynerio VPN — Connect</title>
 <style>
   :root {
     --bg: #0f0f14;
@@ -44,7 +44,6 @@
   .scan-detail { font-size: 13px; color: var(--muted); margin-bottom: 14px; min-height: 18px; }
   .progress-wrap { background: rgba(255,255,255,.08); border-radius: 6px; height: 6px; overflow: hidden; }
   .progress-bar { height: 100%; background: var(--accent); border-radius: 6px; transition: width .4s ease; width: 0; }
-
   .result-card {
     background: var(--card); border-radius: var(--radius);
     padding: 28px 24px; text-align: center; margin-bottom: 16px;
@@ -52,7 +51,6 @@
   .result-emoji { font-size: 44px; margin-bottom: 10px; }
   .result-msg { font-size: 17px; font-weight: 600; margin-bottom: 6px; }
   .result-hint { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
-
   .app-card {
     background: rgba(255,255,255,.04); border-radius: 12px;
     padding: 14px; margin-bottom: 8px; text-align: left;
@@ -77,14 +75,12 @@
     padding: 4px 10px; border-radius: 8px; background: rgba(255,255,255,.06); transition: background .2s;
   }
   .dl-link:hover { background: rgba(255,255,255,.12); color: var(--text); }
-
   .other-toggle {
     display: block; width: 100%; padding: 10px; font-size: 13px; font-weight: 500;
     border: none; border-radius: 12px; cursor: pointer; margin: 8px 0;
     background: transparent; color: var(--accent); border: 1px solid rgba(108,92,231,.2);
   }
   .other-toggle:hover { border-color: rgba(108,92,231,.5); }
-
   .key-section {
     background: var(--card); border-radius: var(--radius);
     padding: 16px; margin-top: 16px; text-align: center;
@@ -109,19 +105,20 @@
     opacity: 0; transition: opacity .3s; pointer-events: none; z-index: 100;
   }
   .copy-toast.show { opacity: 1; }
+  .hidden { display: none !important; }
   .error-msg { text-align: center; color: var(--danger); margin-top: 20px; }
 </style>
 </head>
 <body>
 <div class="container">
   <div class="header">
-    <div class="logo">\U0001f510</div>
+    <div class="logo">🔐</div>
     <h1>Zynerio VPN</h1>
     <p class="subtitle" id="subtitle"></p>
     <div class="platform-badge" id="platformBadge"></div>
   </div>
   <div class="scan-card" id="scanCard">
-    <div class="scan-emoji" id="scanEmoji">\U0001f50d</div>
+    <div class="scan-emoji" id="scanEmoji">🔍</div>
     <div class="scan-msg" id="scanMsg"></div>
     <div class="scan-detail" id="scanDetail"></div>
     <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
@@ -148,24 +145,25 @@
 
   var LANGS = {
     ru: {
-      title: "Zynerio VPN \u2014 \u041f\u043e\u0434\u043a\u043b\u044e\u0447\u0435\u043d\u0438\u0435",
-      subtitle: "\u041f\u043e\u0434\u043a\u043b\u044e\u0447\u0435\u043d\u0438\u0435 \u0432 1 \u043a\u043b\u0438\u043a",
-      errorNoSub: "\u041e\u0448\u0438\u0431\u043a\u0430: \u043d\u0435\u0442 \u0441\u0441\u044b\u043b\u043a\u0438 \u043f\u043e\u0434\u043f\u0438\u0441\u043a\u0438",
-      scanning: "\u0418\u0449\u0435\u043c VPN-\u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u0435...",
-      trying: "\u041f\u0440\u043e\u0432\u0435\u0440\u044f\u0435\u043c {name}...",
-      found: "{name} \u043d\u0430\u0439\u0434\u0435\u043d! \u041e\u0442\u043a\u0440\u044b\u0432\u0430\u0435\u043c...",
-      foundHint: "\u041f\u043e\u0434\u043f\u0438\u0441\u043a\u0430 \u043d\u0430\u0441\u0442\u0440\u0430\u0438\u0432\u0430\u0435\u0442\u0441\u044f \u0430\u0432\u0442\u043e\u043c\u0430\u0442\u0438\u0447\u0435\u0441\u043a\u0438",
-      notFound: "\u041f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u0435 \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d\u043e",
-      notFoundHint: "\u0423\u0441\u0442\u0430\u043d\u043e\u0432\u0438\u0442\u0435 \u043e\u0434\u043d\u043e \u0438\u0437 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u0439 \u0438 \u043d\u0430\u0436\u043c\u0438\u0442\u0435 \u041f\u043e\u0434\u043a\u043b\u044e\u0447\u0438\u0442\u044c",
-      connect: "\U0001f680 \u041f\u043e\u0434\u043a\u043b\u044e\u0447\u0438\u0442\u044c",
-      download: "\U0001f4e5 \u0421\u043a\u0430\u0447\u0430\u0442\u044c",
-      recommended: "\u0420\u0435\u043a\u043e\u043c\u0435\u043d\u0434\u0443\u0435\u043c",
-      otherApps: "\U0001f4cb \u0414\u0440\u0443\u0433\u0438\u0435 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f ({count})",
-      hideApps: "\u25b2 \u0421\u043a\u0440\u044b\u0442\u044c",
-      copyBtn: "\U0001f4cb \u0421\u043a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u043a\u043b\u044e\u0447 \u043f\u043e\u0434\u043f\u0438\u0441\u043a\u0438",
+      title: "Zynerio VPN — Подключение",
+      subtitle: "Подключение в 1 клик",
+      errorNoSub: "Ошибка: нет ссылки подписки",
+      scanning: "Ищем VPN-приложение...",
+      trying: "Проверяем {name}...",
+      found: "{name} найден! Открываем...",
+      foundHint: "Подписка настраивается автоматически",
+      notFound: "Приложение не найдено",
+      notFoundHint: "Установите одно из приложений и нажмите Подключить",
+      connect: "🚀 Подключить",
+      download: "📥 Скачать",
+      recommended: "Рекомендуем",
+      otherApps: "📋 Другие приложения ({count})",
+      hideApps: "▲ Скрыть",
+      copyBtn: "📋 Скопировать ключ подписки",
+      copied: "✅ Скопировано!",
     },
     en: {
-      title: "Zynerio VPN \u2014 Connect",
+      title: "Zynerio VPN — Connect",
       subtitle: "1-click connect",
       errorNoSub: "Error: no subscription URL",
       scanning: "Searching for VPN app...",
@@ -174,29 +172,30 @@
       foundHint: "Subscription is being configured automatically",
       notFound: "No VPN app found",
       notFoundHint: "Install one of the apps below and tap Connect",
-      connect: "\U0001f680 Connect",
-      download: "\U0001f4e5 Download",
+      connect: "🚀 Connect",
+      download: "📥 Download",
       recommended: "Recommended",
-      otherApps: "\U0001f4cb Other apps ({count})",
-      hideApps: "\u25b2 Hide",
-      copyBtn: "\U0001f4cb Copy subscription key",
+      otherApps: "📋 Other apps ({count})",
+      hideApps: "▲ Hide",
+      copyBtn: "📋 Copy subscription key",
+      copied: "✅ Copied!",
     }
   };
 
   var FUN = {
     ru: [
-      "\U0001f50d \u0418\u0449\u0435\u043c \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f...",
-      "\U0001f575\ufe0f \u041f\u0440\u043e\u0432\u0435\u0440\u044f\u0435\u043c, \u0447\u0442\u043e \u0443\u0441\u0442\u0430\u043d\u043e\u0432\u043b\u0435\u043d\u043e...",
-      "\U0001f680 \u041f\u043e\u0447\u0442\u0438 \u043d\u0430\u0448\u043b\u0438...",
-      "\U0001f50e \u0421\u043a\u0430\u043d\u0438\u0440\u0443\u0435\u043c \u0443\u0441\u0442\u0440\u043e\u0439\u0441\u0442\u0432\u043e...",
-      "\u2728 \u0421\u0435\u043a\u0443\u043d\u0434\u043e\u0447\u043a\u0443...",
+      "🔍 Ищем приложения...",
+      "🕵️ Проверяем, что установлено...",
+      "🚀 Почти нашли...",
+      "🔎 Сканируем устройство...",
+      "✨ Секундочку...",
     ],
     en: [
-      "\U0001f50d Scanning for apps...",
-      "\U0001f575\ufe0f Checking what's installed...",
-      "\U0001f680 Almost there...",
-      "\U0001f50e Scanning device...",
-      "\u2728 Just a moment...",
+      "🔍 Scanning for apps...",
+      "🕵️ Checking what's installed...",
+      "🚀 Almost there...",
+      "🔎 Scanning device...",
+      "✨ Just a moment...",
     ]
   };
 
@@ -218,9 +217,9 @@
   document.getElementById("copyToast").textContent = t("copied");
 
   var PLAT_META = {
-    ios:{emoji:"\U0001f4f1",name:"iOS"}, android:{emoji:"\U0001f916",name:"Android"},
-    macos:{emoji:"\U0001f34e",name:"macOS"}, windows:{emoji:"\U0001f4bb",name:"Windows"},
-    linux:{emoji:"\U0001f427",name:"Linux"}
+    ios:{emoji:"📱",name:"iOS"}, android:{emoji:"🤖",name:"Android"},
+    macos:{emoji:"🍎",name:"macOS"}, windows:{emoji:"💻",name:"Windows"},
+    linux:{emoji:"🐧",name:"Linux"}
   };
   function detectPlatform() {
     var ua = navigator.userAgent.toLowerCase();
@@ -244,11 +243,11 @@
       {name:"Clash Mi",deepLink:"clash://install-config?overwrite=no&name=Remnawave&url={{ENC}}",featured:false,storeLinks:[{text:"App Store",link:"https://apps.apple.com/us/app/clash-mi/id6744321968"}]}
     ],
     android: [
-      {name:"FlClashX",deepLink:"flclashx://install-config?url={{ENC}}",featured:true,storeLinks:[{text:"\u0421\u043a\u0430\u0447\u0430\u0442\u044c APK",link:"https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-android-arm64-v8a.apk"}]},
-      {name:"Clash Meta",deepLink:"clashmeta://install-config?name=Remnawave&url={{ENC}}",featured:true,storeLinks:[{text:"\u0421\u043a\u0430\u0447\u0430\u0442\u044c APK",link:"https://github.com/MetaCubeX/ClashMetaForAndroid/releases/download/v2.11.20/cmfa-2.11.20-meta-universal-release.apk"},{text:"F-Droid",link:"https://f-droid.org/packages/com.github.metacubex.clash.meta/"}]},
-      {name:"Happ",deepLink:"happ://add/{{SUB}}",featured:true,storeLinks:[{text:"Google Play",link:"https://play.google.com/store/apps/details?id=com.happproxy"},{text:"\u0421\u043a\u0430\u0447\u0430\u0442\u044c APK",link:"https://github.com/Happ-proxy/happ-android/releases/latest/download/Happ.apk"}]},
-      {name:"v2rayNG",deepLink:"v2rayng://install-config?name=Remnawave&url={{ENC}}",featured:false,storeLinks:[{text:"\u0421\u043a\u0430\u0447\u0430\u0442\u044c APK",link:"https://github.com/2dust/v2rayNG/releases/download/1.10.31/v2rayNG_1.10.31_universal.apk"}]},
-      {name:"Exclave",deepLink:"exclave://subscription?url={{ENC}}",featured:false,storeLinks:[{text:"\u0421\u043a\u0430\u0447\u0430\u0442\u044c APK",link:"https://github.com/dyhkwong/Exclave/releases/download/0.17.4/Exclave-0.17.4-arm64-v8a.apk"}]}
+      {name:"FlClashX",deepLink:"flclashx://install-config?url={{ENC}}",featured:true,storeLinks:[{text:"Скачать APK",link:"https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-android-arm64-v8a.apk"}]},
+      {name:"Clash Meta",deepLink:"clashmeta://install-config?name=Remnawave&url={{ENC}}",featured:true,storeLinks:[{text:"Скачать APK",link:"https://github.com/MetaCubeX/ClashMetaForAndroid/releases/download/v2.11.20/cmfa-2.11.20-meta-universal-release.apk"},{text:"F-Droid",link:"https://f-droid.org/packages/com.github.metacubex.clash.meta/"}]},
+      {name:"Happ",deepLink:"happ://add/{{SUB}}",featured:true,storeLinks:[{text:"Google Play",link:"https://play.google.com/store/apps/details?id=com.happproxy"},{text:"Скачать APK",link:"https://github.com/Happ-proxy/happ-android/releases/latest/download/Happ.apk"}]},
+      {name:"v2rayNG",deepLink:"v2rayng://install-config?name=Remnawave&url={{ENC}}",featured:false,storeLinks:[{text:"Скачать APK",link:"https://github.com/2dust/v2rayNG/releases/download/1.10.31/v2rayNG_1.10.31_universal.apk"}]},
+      {name:"Exclave",deepLink:"exclave://subscription?url={{ENC}}",featured:false,storeLinks:[{text:"Скачать APK",link:"https://github.com/dyhkwong/Exclave/releases/download/0.17.4/Exclave-0.17.4-arm64-v8a.apk"}]}
     ],
     macos: [
       {name:"Happ",deepLink:"happ://add/{{SUB}}",featured:true,storeLinks:[{text:"App Store (RU)",link:"https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973"},{text:"App Store (Global)",link:"https://apps.apple.com/us/app/happ-proxy-utility/id6504287215"}]},
@@ -258,11 +257,11 @@
       {name:"Clash Verge",deepLink:"clash://install-config?url={{ENC}}",featured:false,storeLinks:[{text:"Intel",link:"https://github.com/clash-verge-rev/clash-verge-rev/releases/download/v2.4.4-rc/Clash.Verge_2.4.4-rc_x64.dmg"},{text:"Apple Silicon",link:"https://github.com/clash-verge-rev/clash-verge-rev/releases/download/v2.4.4-rc/Clash.Verge_2.4.4-rc_aarch64.dmg"}]}
     ],
     windows: [
-      {name:"FlClashX",deepLink:"flclashx://install-config?url={{ENC}}",featured:true,storeLinks:[{text:"\u0423\u0441\u0442\u0430\u043d\u043e\u0432\u0449\u0438\u043a",link:"https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-windows-amd64-setup.exe"},{text:"\u041f\u043e\u0440\u0442\u0430\u0442\u0438\u0432\u043d\u0430\u044f",link:"https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-windows-amd64.zip"}]},
-      {name:"Koala Clash",deepLink:"koala-clash://install-config?url={{ENC}}",featured:true,storeLinks:[{text:"\u0423\u0441\u0442\u0430\u043d\u043e\u0432\u0449\u0438\u043a",link:"https://github.com/coolcoala/clash-verge-rev-lite/releases/latest/download/Koala.Clash_x64-setup.exe"}]},
+      {name:"FlClashX",deepLink:"flclashx://install-config?url={{ENC}}",featured:true,storeLinks:[{text:"Установщик",link:"https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-windows-amd64-setup.exe"},{text:"Портативная",link:"https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-windows-amd64.zip"}]},
+      {name:"Koala Clash",deepLink:"koala-clash://install-config?url={{ENC}}",featured:true,storeLinks:[{text:"Установщик",link:"https://github.com/coolcoala/clash-verge-rev-lite/releases/latest/download/Koala.Clash_x64-setup.exe"}]},
       {name:"Happ",deepLink:"happ://add/{{SUB}}",featured:false,storeLinks:[{text:"Windows",link:"https://github.com/Happ-proxy/happ-desktop/releases/latest/download/setup-Happ.x64.exe"}]},
-      {name:"Prizrak-Box",deepLink:"prizrak-box://install-config?url={{ENC}}",featured:true,storeLinks:[{text:"\u0423\u0441\u0442\u0430\u043d\u043e\u0432\u0449\u0438\u043a",link:"https://github.com/legiz-ru/Prizrak-Box/releases/latest/download/windows-amd64.msi"}]},
-      {name:"Clash Verge",deepLink:"clash://install-config?url={{ENC}}",featured:false,storeLinks:[{text:"\u0423\u0441\u0442\u0430\u043d\u043e\u0432\u0449\u0438\u043a",link:"https://github.com/clash-verge-rev/clash-verge-rev/releases/download/v2.4.4-rc/Clash.Verge_2.4.4-rc_x64-setup.exe"}]}
+      {name:"Prizrak-Box",deepLink:"prizrak-box://install-config?url={{ENC}}",featured:true,storeLinks:[{text:"Установщик",link:"https://github.com/legiz-ru/Prizrak-Box/releases/latest/download/windows-amd64.msi"}]},
+      {name:"Clash Verge",deepLink:"clash://install-config?url={{ENC}}",featured:false,storeLinks:[{text:"Установщик",link:"https://github.com/clash-verge-rev/clash-verge-rev/releases/download/v2.4.4-rc/Clash.Verge_2.4.4-rc_x64-setup.exe"}]}
     ],
     linux: [
       {name:"FlClashX",deepLink:"flclashx://install-config?url={{ENC}}",featured:true,storeLinks:[{text:".deb (amd64)",link:"https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-linux-amd64.deb"},{text:"AppImage",link:"https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-linux-amd64.AppImage"}]},
@@ -275,9 +274,10 @@
   var params = new URLSearchParams(window.location.search);
   var subUrl = params.get("sub") || "";
   var appHint = (params.get("app") || "").toLowerCase();
+  if (!subUrl) {
     document.getElementById("scanCard").classList.add("hidden");
     document.getElementById("resultCard").classList.remove("hidden");
-    document.getElementById("resultEmoji").textContent = "\u26a0\ufe0f";
+    document.getElementById("resultEmoji").textContent = "⚠️";
     document.getElementById("resultMsg").textContent = t("errorNoSub");
     return;
   }
@@ -288,10 +288,12 @@
 
   function parseRemnaConfig(cfg) {
     var platformApps = cfg && cfg.platforms && cfg.platforms[platform];
+    if (!Array.isArray(platformApps) || !platformApps.length) return null;
     var apps = [];
     for (var i = 0; i < platformApps.length; i++) {
       var app = platformApps[i];
       var scheme = app.urlScheme;
+      if (!scheme) continue;
       var tpl = scheme + (scheme.charAt(scheme.length-1) === "=" ? "{{ENC}}" : "{{SUB}}");
       var links = [];
       if (app.installationStep && app.installationStep.buttons) {
@@ -303,13 +305,14 @@
           }
         }
       }
-      apps.push({name: app.name||app.id, deepLink: tpl, featured:             {                 echo ___BEGIN___COMMAND_OUTPUT_MARKER___;                 PS1=;PS2=;unset HISTFILE;                 EC=0;                 echo ___BEGIN___COMMAND_DONE_MARKER___0;             }app.isFeatured, storeLinks: links});
+      apps.push({name: app.name||app.id, deepLink: tpl, featured: !!app.isFeatured, storeLinks: links});
     }
     apps.sort(function(a,b){return (b.featured?1:0)-(a.featured?1:0);});
     return apps.length ? apps : null;
   }
 
   function prioritize(apps) {
+    if (!appHint || appHint === "_default") return apps;
     var hint = appHint.replace(/[-_\s]/g,"").toLowerCase();
     for (var i=1; i<apps.length; i++) {
       var n = apps[i].name.replace(/[-_\s]/g,"").toLowerCase();
@@ -334,6 +337,7 @@
       function tryApp(i) {
         if (i >= apps.length || found) {
           clearInterval(funTimer);
+          if (!found) resolve(null);
           return;
         }
         var app = apps[i];
@@ -365,6 +369,7 @@
         try { iframe.src = uri; } catch(e) {}
 
         var timer = setTimeout(function() {
+          if (!found) { cleanup(); tryApp(i+1); }
         }, SCAN_TIMEOUT);
       }
       tryApp(0);
@@ -375,9 +380,8 @@
     document.getElementById("scanCard").classList.add("hidden");
     var rc = document.getElementById("resultCard");
     rc.classList.remove("hidden");
-    rc.style.borderColor = "rgba(0,184,148,.3)";
     rc.style.border = "1px solid rgba(0,184,148,.3)";
-    document.getElementById("resultEmoji").textContent = "\u2705";
+    document.getElementById("resultEmoji").textContent = "✅";
     document.getElementById("resultMsg").textContent = t("found",{name:app.name});
     document.getElementById("resultHint").textContent = t("foundHint");
     showKey();
@@ -387,7 +391,7 @@
     document.getElementById("scanCard").classList.add("hidden");
     var rc = document.getElementById("resultCard");
     rc.classList.remove("hidden");
-    document.getElementById("resultEmoji").textContent = "\U0001f4f2";
+    document.getElementById("resultEmoji").textContent = "📲";
     document.getElementById("resultMsg").textContent = t("notFound");
     document.getElementById("resultHint").textContent = t("notFoundHint");
 
@@ -399,6 +403,7 @@
     for (var i=0; i<apps.length; i++) {
       if (apps[i].featured) featured.push(apps[i]); else other.push(apps[i]);
     }
+    if (!featured.length) { featured.push(apps[0]); other = apps.slice(1); }
 
     for (var f=0; f<featured.length; f++) listEl.appendChild(makeCard(featured[f], true));
 
@@ -411,6 +416,8 @@
       otherWrap.className = "hidden";
       var shown = false;
       togBtn.addEventListener("click", function() {
+        shown = !shown;
+        otherWrap.classList.toggle("hidden",!shown);
         togBtn.textContent = shown ? t("hideApps") : t("otherApps",{count:other.length});
       });
       listEl.appendChild(togBtn);
@@ -419,7 +426,7 @@
     }
     showKey();
 
-    /* Auto-redirect: open first featured app download in 1.5s */
+    /* Auto-redirect: open first featured app download after 1.5s */
     var topApp = featured[0];
     if (topApp && topApp.storeLinks && topApp.storeLinks.length) {
       setTimeout(function() {
@@ -519,6 +526,7 @@
     } catch(e) {
       console.warn("[connect] Config fetch failed, using fallback:", e.message);
     }
+    if (!apps) {
       apps = FALLBACK_APPS[platform] || FALLBACK_APPS.windows;
       console.log("[connect] Using fallback for", platform);
     }
