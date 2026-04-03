@@ -76,7 +76,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
 (function(){
   'use strict';
   var CONFIG_URL='/add_sub/config';
-  var PROBE_TIMEOUT=800;
+  var PROBE_TIMEOUT=500;
 
   function detectPlatform(){var ua=navigator.userAgent;if(/iphone|ipad|ipod/i.test(ua))return'ios';if(/android/i.test(ua)&&/tv|television|aft/i.test(ua))return'androidTV';if(/android/i.test(ua))return'android';if(/apple\s*tv/i.test(ua))return'appleTV';if(/macintosh|mac os/i.test(ua))return'macos';if(/windows/i.test(ua))return'windows';if(/linux/i.test(ua))return'linux';return'windows'}
   var platform=detectPlatform();
@@ -345,11 +345,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
   document.getElementById('keyBox').addEventListener('click',doCopy);
   document.getElementById('retryBtn').addEventListener('click',function(){location.reload()});
 
-  /*
-   * Main: two passes on ALL devices
-   * Pass 1 — hidden iframes (safe, silent everywhere)
-   * Pass 2 — location.href (fallback; works on iOS Safari where iframes can't trigger custom schemes)
-   */
+  /* Main: iframe scan only (silent, no dialogs). href used only via "Подключить" button */
   async function main(){
     startFun();
     var apps=null;
@@ -360,15 +356,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
     if(!apps.length){showAppList([],false);return}
     if(isFirefoxMobile){showAppList(apps,true);return}
 
-    /* Pass 1: iframes */
     for(var i=0;i<apps.length;i++){
-      $scanSub.textContent='\u041F\u0440\u043E\u0432\u0435\u0440\u044F\u0435\u043C '+apps[i].name+'\u2026';
       if(await probeIframe(apps[i])){showSuccess();return}
-    }
-    /* Pass 2: href */
-    for(var i=0;i<apps.length;i++){
-      $scanSub.textContent='\u041F\u0440\u043E\u0432\u0435\u0440\u044F\u0435\u043C '+apps[i].name+'\u2026';
-      if(await probeHref(apps[i])){showSuccess();return}
     }
     showAppList(apps,false);
   }
