@@ -17,8 +17,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
 .scan{text-align:center}
 .pulse-ring{width:52px;height:52px;border-radius:50%;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 14px;animation:pulse 2s ease-in-out infinite}
 @keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.08);opacity:.7}}
-.scan .msg{font-size:15px;font-weight:500;min-height:22px;transition:opacity .2s}
-.scan .msg.fade{opacity:0}
+.scan .msg{font-size:15px;font-weight:500;min-height:22px;transition:opacity .25s ease}
+#scanEmoji{transition:opacity .25s ease}
 .scan .msg-sub{font-size:12px;color:var(--muted);margin-top:3px;min-height:16px}
 .bar{height:3px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden;margin-top:14px}
 .bar-fill{height:100%;border-radius:2px;background:var(--accent);width:30%;animation:slide 1.4s ease-in-out infinite}
@@ -79,6 +79,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
 
   function detectPlatform(){var ua=navigator.userAgent;if(/iphone|ipad|ipod/i.test(ua))return'ios';if(/android/i.test(ua)&&/tv|television|aft/i.test(ua))return'androidTV';if(/android/i.test(ua))return'android';if(/apple\s*tv/i.test(ua))return'appleTV';if(/macintosh|mac os/i.test(ua))return'macos';if(/windows/i.test(ua))return'windows';if(/linux/i.test(ua))return'linux';return'windows'}
   var platform=detectPlatform();
+  var isMobile=/iphone|ipad|ipod|android/i.test(navigator.userAgent);
   var isFirefoxMobile=/firefox/i.test(navigator.userAgent)&&/mobile|android|iphone/i.test(navigator.userAgent);
   var params=new URLSearchParams(location.search);
   var subUrl=params.get('sub')||'';
@@ -187,20 +188,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
   ];
   var funIdx=0,funTimer=null;
   function startFun(){showFM(FUN[0]);funTimer=setInterval(function(){funIdx=(funIdx+1)%FUN.length;showFM(FUN[funIdx])},1800)}
-  function showFM(m){$scanMsg.classList.add('fade');setTimeout(function(){$scanMsg.textContent=m.t;$scanE.textContent=m.e;$scanMsg.classList.remove('fade')},200)}
+  function showFM(m){$scanMsg.style.opacity='0';$scanE.style.opacity='0';setTimeout(function(){$scanMsg.textContent=m.t;$scanE.textContent=m.e;$scanMsg.style.opacity='1';$scanE.style.opacity='1'},250)}
   function stopFun(){if(funTimer){clearInterval(funTimer);funTimer=null}}
 
-  /* Detection: iframe + visibilitychange ONLY */
+  /* Detection: dual probe — iframe.src + location.href (mobile) + visibilitychange */
   function probeApp(app){
     return new Promise(function(resolve){
-      var done=false,uri=buildLink(app.deepLink,subUrl);
-      function finish(d){if(done)return;done=true;document.removeEventListener('visibilitychange',onVis);if(iframe&&iframe.parentNode)iframe.remove();clearTimeout(tmr);resolve(d)}
+      var done=false,uri=buildLink(app.deepLink,subUrl),locTmr;
+      function finish(d){if(done)return;done=true;document.removeEventListener('visibilitychange',onVis);if(iframe&&iframe.parentNode)iframe.remove();clearTimeout(tmr);if(locTmr)clearTimeout(locTmr);resolve(d)}
       function onVis(){if(document.visibilityState==='hidden')finish(true)}
       document.addEventListener('visibilitychange',onVis);
       var iframe=document.createElement('iframe');
       iframe.style.cssText='position:absolute;width:0;height:0;border:0;opacity:0;pointer-events:none;top:-9999px';
       document.body.appendChild(iframe);
       try{iframe.src=uri}catch(e){}
+      if(isMobile){locTmr=setTimeout(function(){if(!done)try{window.location.href=uri}catch(e){}},300)}
       var tmr=setTimeout(function(){finish(false)},PROBE_TIMEOUT);
     });
   }
