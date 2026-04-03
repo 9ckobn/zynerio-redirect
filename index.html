@@ -75,11 +75,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
 <script>
 (function(){
   'use strict';
-  var CONFIG_URL='/add_sub/config',PROBE_TIMEOUT=1500;
+  var CONFIG_URL='/add_sub/config';
+  var HREF_TIMEOUT=800,IFRAME_TIMEOUT=1000;
 
   function detectPlatform(){var ua=navigator.userAgent;if(/iphone|ipad|ipod/i.test(ua))return'ios';if(/android/i.test(ua)&&/tv|television|aft/i.test(ua))return'androidTV';if(/android/i.test(ua))return'android';if(/apple\s*tv/i.test(ua))return'appleTV';if(/macintosh|mac os/i.test(ua))return'macos';if(/windows/i.test(ua))return'windows';if(/linux/i.test(ua))return'linux';return'windows'}
   var platform=detectPlatform();
-  var isMobile=/iphone|ipad|ipod|android/i.test(navigator.userAgent);
+  var useHref=/iphone|ipad|ipod/i.test(navigator.userAgent);
   var isFirefoxMobile=/firefox/i.test(navigator.userAgent)&&/mobile|android|iphone/i.test(navigator.userAgent);
   var params=new URLSearchParams(location.search);
   var subUrl=params.get('sub')||'';
@@ -191,19 +192,27 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
   function showFM(m){$scanMsg.style.opacity='0';$scanE.style.opacity='0';setTimeout(function(){$scanMsg.textContent=m.t;$scanE.textContent=m.e;$scanMsg.style.opacity='1';$scanE.style.opacity='1'},250)}
   function stopFun(){if(funTimer){clearInterval(funTimer);funTimer=null}}
 
-  /* Detection: dual probe — iframe.src + location.href (mobile) + visibilitychange */
+  /*
+   * Detection strategy per platform:
+   * iOS:   location.href — works in Safari + WebView, silent for uninstalled apps
+   * Other: hidden iframe — works on Android Chrome, desktop; no error pages
+   * Both listen for visibilitychange to detect app launch.
+   */
   function probeApp(app){
     return new Promise(function(resolve){
-      var done=false,uri=buildLink(app.deepLink,subUrl),locTmr;
-      function finish(d){if(done)return;done=true;document.removeEventListener('visibilitychange',onVis);if(iframe&&iframe.parentNode)iframe.remove();clearTimeout(tmr);if(locTmr)clearTimeout(locTmr);resolve(d)}
+      var done=false,uri=buildLink(app.deepLink,subUrl),iframe=null;
+      function finish(d){if(done)return;done=true;document.removeEventListener('visibilitychange',onVis);if(iframe&&iframe.parentNode)iframe.remove();clearTimeout(tmr);resolve(d)}
       function onVis(){if(document.visibilityState==='hidden')finish(true)}
       document.addEventListener('visibilitychange',onVis);
-      var iframe=document.createElement('iframe');
-      iframe.style.cssText='position:absolute;width:0;height:0;border:0;opacity:0;pointer-events:none;top:-9999px';
-      document.body.appendChild(iframe);
-      try{iframe.src=uri}catch(e){}
-      if(isMobile){locTmr=setTimeout(function(){if(!done)try{window.location.href=uri}catch(e){}},300)}
-      var tmr=setTimeout(function(){finish(false)},PROBE_TIMEOUT);
+      if(useHref){
+        try{window.location.href=uri}catch(e){}
+      }else{
+        iframe=document.createElement('iframe');
+        iframe.style.cssText='position:absolute;width:0;height:0;border:0;opacity:0;pointer-events:none;top:-9999px';
+        document.body.appendChild(iframe);
+        try{iframe.src=uri}catch(e){}
+      }
+      var tmr=setTimeout(function(){finish(false)},useHref?HREF_TIMEOUT:IFRAME_TIMEOUT);
     });
   }
 
