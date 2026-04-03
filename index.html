@@ -332,30 +332,38 @@
 
   const FALLBACK_APPS = {
     ios: [
-      { name: 'Happ',         deepLink: 'happ://add/{{SUB}}',                                      storeLink: 'https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973' },
-      { name: 'Streisand',    deepLink: 'streisand://import/{{SUB}}',                               storeLink: 'https://apps.apple.com/ru/app/streisand/id6450534064' },
-      { name: 'Stash',        deepLink: 'stash://install-config?url={{ENC}}',                       storeLink: 'https://apps.apple.com/us/app/stash-rule-based-proxy/id1596063349' },
-      { name: 'Shadowrocket', deepLink: 'shadowrocket://add/{{SUB}}',                              storeLink: 'https://apps.apple.com/ru/app/shadowrocket/id932747118' },
+      { name: 'Happ',         deepLink: 'happ://add/{{SUB}}',                                                       storeLinks: [{text:'App Store (RU)',link:'https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973'},{text:'App Store (Global)',link:'https://apps.apple.com/us/app/happ-proxy-utility/id6504287215'}] },
+      { name: 'Streisand',    deepLink: 'streisand://import/{{SUB}}',                                                storeLinks: [{text:'App Store',link:'https://apps.apple.com/ru/app/streisand/id6450534064'}] },
+      { name: 'Stash',        deepLink: 'stash://install-config?url={{ENC}}',                                        storeLinks: [{text:'App Store',link:'https://apps.apple.com/us/app/stash-rule-based-proxy/id1596063349'}] },
+      { name: 'Shadowrocket', deepLink: 'sub://{{SUB}}',                                                            storeLinks: [{text:'App Store',link:'https://apps.apple.com/ru/app/shadowrocket/id932747118'}] },
+      { name: 'Clash Mi',     deepLink: 'clash://install-config?overwrite=no&name=Remnawave&url={{ENC}}',            storeLinks: [{text:'App Store',link:'https://apps.apple.com/us/app/clash-mi/id6744321968'}] },
     ],
     android: [
-      { name: 'Happ',         deepLink: 'happ://add/{{SUB}}',                                      storeLink: 'https://play.google.com/store/apps/details?id=com.happproxy' },
-      { name: 'FlClashX',     deepLink: 'flclashx://install-config?url={{ENC}}',                    storeLink: 'https://github.com/pluralplay/FlClashX/releases/latest/download/FlClashX-android-universal.apk' },
-      { name: 'Clash Meta',   deepLink: 'clashmeta://install-config?url={{ENC}}',                   storeLink: 'https://github.com/MetaCubeX/ClashMetaForAndroid/releases/download/v2.11.20/cmfa-2.11.20-meta-universal-release.apk' },
-      { name: 'V2RayNG',      deepLink: 'v2rayng://install-config?url={{ENC}}',                     storeLink: 'https://github.com/2dust/v2rayNG/releases/latest' },
+      { name: 'FlClashX',     deepLink: 'flclashx://install-config?url={{ENC}}',                                    storeLinks: [{text:'Скачать APK',link:'https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-android-arm64-v8a.apk'}] },
+      { name: 'Clash Meta',   deepLink: 'clashmeta://install-config?name=Remnawave&url={{ENC}}',                    storeLinks: [{text:'Скачать APK',link:'https://github.com/MetaCubeX/ClashMetaForAndroid/releases/download/v2.11.20/cmfa-2.11.20-meta-universal-release.apk'},{text:'F-Droid',link:'https://f-droid.org/packages/com.github.metacubex.clash.meta/'}] },
+      { name: 'Happ',         deepLink: 'happ://add/{{SUB}}',                                                       storeLinks: [{text:'Google Play',link:'https://play.google.com/store/apps/details?id=com.happproxy'},{text:'Скачать APK',link:'https://github.com/Happ-proxy/happ-android/releases/latest/download/Happ.apk'}] },
+      { name: 'v2rayNG',      deepLink: 'v2rayng://install-config?name=Remnawave&url={{ENC}}',                      storeLinks: [{text:'Скачать APK',link:'https://github.com/2dust/v2rayNG/releases/download/1.10.31/v2rayNG_1.10.31_universal.apk'}] },
+      { name: 'Exclave',      deepLink: 'exclave://subscription?url={{ENC}}',                                        storeLinks: [{text:'Скачать APK',link:'https://github.com/dyhkwong/Exclave/releases/download/0.17.4/Exclave-0.17.4-arm64-v8a.apk'},{text:'F-Droid',link:'https://f-droid.org/packages/com.github.dyhkwong.sagernet'}] },
     ],
     macos: [
-      { name: 'Happ',         deepLink: 'happ://add/{{SUB}}',                                      storeLink: 'https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973' },
-      { name: 'FlClashX',     deepLink: 'flclashx://install-config?url={{ENC}}',                    storeLink: 'https://github.com/pluralplay/FlClashX/releases/latest' },
-      { name: 'Koala Clash',  deepLink: 'koala-clash://install-config?url={{ENC}}',                 storeLink: 'https://github.com/coolcoala/clash-verge-rev-lite/releases/latest' },
+      { name: 'Happ',         deepLink: 'happ://add/{{SUB}}',                                                       storeLinks: [{text:'App Store (RU)',link:'https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973'},{text:'App Store (Global)',link:'https://apps.apple.com/us/app/happ-proxy-utility/id6504287215'}] },
+      { name: 'Koala Clash',  deepLink: 'koala-clash://install-config?url={{ENC}}',                                  storeLinks: [{text:'macOS (Apple Silicon)',link:'https://github.com/coolcoala/clash-verge-rev-lite/releases/latest/download/Koala.Clash_aarch64.dmg'},{text:'macOS (Intel)',link:'https://github.com/coolcoala/clash-verge-rev-lite/releases/latest/download/Koala.Clash_x64.dmg'}] },
+      { name: 'FlClashX',     deepLink: 'flclashx://install-config?url={{ENC}}',                                    storeLinks: [{text:'macOS (Apple Silicon)',link:'https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-macos-arm64.dmg'},{text:'macOS (Intel)',link:'https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-macos-amd64.dmg'}] },
+      { name: 'Prizrak-Box',  deepLink: 'prizrak-box://install-config?url={{ENC}}',                                  storeLinks: [{text:'macOS (Apple Silicon)',link:'https://github.com/legiz-ru/Prizrak-Box/releases/latest/download/macos-arm64-dmg.zip'},{text:'macOS (Intel)',link:'https://github.com/legiz-ru/Prizrak-Box/releases/latest/download/macos-amd64-dmg.zip'}] },
+      { name: 'Clash Verge',  deepLink: 'clash://install-config?url={{ENC}}',                                        storeLinks: [{text:'macOS (Intel)',link:'https://github.com/clash-verge-rev/clash-verge-rev/releases/download/v2.4.4-rc/Clash.Verge_2.4.4-rc_x64.dmg'},{text:'macOS (Apple Silicon)',link:'https://github.com/clash-verge-rev/clash-verge-rev/releases/download/v2.4.4-rc/Clash.Verge_2.4.4-rc_aarch64.dmg'}] },
     ],
     windows: [
-      { name: 'Happ',         deepLink: 'happ://add/{{SUB}}',                                      storeLink: 'https://github.com/Happ-proxy/happ-desktop/releases/latest/download/setup-Happ.x64.exe' },
-      { name: 'FlClashX',     deepLink: 'flclashx://install-config?url={{ENC}}',                    storeLink: 'https://github.com/pluralplay/FlClashX/releases/latest/download/FlClashX-windows-amd64-setup.exe' },
-      { name: 'Koala Clash',  deepLink: 'koala-clash://install-config?url={{ENC}}',                 storeLink: 'https://github.com/coolcoala/clash-verge-rev-lite/releases/latest/download/Koala.Clash_x64-setup.exe' },
+      { name: 'FlClashX',     deepLink: 'flclashx://install-config?url={{ENC}}',                                    storeLinks: [{text:'Windows (Установщик)',link:'https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-windows-amd64-setup.exe'},{text:'Windows (Портативная)',link:'https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-windows-amd64.zip'}] },
+      { name: 'Koala Clash',  deepLink: 'koala-clash://install-config?url={{ENC}}',                                  storeLinks: [{text:'Windows (Установщик)',link:'https://github.com/coolcoala/clash-verge-rev-lite/releases/latest/download/Koala.Clash_x64-setup.exe'}] },
+      { name: 'Prizrak-Box',  deepLink: 'prizrak-box://install-config?url={{ENC}}',                                  storeLinks: [{text:'Windows (Установщик)',link:'https://github.com/legiz-ru/Prizrak-Box/releases/latest/download/windows-amd64.msi'},{text:'Windows (Портативная)',link:'https://github.com/legiz-ru/Prizrak-Box/releases/latest/download/windows-amd64.zip'}] },
+      { name: 'Happ',         deepLink: 'happ://add/{{SUB}}',                                                       storeLinks: [{text:'Windows',link:'https://github.com/Happ-proxy/happ-desktop/releases/latest/download/setup-Happ.x64.exe'}] },
+      { name: 'Clash Verge',  deepLink: 'clash://install-config?url={{ENC}}',                                        storeLinks: [{text:'Windows (Установщик)',link:'https://github.com/clash-verge-rev/clash-verge-rev/releases/download/v2.4.4-rc/Clash.Verge_2.4.4-rc_x64-setup.exe'}] },
     ],
     linux: [
-      { name: 'FlClashX',     deepLink: 'flclashx://install-config?url={{ENC}}',                    storeLink: 'https://github.com/pluralplay/FlClashX/releases/latest' },
-      { name: 'Koala Clash',  deepLink: 'koala-clash://install-config?url={{ENC}}',                 storeLink: 'https://github.com/coolcoala/clash-verge-rev-lite/releases/latest' },
+      { name: 'FlClashX',     deepLink: 'flclashx://install-config?url={{ENC}}',                                    storeLinks: [{text:'amd64 (.deb)',link:'https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-linux-amd64.deb'},{text:'amd64 (AppImage)',link:'https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-linux-amd64.AppImage'}] },
+      { name: 'Koala Clash',  deepLink: 'koala-clash://install-config?url={{ENC}}',                                  storeLinks: [{text:'amd64 (.deb)',link:'https://github.com/coolcoala/clash-verge-rev-lite/releases/latest/download/Koala.Clash_amd64.deb'},{text:'amd64 (.rpm)',link:'https://github.com/coolcoala/clash-verge-rev-lite/releases/latest/download/Koala.Clash.x86_64.rpm'}] },
+      { name: 'Prizrak-Box',  deepLink: 'prizrak-box://install-config?url={{ENC}}',                                  storeLinks: [{text:'amd64 (.deb)',link:'https://github.com/legiz-ru/Prizrak-Box/releases/latest/download/linux-amd64.deb'},{text:'amd64 (.rpm)',link:'https://github.com/legiz-ru/Prizrak-Box/releases/latest/download/linux-amd64.rpm'}] },
+      { name: 'Clash Verge',  deepLink: 'clash://install-config?url={{ENC}}',                                        storeLinks: [{text:'Linux (amd64 .deb)',link:'https://github.com/clash-verge-rev/clash-verge-rev/releases/download/v2.4.4-rc/Clash.Verge_2.4.4-rc_amd64.deb'}] },
     ],
   };
 
@@ -391,34 +399,39 @@
   /* ── Parse Remnawave subscription-page config ──────────── */
 
   function parseRemnaConfig(cfg) {
-    // cfg is the full .app-config-v2.json
-    // Structure: { platforms: { ios: { apps: [ { name, featured, blocks: [ { buttons: [...] } ] } ] } } }
-    const platformCfg = cfg?.platforms?.[platform];
-    if (!platformCfg?.apps?.length) return null;
+    // Remnawave config: { platforms: { ios: [ { id, name, isFeatured, urlScheme, installationStep: { buttons: [{buttonLink, buttonText}] } } ] } }
+    const platformApps = cfg?.platforms?.[platform];
+    if (!Array.isArray(platformApps) || !platformApps.length) return null;
 
     const apps = [];
-    for (const app of platformCfg.apps) {
-      const name = app.name || 'Unknown';
-      let deepLink  = null;
-      let storeLink = null;
-      const storeLinks = [];
+    for (const app of platformApps) {
+      const scheme = app.urlScheme;
+      if (!scheme) continue;
 
-      for (const block of (app.blocks || [])) {
-        for (const btn of (block.buttons || [])) {
-          if (btn.type === 'subscriptionLink' && btn.link && !deepLink) {
-            deepLink = btn.link;
-          }
-          if (btn.type === 'external' && btn.link) {
-            if (!storeLink) storeLink = btn.link;
-            storeLinks.push({ text: btn.text || t('download', { name }), link: btn.link });
+      // Build deep link template: if scheme ends with = it's a query param (needs encoding)
+      const deepLink = scheme + (scheme.endsWith('=') ? '{{ENC}}' : '{{SUB}}');
+
+      const storeLinks = [];
+      if (app.installationStep?.buttons) {
+        for (const btn of app.installationStep.buttons) {
+          if (btn.buttonLink) {
+            const text = btn.buttonText?.[lang] || btn.buttonText?.en || btn.buttonText?.ru || app.name;
+            storeLinks.push({ text, link: btn.buttonLink });
           }
         }
       }
 
-      if (deepLink) {
-        apps.push({ name, deepLink, storeLink, storeLinks, featured: !!app.featured });
-      }
+      apps.push({
+        name: app.name || app.id || 'Unknown',
+        deepLink,
+        storeLink: storeLinks.length ? storeLinks[0].link : null,
+        storeLinks,
+        featured: !!app.isFeatured,
+      });
     }
+
+    // Sort: featured apps first
+    apps.sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
 
     return apps.length ? apps : null;
   }
@@ -636,18 +649,11 @@
     window.addEventListener('blur', onBlur);
     document.addEventListener('visibilitychange', onVisChange);
 
-    // Try via hidden iframe
+    // Try via hidden iframe (safe: no system dialog on failure)
     const iframe = document.createElement('iframe');
     iframe.style.display = 'none';
     iframe.src = uri;
     document.body.appendChild(iframe);
-
-    // Also try window.location for platforms where iframe doesn't work
-    setTimeout(() => {
-      if (!detected && !appOpened) {
-        window.location.href = uri;
-      }
-    }, 200);
 
     // Check result after timeout
     setTimeout(() => {
