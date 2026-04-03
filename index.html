@@ -66,7 +66,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
 <div class="wrap">
   <div class="hdr"><div class="hdr-icon">&#x1F510;</div><h1>Zynerio VPN</h1><p class="sub" id="subtitle">&#x0421;&#x0435;&#x043A;&#x0443;&#x043D;&#x0434;&#x043E;&#x0447;&#x043A;&#x0443;&#x2026;</p></div>
   <div class="card" id="scanCard"><div class="scan"><div class="pulse-ring"><span id="scanEmoji">&#x1F50D;</span></div><div class="msg" id="scanMsg">&#x0417;&#x0430;&#x0433;&#x0440;&#x0443;&#x0436;&#x0430;&#x0435;&#x043C; &#x043A;&#x043E;&#x043D;&#x0444;&#x0438;&#x0433;&#x2026;</div><div class="msg-sub" id="scanSub"></div><div class="bar"><div class="bar-fill"></div></div></div></div>
-  <div class="card hidden" id="successCard"><div class="ok"><div class="ok-icon">&#x2705;</div><div class="title" id="okTitle"></div><div class="detail" id="okDetail"></div><a class="btn btn-open" id="openBtn" href="#">&#x041E;&#x0442;&#x043A;&#x0440;&#x044B;&#x0442;&#x044C;</a></div></div>
+  <div class="card hidden" id="successCard"><div class="ok"><div class="ok-icon">&#x2705;</div><div class="title">&#x041F;&#x043E;&#x0434;&#x043F;&#x0438;&#x0441;&#x043A;&#x0430; &#x0443;&#x0441;&#x0442;&#x0430;&#x043D;&#x043E;&#x0432;&#x043B;&#x0435;&#x043D;&#x0430;!</div><div class="detail">&#x041E;&#x0442;&#x043A;&#x0440;&#x043E;&#x0439;&#x0442;&#x0435; VPN-&#x043F;&#x0440;&#x0438;&#x043B;&#x043E;&#x0436;&#x0435;&#x043D;&#x0438;&#x0435; &#x0434;&#x043B;&#x044F; &#x043D;&#x0430;&#x0447;&#x0430;&#x043B;&#x0430; &#x0440;&#x0430;&#x0431;&#x043E;&#x0442;&#x044B;</div><button class="btn btn-copy" id="retryBtn" type="button" style="margin-top:14px">&#x0427;&#x0442;&#x043E;-&#x0442;&#x043E; &#x043D;&#x0435; &#x0442;&#x0430;&#x043A;? &#x041F;&#x043E;&#x043F;&#x0440;&#x043E;&#x0431;&#x043E;&#x0432;&#x0430;&#x0442;&#x044C; &#x0441;&#x043D;&#x043E;&#x0432;&#x0430;</button></div></div>
   <div class="hidden" id="listSection"><div class="lh"><div class="lh-icon">&#x1F4F2;</div><div class="title" id="listTitle"></div><div class="detail" id="listDetail"></div></div><div id="appCards"></div></div>
   <div class="card hidden" id="waitCard"><div class="wt"><div class="wt-icon">&#x23F3;</div><div class="title" id="wtTitle"></div><div class="detail" id="wtDetail">&#x0423;&#x0441;&#x0442;&#x0430;&#x043D;&#x043E;&#x0432;&#x0438;&#x0442;&#x0435; &#x043F;&#x0440;&#x0438;&#x043B;&#x043E;&#x0436;&#x0435;&#x043D;&#x0438;&#x0435; &#x0438; &#x0432;&#x0435;&#x0440;&#x043D;&#x0438;&#x0442;&#x0435;&#x0441;&#x044C; &#x0441;&#x044E;&#x0434;&#x0430;</div><button class="btn-x" id="wtCancel" type="button">&#x041E;&#x0442;&#x043C;&#x0435;&#x043D;&#x0430;</button></div></div>
   <div class="hidden" id="keySection"><div class="ks"><div class="ks-lbl">&#x0421;&#x0441;&#x044B;&#x043B;&#x043A;&#x0430; &#x043F;&#x043E;&#x0434;&#x043F;&#x0438;&#x0441;&#x043A;&#x0438;:</div><div class="ks-box" id="keyBox"></div></div><button class="btn btn-copy" id="copyBtn" type="button">&#x1F4CB; &#x0421;&#x043A;&#x043E;&#x043F;&#x0438;&#x0440;&#x043E;&#x0432;&#x0430;&#x0442;&#x044C; &#x0441;&#x0441;&#x044B;&#x043B;&#x043A;&#x0443; &#x043F;&#x043E;&#x0434;&#x043F;&#x0438;&#x0441;&#x043A;&#x0438;</button></div>
@@ -76,11 +76,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
 (function(){
   'use strict';
   var CONFIG_URL='/add_sub/config';
-  var HREF_TIMEOUT=800,IFRAME_TIMEOUT=1000;
+  var PROBE_TIMEOUT=800;
 
   function detectPlatform(){var ua=navigator.userAgent;if(/iphone|ipad|ipod/i.test(ua))return'ios';if(/android/i.test(ua)&&/tv|television|aft/i.test(ua))return'androidTV';if(/android/i.test(ua))return'android';if(/apple\s*tv/i.test(ua))return'appleTV';if(/macintosh|mac os/i.test(ua))return'macos';if(/windows/i.test(ua))return'windows';if(/linux/i.test(ua))return'linux';return'windows'}
   var platform=detectPlatform();
-  var useHref=/iphone|ipad|ipod/i.test(navigator.userAgent);
   var isFirefoxMobile=/firefox/i.test(navigator.userAgent)&&/mobile|android|iphone/i.test(navigator.userAgent);
   var params=new URLSearchParams(location.search);
   var subUrl=params.get('sub')||'';
@@ -192,44 +191,43 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
   function showFM(m){$scanMsg.style.opacity='0';$scanE.style.opacity='0';setTimeout(function(){$scanMsg.textContent=m.t;$scanE.textContent=m.e;$scanMsg.style.opacity='1';$scanE.style.opacity='1'},250)}
   function stopFun(){if(funTimer){clearInterval(funTimer);funTimer=null}}
 
-  /*
-   * Detection strategy per platform:
-   * iOS:   location.href — works in Safari + WebView, silent for uninstalled apps
-   * Other: hidden iframe — works on Android Chrome, desktop; no error pages
-   * Both listen for visibilitychange to detect app launch.
-   */
-  function probeApp(app){
+  /* Probe via hidden iframe — safe & silent on all platforms */
+  function probeIframe(app){
     return new Promise(function(resolve){
-      var done=false,uri=buildLink(app.deepLink,subUrl),iframe=null;
+      var done=false,uri=buildLink(app.deepLink,subUrl),iframe;
       function finish(d){if(done)return;done=true;document.removeEventListener('visibilitychange',onVis);if(iframe&&iframe.parentNode)iframe.remove();clearTimeout(tmr);resolve(d)}
       function onVis(){if(document.visibilityState==='hidden')finish(true)}
       document.addEventListener('visibilitychange',onVis);
-      if(useHref){
-        try{window.location.href=uri}catch(e){}
-      }else{
-        iframe=document.createElement('iframe');
-        iframe.style.cssText='position:absolute;width:0;height:0;border:0;opacity:0;pointer-events:none;top:-9999px';
-        document.body.appendChild(iframe);
-        try{iframe.src=uri}catch(e){}
-      }
-      var tmr=setTimeout(function(){finish(false)},useHref?HREF_TIMEOUT:IFRAME_TIMEOUT);
+      iframe=document.createElement('iframe');
+      iframe.style.cssText='position:absolute;width:0;height:0;border:0;opacity:0;pointer-events:none;top:-9999px';
+      document.body.appendChild(iframe);
+      try{iframe.src=uri}catch(e){}
+      var tmr=setTimeout(function(){finish(false)},PROBE_TIMEOUT);
     });
   }
 
-  var _waitApp=null,_waitApps=null,_connectingApp=null,_detectedAfterConnect=null;
+  /* Probe via location.href — works where iframes can't (iOS Safari) */
+  function probeHref(app){
+    return new Promise(function(resolve){
+      var done=false,uri=buildLink(app.deepLink,subUrl);
+      function finish(d){if(done)return;done=true;document.removeEventListener('visibilitychange',onVis);clearTimeout(tmr);resolve(d)}
+      function onVis(){if(document.visibilityState==='hidden')finish(true)}
+      document.addEventListener('visibilitychange',onVis);
+      try{window.location.href=uri}catch(e){}
+      var tmr=setTimeout(function(){finish(false)},PROBE_TIMEOUT);
+    });
+  }
+
+  var _waitApp=null,_waitApps=null,_connectClicked=false,_successPending=false;
+  var _allApps=null;
 
   function hideAll(){$scan.classList.add('hidden');$success.classList.add('hidden');$list.classList.add('hidden');$wait.classList.add('hidden');$key.classList.add('hidden')}
   function showKeyBox(){$key.classList.remove('hidden');document.getElementById('keyBox').textContent=subUrl}
 
-  function showSuccess(app){
+  function showSuccess(){
     stopFun();hideAll();
     $success.classList.remove('hidden');
     $sub.textContent='\u0413\u043E\u0442\u043E\u0432\u043E!';
-    document.getElementById('okTitle').textContent=app.name+' \u0438\u043C\u043F\u043E\u0440\u0442\u0438\u0440\u0443\u0435\u0442 \u0432\u0430\u0448\u0443 \u043F\u043E\u0434\u043F\u0438\u0441\u043A\u0443';
-    document.getElementById('okDetail').textContent='VPN \u043D\u0430\u0441\u0442\u0440\u0430\u0438\u0432\u0430\u0435\u0442\u0441\u044F';
-    var btn=document.getElementById('openBtn');
-    btn.textContent='\u041E\u0442\u043A\u0440\u044B\u0442\u044C '+app.name;
-    btn.href=buildLink(app.deepLink,subUrl);
     showKeyBox();
   }
 
@@ -257,22 +255,40 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
   function exitWaitMode(){_waitApp=null;if(_waitApps)showAppList(_waitApps,false)}
   document.getElementById('wtCancel').addEventListener('click',exitWaitMode);
 
-  /* Re-detection on page return */
+  /* Re-detection: when page becomes visible again */
   document.addEventListener('visibilitychange',function(){
     if(document.visibilityState!=='visible'){
-      if(_connectingApp){_detectedAfterConnect=_connectingApp;_connectingApp=null}
+      if(_connectClicked){_successPending=true;_connectClicked=false}
       return;
     }
-    if(_detectedAfterConnect){var a=_detectedAfterConnect;_detectedAfterConnect=null;showSuccess(a);return}
+    if(_successPending){_successPending=false;showSuccess();return}
     if(_waitApp){
       var wa=_waitApp;
-      setTimeout(function(){probeApp(wa).then(function(d){if(d&&_waitApp===wa){_waitApp=null;_waitApps=null;showSuccess(wa)}})},600);
+      setTimeout(function(){
+        probeIframe(wa).then(function(d){
+          if(d&&_waitApp===wa){_waitApp=null;_waitApps=null;showSuccess();return}
+          probeHref(wa).then(function(d2){
+            if(d2&&_waitApp===wa){_waitApp=null;_waitApps=null;showSuccess()}
+          });
+        });
+      },600);
     }
   });
   window.addEventListener('pageshow',function(e){
-    if(e.persisted&&_waitApp){
-      var wa=_waitApp;
-      setTimeout(function(){probeApp(wa).then(function(d){if(d){_waitApp=null;_waitApps=null;showSuccess(wa)}})},600);
+    if(e.persisted){
+      if(_waitApp){
+        var wa=_waitApp;
+        setTimeout(function(){
+          probeIframe(wa).then(function(d){
+            if(d){_waitApp=null;_waitApps=null;showSuccess();return}
+            probeHref(wa).then(function(d2){
+              if(d2){_waitApp=null;_waitApps=null;showSuccess()}
+            });
+          });
+        },600);
+      }else if(_allApps&&$success.classList.contains('hidden')){
+        showAppList(_allApps,false);
+      }
     }
   });
 
@@ -307,7 +323,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
       btns.appendChild(dlBtn);
     }
     var connBtn=document.createElement('button');connBtn.className='btn btn-c';connBtn.type='button';connBtn.textContent='\u041F\u043E\u0434\u043A\u043B\u044E\u0447\u0438\u0442\u044C';
-    connBtn.addEventListener('click',(function(a){return function(){_connectingApp=a;window.location.href=buildLink(a.deepLink,subUrl);setTimeout(function(){if(_connectingApp===a)_connectingApp=null},3000)}})(app));
+    connBtn.addEventListener('click',(function(a){return function(){
+      _connectClicked=true;
+      window.location.href=buildLink(a.deepLink,subUrl);
+      setTimeout(function(){_connectClicked=false},3000);
+    }})(app));
     btns.appendChild(connBtn);card.appendChild(btns);
     if(app.storeLinks&&app.storeLinks.length>1){
       var dls=document.createElement('div');dls.className='dls';
@@ -323,21 +343,32 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
   function showToast(){var el=document.getElementById('toast');el.textContent='\u2705 \u0421\u043A\u043E\u043F\u0438\u0440\u043E\u0432\u0430\u043D\u043E!';el.classList.add('show');setTimeout(function(){el.classList.remove('show')},2000)}
   document.getElementById('copyBtn').addEventListener('click',doCopy);
   document.getElementById('keyBox').addEventListener('click',doCopy);
+  document.getElementById('retryBtn').addEventListener('click',function(){location.reload()});
 
-  /* Main: probe ALL apps sequentially */
+  /*
+   * Main: two passes on ALL devices
+   * Pass 1 — hidden iframes (safe, silent everywhere)
+   * Pass 2 — location.href (fallback; works on iOS Safari where iframes can't trigger custom schemes)
+   */
   async function main(){
     startFun();
     var apps=null;
     try{var res=await fetch(CONFIG_URL,{signal:AbortSignal.timeout(4000)});if(res.ok){apps=parseRemnaConfig(await res.json());if(apps)console.log('[connect] Loaded',apps.length,'apps from config')}}catch(e){console.warn('[connect] Config fetch failed:',e.message)}
     if(!apps){apps=FALLBACK[platform]||FALLBACK.windows;console.log('[connect] Using fallback for',platform)}
     apps=prioritize(apps.slice());
+    _allApps=apps;
     if(!apps.length){showAppList([],false);return}
     if(isFirefoxMobile){showAppList(apps,true);return}
 
+    /* Pass 1: iframes */
     for(var i=0;i<apps.length;i++){
       $scanSub.textContent='\u041F\u0440\u043E\u0432\u0435\u0440\u044F\u0435\u043C '+apps[i].name+'\u2026';
-      var detected=await probeApp(apps[i]);
-      if(detected){showSuccess(apps[i]);return}
+      if(await probeIframe(apps[i])){showSuccess();return}
+    }
+    /* Pass 2: href */
+    for(var i=0;i<apps.length;i++){
+      $scanSub.textContent='\u041F\u0440\u043E\u0432\u0435\u0440\u044F\u0435\u043C '+apps[i].name+'\u2026';
+      if(await probeHref(apps[i])){showSuccess();return}
     }
     showAppList(apps,false);
   }
