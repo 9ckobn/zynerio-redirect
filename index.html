@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" id="root">
+<html lang="ru">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Zynerio VPN &#x2014; Connect</title>
+<title>Zynerio VPN — Подключение</title>
 <style>
 :root{--bg:#0b0b10;--card:#15151e;--card-border:rgba(255,255,255,.05);--accent:#6c5ce7;--accent-soft:rgba(108,92,231,.12);--text:#e8e8ef;--muted:#6e6e84;--success:#00b894;--radius:14px}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -64,30 +64,26 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
 </head>
 <body>
 <div class="wrap">
-  <div class="hdr"><div class="hdr-icon">&#x1F510;</div><h1>Zynerio VPN</h1><p class="sub" id="subtitle"></p></div>
-  <div class="card" id="scanCard"><div class="scan"><div class="pulse-ring"><span id="scanEmoji">&#x1F50D;</span></div><div class="msg" id="scanMsg"></div><div class="msg-sub" id="scanSub"></div><div class="bar"><div class="bar-fill" id="barFill"></div></div></div></div>
-  <div class="card hidden" id="successCard"><div class="ok"><div class="ok-icon">&#x2705;</div><div class="title" id="okTitle"></div><div class="detail" id="okDetail"></div><a class="btn btn-open" id="openBtn" href="#"></a></div></div>
-  <div class="hidden" id="listSection"><div class="lh"><div class="lh-icon" id="lhIcon">&#x1F4F2;</div><div class="title" id="listTitle"></div><div class="detail" id="listDetail"></div></div><div id="appCards"></div></div>
-  <div class="card hidden" id="waitCard"><div class="wt"><div class="wt-icon">&#x23F3;</div><div class="title" id="wtTitle"></div><div class="detail" id="wtDetail"></div><button class="btn-x" id="wtCancel" type="button"></button></div></div>
-  <div class="hidden" id="keySection"><div class="ks"><div class="ks-lbl" id="keyLabel"></div><div class="ks-box" id="keyBox"></div></div><button class="btn btn-copy" id="copyBtn" type="button"></button></div>
+  <div class="hdr"><div class="hdr-icon">&#x1F510;</div><h1>Zynerio VPN</h1><p class="sub" id="subtitle">&#x0421;&#x0435;&#x043A;&#x0443;&#x043D;&#x0434;&#x043E;&#x0447;&#x043A;&#x0443;&#x2026;</p></div>
+  <div class="card" id="scanCard"><div class="scan"><div class="pulse-ring"><span id="scanEmoji">&#x1F50D;</span></div><div class="msg" id="scanMsg">&#x0417;&#x0430;&#x0433;&#x0440;&#x0443;&#x0436;&#x0430;&#x0435;&#x043C; &#x043A;&#x043E;&#x043D;&#x0444;&#x0438;&#x0433;&#x2026;</div><div class="msg-sub" id="scanSub"></div><div class="bar"><div class="bar-fill"></div></div></div></div>
+  <div class="card hidden" id="successCard"><div class="ok"><div class="ok-icon">&#x2705;</div><div class="title" id="okTitle"></div><div class="detail" id="okDetail"></div><a class="btn btn-open" id="openBtn" href="#">&#x041E;&#x0442;&#x043A;&#x0440;&#x044B;&#x0442;&#x044C;</a></div></div>
+  <div class="hidden" id="listSection"><div class="lh"><div class="lh-icon">&#x1F4F2;</div><div class="title" id="listTitle"></div><div class="detail" id="listDetail"></div></div><div id="appCards"></div></div>
+  <div class="card hidden" id="waitCard"><div class="wt"><div class="wt-icon">&#x23F3;</div><div class="title" id="wtTitle"></div><div class="detail" id="wtDetail">&#x0423;&#x0441;&#x0442;&#x0430;&#x043D;&#x043E;&#x0432;&#x0438;&#x0442;&#x0435; &#x043F;&#x0440;&#x0438;&#x043B;&#x043E;&#x0436;&#x0435;&#x043D;&#x0438;&#x0435; &#x0438; &#x0432;&#x0435;&#x0440;&#x043D;&#x0438;&#x0442;&#x0435;&#x0441;&#x044C; &#x0441;&#x044E;&#x0434;&#x0430;</div><button class="btn-x" id="wtCancel" type="button">&#x041E;&#x0442;&#x043C;&#x0435;&#x043D;&#x0430;</button></div></div>
+  <div class="hidden" id="keySection"><div class="ks"><div class="ks-lbl">&#x0421;&#x0441;&#x044B;&#x043B;&#x043A;&#x0430; &#x043F;&#x043E;&#x0434;&#x043F;&#x0438;&#x0441;&#x043A;&#x0438;:</div><div class="ks-box" id="keyBox"></div></div><button class="btn btn-copy" id="copyBtn" type="button">&#x1F4CB; &#x0421;&#x043A;&#x043E;&#x043F;&#x0438;&#x0440;&#x043E;&#x0432;&#x0430;&#x0442;&#x044C; &#x0441;&#x0441;&#x044B;&#x043B;&#x043A;&#x0443; &#x043F;&#x043E;&#x0434;&#x043F;&#x0438;&#x0441;&#x043A;&#x0438;</button></div>
 </div>
 <div class="toast" id="toast"></div>
 <script>
 (function(){
   'use strict';
-  var CONFIG_URL='/add_sub/config',PROBE_TIMEOUT=2500;
-  var LANG={ru:{scanning:'\u0421\u0435\u043a\u0443\u043d\u0434\u043e\u0447\u043a\u0443\u2026',loading:'\u0417\u0430\u0433\u0440\u0443\u0436\u0430\u0435\u043c \u043a\u043e\u043d\u0444\u0438\u0433\u2026',found_title:'\u0413\u043e\u0442\u043e\u0432\u043e!',found_detail:'{name} \u0438\u043c\u043f\u043e\u0440\u0442\u0438\u0440\u0443\u0435\u0442 \u0432\u0430\u0448\u0443 \u043f\u043e\u0434\u043f\u0438\u0441\u043a\u0443',found_sub:'VPN \u043d\u0430\u0441\u0442\u0440\u0430\u0438\u0432\u0430\u0435\u0442\u0441\u044f',open_app:'\u041e\u0442\u043a\u0440\u044b\u0442\u044c {name}',not_found_title:'\u0423\u0441\u0442\u0430\u043d\u043e\u0432\u0438\u0442\u0435 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u0435',not_found_sub:'\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u0435 \u0438 \u043d\u0430\u0436\u043c\u0438\u0442\u0435 \u00ab\u041f\u043e\u0434\u043a\u043b\u044e\u0447\u0438\u0442\u044c\u00bb',choose_title:'\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u0435',choose_sub:'\u041d\u0430\u0436\u043c\u0438\u0442\u0435 \u00ab\u041f\u043e\u0434\u043a\u043b\u044e\u0447\u0438\u0442\u044c\u00bb \u043d\u0430\u043f\u0440\u043e\u0442\u0438\u0432 \u0432\u0430\u0448\u0435\u0433\u043e \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f',connect:'\u041f\u043e\u0434\u043a\u043b\u044e\u0447\u0438\u0442\u044c',download:'\u0421\u043a\u0430\u0447\u0430\u0442\u044c',recommended:'\u0420\u0435\u043a\u043e\u043c\u0435\u043d\u0434\u0443\u0435\u043c',other_apps:'\u0415\u0449\u0451 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f ({count})',hide_other:'\u0421\u043a\u0440\u044b\u0442\u044c',copy_key:'📋 \u0421\u043a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u0441\u0441\u044b\u043b\u043a\u0443 \u043f\u043e\u0434\u043f\u0438\u0441\u043a\u0438',copied:'\u2705 \u0421\u043a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u043d\u043e!',key_label:'\u0421\u0441\u044b\u043b\u043a\u0430 \u043f\u043e\u0434\u043f\u0438\u0441\u043a\u0438:',wait_title:'\u041e\u0436\u0438\u0434\u0430\u0435\u043c \u0443\u0441\u0442\u0430\u043d\u043e\u0432\u043a\u0443 {name}\u2026',wait_detail:'\u0423\u0441\u0442\u0430\u043d\u043e\u0432\u0438\u0442\u0435 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u0435 \u0438 \u0432\u0435\u0440\u043d\u0438\u0442\u0435\u0441\u044c \u0441\u044e\u0434\u0430',cancel:'\u041e\u0442\u043c\u0435\u043d\u0430',error_no_sub:'\u041e\u0448\u0438\u0431\u043a\u0430: \u043d\u0435\u0442 \u0441\u0441\u044b\u043b\u043a\u0438 \u043f\u043e\u0434\u043f\u0438\u0441\u043a\u0438'},en:{scanning:'Just a moment\u2026',loading:'Loading config\u2026',found_title:'Done!',found_detail:'{name} is importing your subscription',found_sub:'VPN is being configured',open_app:'Open {name}',not_found_title:'Install a VPN app',not_found_sub:'Choose an app and tap Connect',choose_title:'Choose your app',choose_sub:'Tap Connect next to your installed app',connect:'Connect',download:'Download',recommended:'Recommended',other_apps:'More apps ({count})',hide_other:'Hide',copy_key:'📋 Copy subscription link',copied:'\u2705 Copied!',key_label:'Subscription link:',wait_title:'Waiting for {name}\u2026',wait_detail:'Install the app and come back here',cancel:'Cancel',error_no_sub:'Error: no subscription URL'}};
-  var params=new URLSearchParams(location.search);
-  var lc=(params.get('lang_code')||'').slice(0,2).toLowerCase();
-  var bl=(navigator.language||'').slice(0,2).toLowerCase();
-  var lang=LANG[lc]?lc:(LANG[bl]?bl:'en');
-  var S=LANG[lang];
-  function t(k,v){var s=S[k]||LANG.en[k]||k;if(v)for(var p in v)s=s.replace('{'+p+'}',v[p]);return s}
-  document.getElementById('root').lang=lang;
-  var FUN={ru:[{t:'\u0418\u0449\u0435\u043c VPN-\u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f\u2026',e:'🔍',s:''},{t:'\u0421\u0442\u0443\u0447\u0438\u043c\u0441\u044f \u0432 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f\u2026',e:'🚪',s:'\u0422\u0443\u043a-\u0442\u0443\u043a!'},{t:'\u0421\u043a\u0430\u043d\u0438\u0440\u0443\u0435\u043c \u0443\u0441\u0442\u0440\u043e\u0439\u0441\u0442\u0432\u043e\u2026',e:'📡',s:'\u041f\u043e\u0447\u0442\u0438 \u0433\u043e\u0442\u043e\u0432\u043e\u2026'},{t:'\u041f\u0440\u043e\u0432\u0435\u0440\u044f\u0435\u043c \u043f\u043e\u0441\u043b\u0435\u0434\u043d\u0435\u0435\u2026',e:'🎯',s:'\u0415\u0449\u0451 \u0447\u0443\u0442\u044c-\u0447\u0443\u0442\u044c'}],en:[{t:'Looking for VPN apps\u2026',e:'🔍',s:''},{t:'Knocking on apps\u2026',e:'🚪',s:'Knock knock!'},{t:'Scanning device\u2026',e:'📡',s:'Almost there\u2026'},{t:'Checking the last one\u2026',e:'🎯',s:'Just a moment'}]};
+  var CONFIG_URL='/add_sub/config',PROBE_TIMEOUT=1500;
+
   function detectPlatform(){var ua=navigator.userAgent;if(/iphone|ipad|ipod/i.test(ua))return'ios';if(/android/i.test(ua)&&/tv|television|aft/i.test(ua))return'androidTV';if(/android/i.test(ua))return'android';if(/apple\s*tv/i.test(ua))return'appleTV';if(/macintosh|mac os/i.test(ua))return'macos';if(/windows/i.test(ua))return'windows';if(/linux/i.test(ua))return'linux';return'windows'}
   var platform=detectPlatform();
   var isFirefoxMobile=/firefox/i.test(navigator.userAgent)&&/mobile|android|iphone/i.test(navigator.userAgent);
+  var params=new URLSearchParams(location.search);
+  var subUrl=params.get('sub')||'';
+  var appHint=(params.get('app')||'').toLowerCase();
+
   var FALLBACK={
     ios:[
       {name:'Happ',deepLink:'happ://add/{{SUB}}',featured:true,storeLinks:[{text:'App Store (RU)',link:'https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973'},{text:'App Store (Global)',link:'https://apps.apple.com/us/app/happ-proxy-utility/id6504287215'}]},
@@ -124,18 +120,34 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
       {name:'Clash Verge',deepLink:'clash://install-config?url={{ENC}}',featured:false,storeLinks:[{text:'.deb (amd64)',link:'https://github.com/clash-verge-rev/clash-verge-rev/releases/download/v2.4.4-rc/Clash.Verge_2.4.4-rc_amd64.deb'}]}
     ]
   };
-  var subUrl=params.get('sub')||'';
-  var appHint=(params.get('app')||'').toLowerCase();
-  var $sub=document.getElementById('subtitle'),$scan=document.getElementById('scanCard'),$success=document.getElementById('successCard'),$list=document.getElementById('listSection'),$wait=document.getElementById('waitCard'),$key=document.getElementById('keySection'),$scanMsg=document.getElementById('scanMsg'),$scanSub=document.getElementById('scanSub'),$scanE=document.getElementById('scanEmoji');
-  $sub.textContent=t('scanning');$scanMsg.textContent=t('loading');
-  document.getElementById('keyLabel').textContent=t('key_label');
-  document.getElementById('copyBtn').textContent=t('copy_key');
-  document.getElementById('wtCancel').textContent=t('cancel');
-  if(!subUrl){$scanE.textContent='\u26A0\uFE0F';document.querySelector('.pulse-ring').style.animation='none';$scanMsg.textContent=t('error_no_sub');$scanSub.textContent='';document.querySelector('.bar').style.display='none';return}
+
+  var $sub=document.getElementById('subtitle'),
+      $scan=document.getElementById('scanCard'),
+      $success=document.getElementById('successCard'),
+      $list=document.getElementById('listSection'),
+      $wait=document.getElementById('waitCard'),
+      $key=document.getElementById('keySection'),
+      $scanMsg=document.getElementById('scanMsg'),
+      $scanSub=document.getElementById('scanSub'),
+      $scanE=document.getElementById('scanEmoji');
+
+  if(!subUrl){
+    $scanE.textContent='\u26A0\uFE0F';
+    document.querySelector('.pulse-ring').style.animation='none';
+    $scanMsg.textContent='\u041E\u0448\u0438\u0431\u043A\u0430: \u043D\u0435\u0442 \u0441\u0441\u044B\u043B\u043A\u0438 \u043F\u043E\u0434\u043F\u0438\u0441\u043A\u0438';
+    $scanSub.textContent='';
+    document.querySelector('.bar').style.display='none';
+    return;
+  }
+
   function buildLink(tpl,sub){return tpl.replace('{{SUB}}',sub).replace('{{ENC}}',encodeURIComponent(sub))}
+
   function parseRemnaConfig(cfg){
     var key=platform;var apps=cfg&&cfg.platforms&&cfg.platforms[key];
-    if(!Array.isArray(apps)||!apps.length){if(key==='androidTV')apps=cfg.platforms&&cfg.platforms.android;else if(key==='appleTV')apps=cfg.platforms&&cfg.platforms.ios}
+    if(!Array.isArray(apps)||!apps.length){
+      if(key==='androidTV')apps=cfg.platforms&&cfg.platforms.android;
+      else if(key==='appleTV')apps=cfg.platforms&&cfg.platforms.ios;
+    }
     if(!Array.isArray(apps)||!apps.length)return null;
     var out=[];
     for(var i=0;i<apps.length;i++){
@@ -143,24 +155,42 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
       var scheme=a.urlScheme;
       var tpl=scheme+(scheme.charAt(scheme.length-1)==='='?'{{ENC}}':'{{SUB}}');
       var links=[];var btns=(a.installationStep&&a.installationStep.buttons)||[];
-      for(var j=0;j<btns.length;j++){if(btns[j].buttonLink){var txt=btns[j].buttonText&&(btns[j].buttonText[lang]||btns[j].buttonText.en||btns[j].buttonText.ru);links.push({text:txt||a.name,link:btns[j].buttonLink})}}
-      out.push({name:a.name||a.id||'App',deepLink:tpl,featured:!!a.isFeatured,storeLinks:links})
+      for(var j=0;j<btns.length;j++){
+        if(btns[j].buttonLink){
+          var txt=btns[j].buttonText&&(btns[j].buttonText.ru||btns[j].buttonText.en);
+          links.push({text:txt||a.name,link:btns[j].buttonLink});
+        }
+      }
+      out.push({name:a.name||a.id||'App',deepLink:tpl,featured:!!a.isFeatured,storeLinks:links});
     }
     out.sort(function(a,b){return(b.featured?1:0)-(a.featured?1:0)});
-    return out.length?out:null
+    return out.length?out:null;
   }
+
   function prioritize(apps){
     if(!appHint||appHint==='_default')return apps;
     var hint=appHint.replace(/[-_\s]/g,'');
-    for(var i=0;i<apps.length;i++){var n=apps[i].name.replace(/[-_\s]/g,'').toLowerCase();if(n.indexOf(hint)!==-1||hint.indexOf(n)!==-1){var m=apps.splice(i,1)[0];apps.unshift(m);return apps}}
-    return apps
+    for(var i=0;i<apps.length;i++){
+      var n=apps[i].name.replace(/[-_\s]/g,'').toLowerCase();
+      if(n.indexOf(hint)!==-1||hint.indexOf(n)!==-1){
+        var m=apps.splice(i,1)[0];apps.unshift(m);return apps;
+      }
+    }
+    return apps;
   }
-  var funMsgs=FUN[lang]||FUN.en,funIdx=0,funTimer=null;
-  function startFun(){showFM(funMsgs[0]);funTimer=setInterval(function(){funIdx=(funIdx+1)%funMsgs.length;showFM(funMsgs[funIdx])},1800)}
-  function showFM(m){$scanMsg.classList.add('fade');setTimeout(function(){$scanMsg.textContent=m.t;$scanSub.textContent=m.s;$scanE.textContent=m.e;$scanMsg.classList.remove('fade')},200)}
+
+  var FUN=[
+    {t:'\u0418\u0449\u0435\u043C VPN-\u043F\u0440\u0438\u043B\u043E\u0436\u0435\u043D\u0438\u044F\u2026',e:'\uD83D\uDD0D'},
+    {t:'\u0421\u0442\u0443\u0447\u0438\u043C\u0441\u044F \u0432 \u043F\u0440\u0438\u043B\u043E\u0436\u0435\u043D\u0438\u044F\u2026',e:'\uD83D\uDEAA'},
+    {t:'\u0421\u043A\u0430\u043D\u0438\u0440\u0443\u0435\u043C \u0443\u0441\u0442\u0440\u043E\u0439\u0441\u0442\u0432\u043E\u2026',e:'\uD83D\uDCE1'},
+    {t:'\u041F\u0440\u043E\u0432\u0435\u0440\u044F\u0435\u043C \u043F\u043E\u0441\u043B\u0435\u0434\u043D\u0435\u0435\u2026',e:'\uD83C\uDFAF'}
+  ];
+  var funIdx=0,funTimer=null;
+  function startFun(){showFM(FUN[0]);funTimer=setInterval(function(){funIdx=(funIdx+1)%FUN.length;showFM(FUN[funIdx])},1800)}
+  function showFM(m){$scanMsg.classList.add('fade');setTimeout(function(){$scanMsg.textContent=m.t;$scanE.textContent=m.e;$scanMsg.classList.remove('fade')},200)}
   function stopFun(){if(funTimer){clearInterval(funTimer);funTimer=null}}
 
-  /* Detection: ONLY iframe + visibilitychange. No blur. No location.href. */
+  /* Detection: iframe + visibilitychange ONLY */
   function probeApp(app){
     return new Promise(function(resolve){
       var done=false,uri=buildLink(app.deepLink,subUrl);
@@ -171,80 +201,119 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
       iframe.style.cssText='position:absolute;width:0;height:0;border:0;opacity:0;pointer-events:none;top:-9999px';
       document.body.appendChild(iframe);
       try{iframe.src=uri}catch(e){}
-      var tmr=setTimeout(function(){finish(false)},PROBE_TIMEOUT)
-    })
+      var tmr=setTimeout(function(){finish(false)},PROBE_TIMEOUT);
+    });
   }
 
   var _waitApp=null,_waitApps=null,_connectingApp=null,_detectedAfterConnect=null;
+
   function hideAll(){$scan.classList.add('hidden');$success.classList.add('hidden');$list.classList.add('hidden');$wait.classList.add('hidden');$key.classList.add('hidden')}
   function showKeyBox(){$key.classList.remove('hidden');document.getElementById('keyBox').textContent=subUrl}
-  function showSuccess(app){stopFun();hideAll();$success.classList.remove('hidden');$sub.textContent=t('found_title');document.getElementById('okTitle').textContent=t('found_detail',{name:app.name});document.getElementById('okDetail').textContent=t('found_sub');var btn=document.getElementById('openBtn');btn.textContent=t('open_app',{name:app.name});btn.href=buildLink(app.deepLink,subUrl);showKeyBox()}
-  function showAppList(apps,isChoose){
-    stopFun();hideAll();$list.classList.remove('hidden');
-    if(isChoose){document.getElementById('lhIcon').textContent='📱';document.getElementById('listTitle').textContent=t('choose_title');document.getElementById('listDetail').textContent=t('choose_sub');$sub.textContent=t('choose_title')}
-    else{document.getElementById('lhIcon').textContent='📲';document.getElementById('listTitle').textContent=t('not_found_title');document.getElementById('listDetail').textContent=t('not_found_sub');$sub.textContent=t('not_found_title')}
-    renderApps(apps);showKeyBox()
+
+  function showSuccess(app){
+    stopFun();hideAll();
+    $success.classList.remove('hidden');
+    $sub.textContent='\u0413\u043E\u0442\u043E\u0432\u043E!';
+    document.getElementById('okTitle').textContent=app.name+' \u0438\u043C\u043F\u043E\u0440\u0442\u0438\u0440\u0443\u0435\u0442 \u0432\u0430\u0448\u0443 \u043F\u043E\u0434\u043F\u0438\u0441\u043A\u0443';
+    document.getElementById('okDetail').textContent='VPN \u043D\u0430\u0441\u0442\u0440\u0430\u0438\u0432\u0430\u0435\u0442\u0441\u044F';
+    var btn=document.getElementById('openBtn');
+    btn.textContent='\u041E\u0442\u043A\u0440\u044B\u0442\u044C '+app.name;
+    btn.href=buildLink(app.deepLink,subUrl);
+    showKeyBox();
   }
-  function enterWaitMode(app,allApps){hideAll();$wait.classList.remove('hidden');$sub.textContent=t('wait_title',{name:app.name});document.getElementById('wtTitle').textContent=t('wait_title',{name:app.name});document.getElementById('wtDetail').textContent=t('wait_detail');_waitApp=app;_waitApps=allApps}
+
+  function showAppList(apps,skipScan){
+    stopFun();hideAll();$list.classList.remove('hidden');
+    if(skipScan){
+      $sub.textContent='\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u043F\u0440\u0438\u043B\u043E\u0436\u0435\u043D\u0438\u0435';
+      document.getElementById('listTitle').textContent='\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u043F\u0440\u0438\u043B\u043E\u0436\u0435\u043D\u0438\u0435';
+      document.getElementById('listDetail').textContent='\u041D\u0430\u0436\u043C\u0438\u0442\u0435 \u00AB\u041F\u043E\u0434\u043A\u043B\u044E\u0447\u0438\u0442\u044C\u00BB \u043D\u0430\u043F\u0440\u043E\u0442\u0438\u0432 \u0432\u0430\u0448\u0435\u0433\u043E \u043F\u0440\u0438\u043B\u043E\u0436\u0435\u043D\u0438\u044F';
+    }else{
+      $sub.textContent='\u041F\u0440\u0438\u043B\u043E\u0436\u0435\u043D\u0438\u0435 \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D\u043E';
+      document.getElementById('listTitle').textContent='\u041F\u0440\u0438\u043B\u043E\u0436\u0435\u043D\u0438\u0435 \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D\u043E';
+      document.getElementById('listDetail').textContent='\u041D\u0430\u0436\u043C\u0438\u0442\u0435 \u00AB\u041F\u043E\u0434\u043A\u043B\u044E\u0447\u0438\u0442\u044C\u00BB \u0438\u043B\u0438 \u0441\u043A\u0430\u0447\u0430\u0439\u0442\u0435 \u043F\u0440\u0438\u043B\u043E\u0436\u0435\u043D\u0438\u0435';
+    }
+    renderApps(apps);showKeyBox();
+  }
+
+  function enterWaitMode(app,allApps){
+    hideAll();$wait.classList.remove('hidden');
+    var msg='\u041E\u0436\u0438\u0434\u0430\u0435\u043C \u0443\u0441\u0442\u0430\u043D\u043E\u0432\u043A\u0443 '+app.name+'\u2026';
+    $sub.textContent=msg;
+    document.getElementById('wtTitle').textContent=msg;
+    _waitApp=app;_waitApps=allApps;
+  }
   function exitWaitMode(){_waitApp=null;if(_waitApps)showAppList(_waitApps,false)}
   document.getElementById('wtCancel').addEventListener('click',exitWaitMode);
 
   /* Re-detection on page return */
   document.addEventListener('visibilitychange',function(){
-    if(document.visibilityState!=='visible'){if(_connectingApp){_detectedAfterConnect=_connectingApp;_connectingApp=null}return}
+    if(document.visibilityState!=='visible'){
+      if(_connectingApp){_detectedAfterConnect=_connectingApp;_connectingApp=null}
+      return;
+    }
     if(_detectedAfterConnect){var a=_detectedAfterConnect;_detectedAfterConnect=null;showSuccess(a);return}
-    if(_waitApp){var wa=_waitApp;setTimeout(function(){probeApp(wa).then(function(d){if(d&&_waitApp===wa){_waitApp=null;_waitApps=null;showSuccess(wa)}})},600)}
+    if(_waitApp){
+      var wa=_waitApp;
+      setTimeout(function(){probeApp(wa).then(function(d){if(d&&_waitApp===wa){_waitApp=null;_waitApps=null;showSuccess(wa)}})},600);
+    }
   });
   window.addEventListener('pageshow',function(e){
-    if(e.persisted&&_waitApp){var wa=_waitApp;setTimeout(function(){probeApp(wa).then(function(d){if(d){_waitApp=null;_waitApps=null;showSuccess(wa)}})},600)}
+    if(e.persisted&&_waitApp){
+      var wa=_waitApp;
+      setTimeout(function(){probeApp(wa).then(function(d){if(d){_waitApp=null;_waitApps=null;showSuccess(wa)}})},600);
+    }
   });
 
-  /* App list rendering */
+  /* App list: only FIRST app is recommended, rest in dropdown */
   function renderApps(apps){
     var c=document.getElementById('appCards');c.innerHTML='';
-    var feat=[],other=[];
-    for(var i=0;i<apps.length;i++){if(apps[i].featured)feat.push(apps[i]);else other.push(apps[i])}
-    if(!feat.length&&apps.length){feat.push(apps[0]);other=apps.slice(1)}
-    for(var f=0;f<feat.length;f++)c.appendChild(mkCard(feat[f],true,apps));
-    if(other.length){
-      var togBtn=document.createElement('button');togBtn.className='btn-tog';togBtn.type='button';togBtn.textContent=t('other_apps',{count:other.length});
+    if(!apps.length)return;
+    c.appendChild(mkCard(apps[0],true,apps));
+    if(apps.length>1){
+      var rest=apps.slice(1);
+      var togBtn=document.createElement('button');togBtn.className='btn-tog';togBtn.type='button';
+      togBtn.textContent='\u0415\u0449\u0451 \u043F\u0440\u0438\u043B\u043E\u0436\u0435\u043D\u0438\u044F ('+rest.length+')';
       var wrap=document.createElement('div');wrap.className='hidden';var isOpen=false;
-      togBtn.addEventListener('click',function(){isOpen=!isOpen;wrap.classList.toggle('hidden',!isOpen);togBtn.textContent=isOpen?t('hide_other'):t('other_apps',{count:other.length})});
-      for(var o=0;o<other.length;o++)wrap.appendChild(mkCard(other[o],false,apps));
-      c.appendChild(togBtn);c.appendChild(wrap)
+      togBtn.addEventListener('click',function(){
+        isOpen=!isOpen;wrap.classList.toggle('hidden',!isOpen);
+        togBtn.textContent=isOpen?'\u0421\u043A\u0440\u044B\u0442\u044C':'\u0415\u0449\u0451 \u043F\u0440\u0438\u043B\u043E\u0436\u0435\u043D\u0438\u044F ('+rest.length+')';
+      });
+      for(var i=0;i<rest.length;i++)wrap.appendChild(mkCard(rest[i],false,apps));
+      c.appendChild(togBtn);c.appendChild(wrap);
     }
   }
-  function mkCard(app,isFeat,allApps){
-    var card=document.createElement('div');card.className='ac'+(isFeat?' feat':'');
+  function mkCard(app,isRec,allApps){
+    var card=document.createElement('div');card.className='ac'+(isRec?' feat':'');
     var top=document.createElement('div');top.className='ac-top';
     var nm=document.createElement('span');nm.className='ac-name';nm.textContent=app.name;top.appendChild(nm);
-    if(isFeat){var badge=document.createElement('span');badge.className='ac-badge';badge.textContent=t('recommended');top.appendChild(badge)}
+    if(isRec){var badge=document.createElement('span');badge.className='ac-badge';badge.textContent='\u0420\u0435\u043A\u043E\u043C\u0435\u043D\u0434\u0443\u0435\u043C';top.appendChild(badge)}
     card.appendChild(top);
     var btns=document.createElement('div');btns.className='ac-btns';
     if(app.storeLinks&&app.storeLinks.length){
-      var dlBtn=document.createElement('button');dlBtn.className='btn btn-d';dlBtn.type='button';dlBtn.textContent=t('download');
+      var dlBtn=document.createElement('button');dlBtn.className='btn btn-d';dlBtn.type='button';dlBtn.textContent='\u0421\u043A\u0430\u0447\u0430\u0442\u044C';
       dlBtn.addEventListener('click',(function(a){return function(){window.open(a.storeLinks[0].link,'_blank','noopener');enterWaitMode(a,allApps)}})(app));
-      btns.appendChild(dlBtn)
+      btns.appendChild(dlBtn);
     }
-    var connBtn=document.createElement('button');connBtn.className='btn btn-c';connBtn.type='button';connBtn.textContent=t('connect');
+    var connBtn=document.createElement('button');connBtn.className='btn btn-c';connBtn.type='button';connBtn.textContent='\u041F\u043E\u0434\u043A\u043B\u044E\u0447\u0438\u0442\u044C';
     connBtn.addEventListener('click',(function(a){return function(){_connectingApp=a;window.location.href=buildLink(a.deepLink,subUrl);setTimeout(function(){if(_connectingApp===a)_connectingApp=null},3000)}})(app));
     btns.appendChild(connBtn);card.appendChild(btns);
     if(app.storeLinks&&app.storeLinks.length>1){
       var dls=document.createElement('div');dls.className='dls';
       for(var i=0;i<app.storeLinks.length;i++){var dl=document.createElement('a');dl.className='dl';dl.href=app.storeLinks[i].link;dl.target='_blank';dl.rel='noopener';dl.textContent=app.storeLinks[i].text;dls.appendChild(dl)}
-      card.appendChild(dls)
+      card.appendChild(dls);
     }
-    return card
+    return card;
   }
 
   /* Copy */
   function doCopy(){if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(subUrl).then(showToast).catch(fallbackCopy)}else{fallbackCopy()}}
   function fallbackCopy(){var ta=document.createElement('textarea');ta.value=subUrl;ta.style.cssText='position:fixed;top:-999px';document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();showToast()}
-  function showToast(){var el=document.getElementById('toast');el.textContent=t('copied');el.classList.add('show');setTimeout(function(){el.classList.remove('show')},2000)}
+  function showToast(){var el=document.getElementById('toast');el.textContent='\u2705 \u0421\u043A\u043E\u043F\u0438\u0440\u043E\u0432\u0430\u043D\u043E!';el.classList.add('show');setTimeout(function(){el.classList.remove('show')},2000)}
   document.getElementById('copyBtn').addEventListener('click',doCopy);
   document.getElementById('keyBox').addEventListener('click',doCopy);
 
-  /* Main */
+  /* Main: probe ALL apps sequentially */
   async function main(){
     startFun();
     var apps=null;
@@ -253,9 +322,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
     apps=prioritize(apps.slice());
     if(!apps.length){showAppList([],false);return}
     if(isFirefoxMobile){showAppList(apps,true);return}
-    var target=apps[0];
-    var detected=await probeApp(target);
-    if(detected){showSuccess(target)}else{showAppList(apps,false)}
+
+    for(var i=0;i<apps.length;i++){
+      $scanSub.textContent='\u041F\u0440\u043E\u0432\u0435\u0440\u044F\u0435\u043C '+apps[i].name+'\u2026';
+      var detected=await probeApp(apps[i]);
+      if(detected){showSuccess(apps[i]);return}
+    }
+    showAppList(apps,false);
   }
   setTimeout(main,150);
 })();
