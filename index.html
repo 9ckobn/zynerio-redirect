@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Zynerio VPN — Connect</title>
+<title>Zynerio VPN \u2014 Connect</title>
 <style>
   :root {
     --bg: #0f0f14;
@@ -13,847 +13,532 @@
     --text: #e8e8ef;
     --muted: #8888a0;
     --success: #00b894;
-    --warn: #fdcb6e;
     --danger: #e17055;
     --radius: 16px;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100dvh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg); color: var(--text);
+    min-height: 100dvh; display: flex; align-items: center;
+    justify-content: center; padding: 20px;
   }
-  .container {
-    max-width: 420px;
-    width: 100%;
-    text-align: center;
+  .container { max-width: 420px; width: 100%; }
+  .header { text-align: center; margin-bottom: 24px; }
+  .logo { font-size: 48px; margin-bottom: 8px; }
+  h1 { font-size: 22px; font-weight: 600; margin-bottom: 4px; }
+  .subtitle { color: var(--muted); font-size: 14px; }
+  .platform-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(108,92,231,.15); color: var(--accent);
+    padding: 6px 14px; border-radius: 20px;
+    font-size: 13px; font-weight: 500; margin-top: 12px;
   }
-  .logo {
-    font-size: 48px;
-    margin-bottom: 8px;
+  .scan-card {
+    background: var(--card); border-radius: var(--radius);
+    padding: 28px 24px; text-align: center; margin-bottom: 16px;
   }
-  h1 {
-    font-size: 22px;
-    font-weight: 600;
-    margin-bottom: 4px;
+  .scan-emoji { font-size: 40px; margin-bottom: 12px; animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.15)} }
+  .scan-msg { font-size: 16px; font-weight: 500; margin-bottom: 6px; min-height: 24px; }
+  .scan-detail { font-size: 13px; color: var(--muted); margin-bottom: 14px; min-height: 18px; }
+  .progress-wrap { background: rgba(255,255,255,.08); border-radius: 6px; height: 6px; overflow: hidden; }
+  .progress-bar { height: 100%; background: var(--accent); border-radius: 6px; transition: width .4s ease; width: 0; }
+
+  .result-card {
+    background: var(--card); border-radius: var(--radius);
+    padding: 28px 24px; text-align: center; margin-bottom: 16px;
   }
-  .subtitle {
-    color: var(--muted);
-    font-size: 14px;
-    margin-bottom: 28px;
+  .result-emoji { font-size: 44px; margin-bottom: 10px; }
+  .result-msg { font-size: 17px; font-weight: 600; margin-bottom: 6px; }
+  .result-hint { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+
+  .app-card {
+    background: rgba(255,255,255,.04); border-radius: 12px;
+    padding: 14px; margin-bottom: 8px; text-align: left;
   }
-  .card {
-    background: var(--card);
-    border-radius: var(--radius);
-    padding: 28px 24px;
-    margin-bottom: 16px;
+  .app-card.featured { border: 1px solid rgba(108,92,231,.25); background: rgba(108,92,231,.06); }
+  .app-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .app-name { font-size: 15px; font-weight: 600; }
+  .app-tag { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; background: rgba(108,92,231,.2); color: var(--accent); }
+  .btn-action {
+    display: block; width: 100%; padding: 11px; font-size: 14px; font-weight: 600;
+    border: none; border-radius: 10px; cursor: pointer; color: #fff;
+    text-decoration: none; text-align: center; transition: transform .1s;
   }
-  .status {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 14px;
-    font-size: 16px;
-    font-weight: 500;
-    margin-bottom: 8px;
+  .btn-action:active { transform: scale(.97); }
+  .btn-connect { background: linear-gradient(135deg, var(--success), #00a383); }
+  .btn-download { background: var(--accent); margin-bottom: 6px; }
+  .btn-row { display: flex; gap: 8px; }
+  .btn-row .btn-action { flex: 1; }
+  .dl-links { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .dl-link {
+    font-size: 12px; color: var(--muted); text-decoration: none;
+    padding: 4px 10px; border-radius: 8px; background: rgba(255,255,255,.06); transition: background .2s;
   }
-  .search-emoji {
-    font-size: 40px;
-    animation: bounce 1s ease infinite;
+  .dl-link:hover { background: rgba(255,255,255,.12); color: var(--text); }
+
+  .other-toggle {
+    display: block; width: 100%; padding: 10px; font-size: 13px; font-weight: 500;
+    border: none; border-radius: 12px; cursor: pointer; margin: 8px 0;
+    background: transparent; color: var(--accent); border: 1px solid rgba(108,92,231,.2);
   }
-  @keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-8px); }
+  .other-toggle:hover { border-color: rgba(108,92,231,.5); }
+
+  .key-section {
+    background: var(--card); border-radius: var(--radius);
+    padding: 16px; margin-top: 16px; text-align: center;
   }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: .7; transform: scale(1.08); }
+  .btn-copy {
+    display: block; width: 100%; padding: 12px; font-size: 14px; font-weight: 600;
+    border: none; border-radius: 12px; cursor: pointer; color: #fff;
+    background: var(--accent); transition: background .2s, transform .1s; margin-bottom: 10px;
   }
-  .search-emoji.pulse { animation: pulse 1.5s ease infinite; }
-  .poll-hint {
-    font-size: 11px;
-    color: var(--muted);
-    margin-top: 6px;
-    opacity: .7;
-  }
-  .status-icon { font-size: 22px; }
-  .fun-text {
-    font-size: 15px;
-    color: var(--text);
-    min-height: 24px;
-    transition: opacity .3s;
-  }
-  .fun-text.fade { opacity: 0; }
-  .fun-sub {
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 2px;
-  }
-  .progress-bar {
-    width: 100%;
-    height: 4px;
-    background: rgba(255,255,255,.08);
-    border-radius: 2px;
-    overflow: hidden;
-    margin-top: 8px;
-  }
-  .progress-fill {
-    height: 100%;
-    width: 0%;
-    background: var(--accent);
-    border-radius: 2px;
-    transition: width .4s ease;
-  }
-  .btn {
-    display: inline-block;
-    width: 100%;
-    padding: 14px 24px;
-    font-size: 15px;
-    font-weight: 600;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    text-decoration: none;
-    transition: background .2s, transform .1s;
-    color: #fff;
-  }
-  .btn:active { transform: scale(.97); }
-  .btn-primary { background: var(--accent); }
-  .btn-primary:hover { background: var(--accent-hover); }
-  .btn-secondary {
-    background: transparent;
-    border: 1px solid rgba(255,255,255,.12);
-    color: var(--muted);
-    margin-top: 10px;
-    font-size: 13px;
-    padding: 10px 20px;
-  }
-  .btn-secondary:hover { border-color: rgba(255,255,255,.25); color: var(--text); }
-  .hidden { display: none !important; }
-  .manual-section {
-    margin-top: 20px;
-    text-align: left;
-  }
-  .manual-section h3 {
-    font-size: 14px;
-    margin-bottom: 8px;
-    color: var(--muted);
-  }
+  .btn-copy:hover { background: var(--accent-hover); }
+  .btn-copy:active { transform: scale(.97); }
   .key-box {
-    background: rgba(255,255,255,.06);
-    border-radius: 10px;
-    padding: 12px;
-    font-family: 'SF Mono', Monaco, Consolas, monospace;
-    font-size: 11px;
-    word-break: break-all;
-    color: var(--muted);
-    position: relative;
-    cursor: pointer;
-    max-height: 80px;
-    overflow: hidden;
-    transition: max-height .3s;
+    background: rgba(255,255,255,.06); border-radius: 10px; padding: 10px;
+    font-family: "SF Mono", Monaco, Consolas, monospace; font-size: 11px;
+    word-break: break-all; color: var(--muted); cursor: pointer;
+    max-height: 60px; overflow: hidden;
   }
-  .key-box.expanded { max-height: 400px; }
   .copy-toast {
-    position: fixed;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--success);
-    color: #fff;
-    padding: 10px 24px;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 500;
-    opacity: 0;
-    transition: opacity .3s;
-    pointer-events: none;
-    z-index: 100;
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+    background: var(--success); color: #fff; padding: 10px 24px;
+    border-radius: 10px; font-size: 14px; font-weight: 500;
+    opacity: 0; transition: opacity .3s; pointer-events: none; z-index: 100;
   }
   .copy-toast.show { opacity: 1; }
+  .error-msg { text-align: center; color: var(--danger); margin-top: 20px; }
 </style>
 </head>
 <body>
 <div class="container">
-  <div class="logo">🔐</div>
-  <h1>Zynerio VPN</h1>
-  <p class="subtitle" id="subtitle"></p>
-
-  <div class="card">
-    <div class="status" id="status">
-      <div class="search-emoji" id="searchEmoji">🔍</div>
-      <div class="fun-text" id="funText"></div>
-      <div class="fun-sub" id="funSub"></div>
-      <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
-    </div>
+  <div class="header">
+    <div class="logo">\U0001f510</div>
+    <h1>Zynerio VPN</h1>
+    <p class="subtitle" id="subtitle"></p>
+    <div class="platform-badge" id="platformBadge"></div>
   </div>
-
-  <!-- Shown when all attempts fail -->
-  <div id="fallbackSection" class="hidden">
-    <div id="storeButtons"></div>
-    <button class="btn btn-secondary" onclick="copyKey()" id="copyKeyBtn">
-      📋
-    </button>
+  <div class="scan-card" id="scanCard">
+    <div class="scan-emoji" id="scanEmoji">\U0001f50d</div>
+    <div class="scan-msg" id="scanMsg"></div>
+    <div class="scan-detail" id="scanDetail"></div>
+    <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
   </div>
-
-  <!-- Manual key section -->
-  <div class="manual-section hidden" id="manualSection">
-    <h3 id="manualKeyTitle"></h3>
-    <div class="key-box" id="keyBox" onclick="copyKey()"></div>
+  <div class="result-card hidden" id="resultCard">
+    <div class="result-emoji" id="resultEmoji"></div>
+    <div class="result-msg" id="resultMsg"></div>
+    <div class="result-hint" id="resultHint"></div>
+    <div id="resultActions"></div>
+  </div>
+  <div id="appList" class="hidden"></div>
+  <div class="key-section hidden" id="keySection">
+    <button class="btn-copy" id="copyBtn" type="button"></button>
+    <div class="key-box" id="keyBox"></div>
   </div>
 </div>
-
 <div class="copy-toast" id="copyToast"></div>
 
 <script>
 (function() {
-  'use strict';
+  "use strict";
+  var CONFIG_URL = "/add_sub/config";
+  var SCAN_TIMEOUT = 1200;
 
-  /* ── Config endpoint (proxied through Caddy to subscription-page) ── */
-
-  const CONFIG_URL = '/add_sub/config';
-
-  /* ── Localization ───────────────────────────────────────── */
-
-  const LANGS = {
+  var LANGS = {
     ru: {
-      title:          'Zynerio VPN — Подключение',
-      subtitle:       'Секундочку…',
-      loading:        'Загружаем конфиг…',
-      errorNoSub:     'Ошибка: нет ссылки подписки',
-      copyKeyBtn:     '📋 Скопировать ключ подписки',
-      manualKeyTitle: 'Ключ подписки (нажмите, чтобы скопировать):',
-      copied:         '✅ Скопировано!',
-      opening:        'Открываем {name}…',
-      openingSub:     'VPN уже настраивается',
-      openingSubtitle:'Настраиваем ваш VPN',
-      notFound:       'Приложение не найдено',
-      notFoundSub:    'Но это легко исправить!',
-      notFoundSubtitle:'Установите VPN-приложение',
-      download:       'Скачать {name}',
-      otherApps:      '📋 Другие приложения',
-      hideApps:       '▲ Скрыть',
-      waitingInstall: 'Ждём установку приложения…',
-      waitingSub:     'Скачайте и откройте — мы сделаем всё сами',
-      waitingSubtitle:'Установите приложение и вернитесь сюда',
-      waitingPoll:    'Автоматически подключим, как только установите',
-      waitingMessages: [
-        { text: 'Ждём, пока установится…',     emoji: '⏳', sub: 'Не закрывайте эту страничку' },
-        { text: 'Всё ещё ждём…',               emoji: '👀', sub: 'Скачали? Откройте приложение' },
-        { text: 'Проверяем, на месте ли…',      emoji: '🔄', sub: 'Как только установите — подключим' },
-        { text: 'Терпение — наше всё…',         emoji: '🧘', sub: 'Мы никуда не торопимся' },
-        { text: 'Мониторим ситуацию…',          emoji: '📡', sub: 'Приложение пока не найдено' },
-        { text: 'Секундочку…',                  emoji: '⏱️', sub: 'Проверяем каждую секунду' },
-      ],
-      funMessages: [
-        { text: 'Копаемся на вашем устройстве…', emoji: '🔍', sub: 'Не волнуйтесь, мы аккуратно' },
-        { text: 'Ищем шпионов…',                emoji: '🕵️', sub: 'Пока чисто, продолжаем' },
-        { text: 'Заглядываем под капот…',        emoji: '🔧', sub: 'Тут столько всего интересного' },
-        { text: 'Проверяем тайные папки…',       emoji: '📂', sub: 'Обещаем — не подглядываем' },
-        { text: 'Стучимся в приложения…',        emoji: '🚪', sub: 'Тук-тук, есть кто дома?' },
-        { text: 'Допрашиваем иконки…',           emoji: '🧐', sub: 'Молчат, но мы найдём' },
-        { text: 'Сканируем окрестности…',        emoji: '📡', sub: 'Почти нашли, кажется…' },
-        { text: 'Спрашиваем у Siri… шутка',      emoji: '🤖', sub: 'Она бы не помогла' },
-        { text: 'Проверяем последнее…',          emoji: '🎯', sub: 'Ещё чуть-чуть' },
-      ],
+      title: "Zynerio VPN \u2014 \u041f\u043e\u0434\u043a\u043b\u044e\u0447\u0435\u043d\u0438\u0435",
+      subtitle: "\u041f\u043e\u0434\u043a\u043b\u044e\u0447\u0435\u043d\u0438\u0435 \u0432 1 \u043a\u043b\u0438\u043a",
+      errorNoSub: "\u041e\u0448\u0438\u0431\u043a\u0430: \u043d\u0435\u0442 \u0441\u0441\u044b\u043b\u043a\u0438 \u043f\u043e\u0434\u043f\u0438\u0441\u043a\u0438",
+      scanning: "\u0418\u0449\u0435\u043c VPN-\u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u0435...",
+      trying: "\u041f\u0440\u043e\u0432\u0435\u0440\u044f\u0435\u043c {name}...",
+      found: "{name} \u043d\u0430\u0439\u0434\u0435\u043d! \u041e\u0442\u043a\u0440\u044b\u0432\u0430\u0435\u043c...",
+      foundHint: "\u041f\u043e\u0434\u043f\u0438\u0441\u043a\u0430 \u043d\u0430\u0441\u0442\u0440\u0430\u0438\u0432\u0430\u0435\u0442\u0441\u044f \u0430\u0432\u0442\u043e\u043c\u0430\u0442\u0438\u0447\u0435\u0441\u043a\u0438",
+      notFound: "\u041f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u0435 \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d\u043e",
+      notFoundHint: "\u0423\u0441\u0442\u0430\u043d\u043e\u0432\u0438\u0442\u0435 \u043e\u0434\u043d\u043e \u0438\u0437 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u0439 \u0438 \u043d\u0430\u0436\u043c\u0438\u0442\u0435 \u041f\u043e\u0434\u043a\u043b\u044e\u0447\u0438\u0442\u044c",
+      connect: "\U0001f680 \u041f\u043e\u0434\u043a\u043b\u044e\u0447\u0438\u0442\u044c",
+      download: "\U0001f4e5 \u0421\u043a\u0430\u0447\u0430\u0442\u044c",
+      recommended: "\u0420\u0435\u043a\u043e\u043c\u0435\u043d\u0434\u0443\u0435\u043c",
+      otherApps: "\U0001f4cb \u0414\u0440\u0443\u0433\u0438\u0435 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f ({count})",
+      hideApps: "\u25b2 \u0421\u043a\u0440\u044b\u0442\u044c",
+      copyBtn: "\U0001f4cb \u0421\u043a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u043a\u043b\u044e\u0447 \u043f\u043e\u0434\u043f\u0438\u0441\u043a\u0438",
     },
     en: {
-      title:          'Zynerio VPN — Connect',
-      subtitle:       'One moment…',
-      loading:        'Loading config…',
-      errorNoSub:     'Error: no subscription URL',
-      copyKeyBtn:     '📋 Copy subscription key',
-      manualKeyTitle: 'Subscription key (tap to copy):',
-      copied:         '✅ Copied!',
-      opening:        'Opening {name}…',
-      openingSub:     'Your VPN is being configured',
-      openingSubtitle:'Configuring your VPN',
-      notFound:       'App not found',
-      notFoundSub:    'But that\'s an easy fix!',
-      notFoundSubtitle:'Install a VPN app to continue',
-      download:       'Download {name}',
-      otherApps:      '📋 Other apps',
-      hideApps:       '▲ Hide',
-      waitingInstall: 'Waiting for app to install…',
-      waitingSub:     'Download and open it — we\'ll do the rest',
-      waitingSubtitle:'Install the app and come back here',
-      waitingPoll:    'We\'ll auto-connect once you install it',
-      waitingMessages: [
-        { text: 'Waiting for installation…',    emoji: '⏳', sub: 'Don\'t close this page' },
-        { text: 'Still waiting…',               emoji: '👀', sub: 'Downloaded? Open the app' },
-        { text: 'Checking if it\'s ready…',     emoji: '🔄', sub: 'We\'ll connect once installed' },
-        { text: 'Patience is a virtue…',        emoji: '🧘', sub: 'We\'re in no rush' },
-        { text: 'Monitoring the situation…',    emoji: '📡', sub: 'App not found yet' },
-        { text: 'One moment…',                  emoji: '⏱️', sub: 'Checking every second' },
-      ],
-      funMessages: [
-        { text: 'Digging through your device…',  emoji: '🔍', sub: 'Don\'t worry, we\'re gentle' },
-        { text: 'Looking for spies…',            emoji: '🕵️', sub: 'All clear so far' },
-        { text: 'Peeking under the hood…',       emoji: '🔧', sub: 'So many interesting things here' },
-        { text: 'Checking secret folders…',      emoji: '📂', sub: 'Promise we won\'t peek' },
-        { text: 'Knocking on apps…',             emoji: '🚪', sub: 'Knock-knock, anyone home?' },
-        { text: 'Interrogating icons…',          emoji: '🧐', sub: 'They\'re silent, but we\'ll find it' },
-        { text: 'Scanning the area…',            emoji: '📡', sub: 'Almost found it, maybe…' },
-        { text: 'Asking Siri… just kidding',     emoji: '🤖', sub: 'She wouldn\'t help anyway' },
-        { text: 'Checking the last one…',        emoji: '🎯', sub: 'Almost there' },
-      ],
-    },
+      title: "Zynerio VPN \u2014 Connect",
+      subtitle: "1-click connect",
+      errorNoSub: "Error: no subscription URL",
+      scanning: "Searching for VPN app...",
+      trying: "Checking {name}...",
+      found: "{name} found! Opening...",
+      foundHint: "Subscription is being configured automatically",
+      notFound: "No VPN app found",
+      notFoundHint: "Install one of the apps below and tap Connect",
+      connect: "\U0001f680 Connect",
+      download: "\U0001f4e5 Download",
+      recommended: "Recommended",
+      otherApps: "\U0001f4cb Other apps ({count})",
+      hideApps: "\u25b2 Hide",
+      copyBtn: "\U0001f4cb Copy subscription key",
+    }
   };
 
-  // Detect language: URL param > browser language > default 'en'
-  const _params0 = new URLSearchParams(window.location.search);
-  const langParam = (_params0.get('lang_code') || '').toLowerCase();
-  const browserLang = (navigator.language || '').slice(0, 2).toLowerCase();
-  const lang = LANGS[langParam] ? langParam : (LANGS[browserLang] ? browserLang : 'en');
-  const L = LANGS[lang];
+  var FUN = {
+    ru: [
+      "\U0001f50d \u0418\u0449\u0435\u043c \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f...",
+      "\U0001f575\ufe0f \u041f\u0440\u043e\u0432\u0435\u0440\u044f\u0435\u043c, \u0447\u0442\u043e \u0443\u0441\u0442\u0430\u043d\u043e\u0432\u043b\u0435\u043d\u043e...",
+      "\U0001f680 \u041f\u043e\u0447\u0442\u0438 \u043d\u0430\u0448\u043b\u0438...",
+      "\U0001f50e \u0421\u043a\u0430\u043d\u0438\u0440\u0443\u0435\u043c \u0443\u0441\u0442\u0440\u043e\u0439\u0441\u0442\u0432\u043e...",
+      "\u2728 \u0421\u0435\u043a\u0443\u043d\u0434\u043e\u0447\u043a\u0443...",
+    ],
+    en: [
+      "\U0001f50d Scanning for apps...",
+      "\U0001f575\ufe0f Checking what's installed...",
+      "\U0001f680 Almost there...",
+      "\U0001f50e Scanning device...",
+      "\u2728 Just a moment...",
+    ]
+  };
 
+  var _p = new URLSearchParams(window.location.search);
+  var langParam = (_p.get("lang_code") || "").toLowerCase();
+  var browserLang = (navigator.language || "").slice(0,2).toLowerCase();
+  var lang = LANGS[langParam] ? langParam : (LANGS[browserLang] ? browserLang : "en");
+  var L = LANGS[lang];
   function t(key, vars) {
-    let s = L[key] || LANGS.en[key] || key;
-    if (vars) for (const [k, v] of Object.entries(vars)) s = s.replace('{' + k + '}', v);
+    var s = L[key] || LANGS.en[key] || key;
+    if (vars) for (var k in vars) s = s.replace("{" + k + "}", vars[k]);
     return s;
   }
+  document.getElementById("htmlRoot").lang = lang;
+  document.title = t("title");
+  document.getElementById("subtitle").textContent = t("subtitle");
+  document.getElementById("scanMsg").textContent = t("scanning");
+  document.getElementById("copyBtn").textContent = t("copyBtn");
+  document.getElementById("copyToast").textContent = t("copied");
 
-  // Apply static locale
-  document.getElementById('htmlRoot').lang = lang;
-  document.title = t('title');
-  document.getElementById('subtitle').textContent = t('subtitle');
-  document.getElementById('funText').textContent = t('loading');
-  document.getElementById('copyKeyBtn').textContent = t('copyKeyBtn');
-  document.getElementById('manualKeyTitle').textContent = t('manualKeyTitle');
-  document.getElementById('copyToast').textContent = t('copied');
+  var PLAT_META = {
+    ios:{emoji:"\U0001f4f1",name:"iOS"}, android:{emoji:"\U0001f916",name:"Android"},
+    macos:{emoji:"\U0001f34e",name:"macOS"}, windows:{emoji:"\U0001f4bb",name:"Windows"},
+    linux:{emoji:"\U0001f427",name:"Linux"}
+  };
+  function detectPlatform() {
+    var ua = navigator.userAgent.toLowerCase();
+    if (/iphone|ipad|ipod/.test(ua)) return "ios";
+    if (/android/.test(ua)) return "android";
+    if (/macintosh|mac os/.test(ua)) return "macos";
+    if (/windows/.test(ua)) return "windows";
+    if (/linux/.test(ua)) return "linux";
+    return "windows";
+  }
+  var platform = detectPlatform();
+  var pm = PLAT_META[platform] || PLAT_META.windows;
+  document.getElementById("platformBadge").textContent = pm.emoji + " " + pm.name;
 
-  /* ── Hardcoded fallback (used when config fetch fails) ────────────── */
-
-  const FALLBACK_APPS = {
+  var FALLBACK_APPS = {
     ios: [
-      { name: 'Happ',         deepLink: 'happ://add/{{SUB}}',                                                       storeLinks: [{text:'App Store (RU)',link:'https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973'},{text:'App Store (Global)',link:'https://apps.apple.com/us/app/happ-proxy-utility/id6504287215'}] },
-      { name: 'Streisand',    deepLink: 'streisand://import/{{SUB}}',                                                storeLinks: [{text:'App Store',link:'https://apps.apple.com/ru/app/streisand/id6450534064'}] },
-      { name: 'Stash',        deepLink: 'stash://install-config?url={{ENC}}',                                        storeLinks: [{text:'App Store',link:'https://apps.apple.com/us/app/stash-rule-based-proxy/id1596063349'}] },
-      { name: 'Shadowrocket', deepLink: 'sub://{{SUB}}',                                                            storeLinks: [{text:'App Store',link:'https://apps.apple.com/ru/app/shadowrocket/id932747118'}] },
-      { name: 'Clash Mi',     deepLink: 'clash://install-config?overwrite=no&name=Remnawave&url={{ENC}}',            storeLinks: [{text:'App Store',link:'https://apps.apple.com/us/app/clash-mi/id6744321968'}] },
+      {name:"Happ",deepLink:"happ://add/{{SUB}}",featured:true,storeLinks:[{text:"App Store (RU)",link:"https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973"},{text:"App Store (Global)",link:"https://apps.apple.com/us/app/happ-proxy-utility/id6504287215"}]},
+      {name:"Streisand",deepLink:"streisand://import/{{SUB}}",featured:false,storeLinks:[{text:"App Store",link:"https://apps.apple.com/ru/app/streisand/id6450534064"}]},
+      {name:"Stash",deepLink:"stash://install-config?url={{ENC}}",featured:false,storeLinks:[{text:"App Store",link:"https://apps.apple.com/us/app/stash-rule-based-proxy/id1596063349"}]},
+      {name:"Shadowrocket",deepLink:"sub://{{SUB}}",featured:false,storeLinks:[{text:"App Store",link:"https://apps.apple.com/ru/app/shadowrocket/id932747118"}]},
+      {name:"Clash Mi",deepLink:"clash://install-config?overwrite=no&name=Remnawave&url={{ENC}}",featured:false,storeLinks:[{text:"App Store",link:"https://apps.apple.com/us/app/clash-mi/id6744321968"}]}
     ],
     android: [
-      { name: 'FlClashX',     deepLink: 'flclashx://install-config?url={{ENC}}',                                    storeLinks: [{text:'Скачать APK',link:'https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-android-arm64-v8a.apk'}] },
-      { name: 'Clash Meta',   deepLink: 'clashmeta://install-config?name=Remnawave&url={{ENC}}',                    storeLinks: [{text:'Скачать APK',link:'https://github.com/MetaCubeX/ClashMetaForAndroid/releases/download/v2.11.20/cmfa-2.11.20-meta-universal-release.apk'},{text:'F-Droid',link:'https://f-droid.org/packages/com.github.metacubex.clash.meta/'}] },
-      { name: 'Happ',         deepLink: 'happ://add/{{SUB}}',                                                       storeLinks: [{text:'Google Play',link:'https://play.google.com/store/apps/details?id=com.happproxy'},{text:'Скачать APK',link:'https://github.com/Happ-proxy/happ-android/releases/latest/download/Happ.apk'}] },
-      { name: 'v2rayNG',      deepLink: 'v2rayng://install-config?name=Remnawave&url={{ENC}}',                      storeLinks: [{text:'Скачать APK',link:'https://github.com/2dust/v2rayNG/releases/download/1.10.31/v2rayNG_1.10.31_universal.apk'}] },
-      { name: 'Exclave',      deepLink: 'exclave://subscription?url={{ENC}}',                                        storeLinks: [{text:'Скачать APK',link:'https://github.com/dyhkwong/Exclave/releases/download/0.17.4/Exclave-0.17.4-arm64-v8a.apk'},{text:'F-Droid',link:'https://f-droid.org/packages/com.github.dyhkwong.sagernet'}] },
+      {name:"FlClashX",deepLink:"flclashx://install-config?url={{ENC}}",featured:true,storeLinks:[{text:"\u0421\u043a\u0430\u0447\u0430\u0442\u044c APK",link:"https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-android-arm64-v8a.apk"}]},
+      {name:"Clash Meta",deepLink:"clashmeta://install-config?name=Remnawave&url={{ENC}}",featured:true,storeLinks:[{text:"\u0421\u043a\u0430\u0447\u0430\u0442\u044c APK",link:"https://github.com/MetaCubeX/ClashMetaForAndroid/releases/download/v2.11.20/cmfa-2.11.20-meta-universal-release.apk"},{text:"F-Droid",link:"https://f-droid.org/packages/com.github.metacubex.clash.meta/"}]},
+      {name:"Happ",deepLink:"happ://add/{{SUB}}",featured:true,storeLinks:[{text:"Google Play",link:"https://play.google.com/store/apps/details?id=com.happproxy"},{text:"\u0421\u043a\u0430\u0447\u0430\u0442\u044c APK",link:"https://github.com/Happ-proxy/happ-android/releases/latest/download/Happ.apk"}]},
+      {name:"v2rayNG",deepLink:"v2rayng://install-config?name=Remnawave&url={{ENC}}",featured:false,storeLinks:[{text:"\u0421\u043a\u0430\u0447\u0430\u0442\u044c APK",link:"https://github.com/2dust/v2rayNG/releases/download/1.10.31/v2rayNG_1.10.31_universal.apk"}]},
+      {name:"Exclave",deepLink:"exclave://subscription?url={{ENC}}",featured:false,storeLinks:[{text:"\u0421\u043a\u0430\u0447\u0430\u0442\u044c APK",link:"https://github.com/dyhkwong/Exclave/releases/download/0.17.4/Exclave-0.17.4-arm64-v8a.apk"}]}
     ],
     macos: [
-      { name: 'Happ',         deepLink: 'happ://add/{{SUB}}',                                                       storeLinks: [{text:'App Store (RU)',link:'https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973'},{text:'App Store (Global)',link:'https://apps.apple.com/us/app/happ-proxy-utility/id6504287215'}] },
-      { name: 'Koala Clash',  deepLink: 'koala-clash://install-config?url={{ENC}}',                                  storeLinks: [{text:'macOS (Apple Silicon)',link:'https://github.com/coolcoala/clash-verge-rev-lite/releases/latest/download/Koala.Clash_aarch64.dmg'},{text:'macOS (Intel)',link:'https://github.com/coolcoala/clash-verge-rev-lite/releases/latest/download/Koala.Clash_x64.dmg'}] },
-      { name: 'FlClashX',     deepLink: 'flclashx://install-config?url={{ENC}}',                                    storeLinks: [{text:'macOS (Apple Silicon)',link:'https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-macos-arm64.dmg'},{text:'macOS (Intel)',link:'https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-macos-amd64.dmg'}] },
-      { name: 'Prizrak-Box',  deepLink: 'prizrak-box://install-config?url={{ENC}}',                                  storeLinks: [{text:'macOS (Apple Silicon)',link:'https://github.com/legiz-ru/Prizrak-Box/releases/latest/download/macos-arm64-dmg.zip'},{text:'macOS (Intel)',link:'https://github.com/legiz-ru/Prizrak-Box/releases/latest/download/macos-amd64-dmg.zip'}] },
-      { name: 'Clash Verge',  deepLink: 'clash://install-config?url={{ENC}}',                                        storeLinks: [{text:'macOS (Intel)',link:'https://github.com/clash-verge-rev/clash-verge-rev/releases/download/v2.4.4-rc/Clash.Verge_2.4.4-rc_x64.dmg'},{text:'macOS (Apple Silicon)',link:'https://github.com/clash-verge-rev/clash-verge-rev/releases/download/v2.4.4-rc/Clash.Verge_2.4.4-rc_aarch64.dmg'}] },
+      {name:"Happ",deepLink:"happ://add/{{SUB}}",featured:true,storeLinks:[{text:"App Store (RU)",link:"https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973"},{text:"App Store (Global)",link:"https://apps.apple.com/us/app/happ-proxy-utility/id6504287215"}]},
+      {name:"Koala Clash",deepLink:"koala-clash://install-config?url={{ENC}}",featured:true,storeLinks:[{text:"Apple Silicon",link:"https://github.com/coolcoala/clash-verge-rev-lite/releases/latest/download/Koala.Clash_aarch64.dmg"},{text:"Intel",link:"https://github.com/coolcoala/clash-verge-rev-lite/releases/latest/download/Koala.Clash_x64.dmg"}]},
+      {name:"FlClashX",deepLink:"flclashx://install-config?url={{ENC}}",featured:true,storeLinks:[{text:"Apple Silicon",link:"https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-macos-arm64.dmg"},{text:"Intel",link:"https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-macos-amd64.dmg"}]},
+      {name:"Prizrak-Box",deepLink:"prizrak-box://install-config?url={{ENC}}",featured:false,storeLinks:[{text:"Apple Silicon",link:"https://github.com/legiz-ru/Prizrak-Box/releases/latest/download/macos-arm64-dmg.zip"},{text:"Intel",link:"https://github.com/legiz-ru/Prizrak-Box/releases/latest/download/macos-amd64-dmg.zip"}]},
+      {name:"Clash Verge",deepLink:"clash://install-config?url={{ENC}}",featured:false,storeLinks:[{text:"Intel",link:"https://github.com/clash-verge-rev/clash-verge-rev/releases/download/v2.4.4-rc/Clash.Verge_2.4.4-rc_x64.dmg"},{text:"Apple Silicon",link:"https://github.com/clash-verge-rev/clash-verge-rev/releases/download/v2.4.4-rc/Clash.Verge_2.4.4-rc_aarch64.dmg"}]}
     ],
     windows: [
-      { name: 'FlClashX',     deepLink: 'flclashx://install-config?url={{ENC}}',                                    storeLinks: [{text:'Windows (Установщик)',link:'https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-windows-amd64-setup.exe'},{text:'Windows (Портативная)',link:'https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-windows-amd64.zip'}] },
-      { name: 'Koala Clash',  deepLink: 'koala-clash://install-config?url={{ENC}}',                                  storeLinks: [{text:'Windows (Установщик)',link:'https://github.com/coolcoala/clash-verge-rev-lite/releases/latest/download/Koala.Clash_x64-setup.exe'}] },
-      { name: 'Prizrak-Box',  deepLink: 'prizrak-box://install-config?url={{ENC}}',                                  storeLinks: [{text:'Windows (Установщик)',link:'https://github.com/legiz-ru/Prizrak-Box/releases/latest/download/windows-amd64.msi'},{text:'Windows (Портативная)',link:'https://github.com/legiz-ru/Prizrak-Box/releases/latest/download/windows-amd64.zip'}] },
-      { name: 'Happ',         deepLink: 'happ://add/{{SUB}}',                                                       storeLinks: [{text:'Windows',link:'https://github.com/Happ-proxy/happ-desktop/releases/latest/download/setup-Happ.x64.exe'}] },
-      { name: 'Clash Verge',  deepLink: 'clash://install-config?url={{ENC}}',                                        storeLinks: [{text:'Windows (Установщик)',link:'https://github.com/clash-verge-rev/clash-verge-rev/releases/download/v2.4.4-rc/Clash.Verge_2.4.4-rc_x64-setup.exe'}] },
+      {name:"FlClashX",deepLink:"flclashx://install-config?url={{ENC}}",featured:true,storeLinks:[{text:"\u0423\u0441\u0442\u0430\u043d\u043e\u0432\u0449\u0438\u043a",link:"https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-windows-amd64-setup.exe"},{text:"\u041f\u043e\u0440\u0442\u0430\u0442\u0438\u0432\u043d\u0430\u044f",link:"https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-windows-amd64.zip"}]},
+      {name:"Koala Clash",deepLink:"koala-clash://install-config?url={{ENC}}",featured:true,storeLinks:[{text:"\u0423\u0441\u0442\u0430\u043d\u043e\u0432\u0449\u0438\u043a",link:"https://github.com/coolcoala/clash-verge-rev-lite/releases/latest/download/Koala.Clash_x64-setup.exe"}]},
+      {name:"Happ",deepLink:"happ://add/{{SUB}}",featured:false,storeLinks:[{text:"Windows",link:"https://github.com/Happ-proxy/happ-desktop/releases/latest/download/setup-Happ.x64.exe"}]},
+      {name:"Prizrak-Box",deepLink:"prizrak-box://install-config?url={{ENC}}",featured:true,storeLinks:[{text:"\u0423\u0441\u0442\u0430\u043d\u043e\u0432\u0449\u0438\u043a",link:"https://github.com/legiz-ru/Prizrak-Box/releases/latest/download/windows-amd64.msi"}]},
+      {name:"Clash Verge",deepLink:"clash://install-config?url={{ENC}}",featured:false,storeLinks:[{text:"\u0423\u0441\u0442\u0430\u043d\u043e\u0432\u0449\u0438\u043a",link:"https://github.com/clash-verge-rev/clash-verge-rev/releases/download/v2.4.4-rc/Clash.Verge_2.4.4-rc_x64-setup.exe"}]}
     ],
     linux: [
-      { name: 'FlClashX',     deepLink: 'flclashx://install-config?url={{ENC}}',                                    storeLinks: [{text:'amd64 (.deb)',link:'https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-linux-amd64.deb'},{text:'amd64 (AppImage)',link:'https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-linux-amd64.AppImage'}] },
-      { name: 'Koala Clash',  deepLink: 'koala-clash://install-config?url={{ENC}}',                                  storeLinks: [{text:'amd64 (.deb)',link:'https://github.com/coolcoala/clash-verge-rev-lite/releases/latest/download/Koala.Clash_amd64.deb'},{text:'amd64 (.rpm)',link:'https://github.com/coolcoala/clash-verge-rev-lite/releases/latest/download/Koala.Clash.x86_64.rpm'}] },
-      { name: 'Prizrak-Box',  deepLink: 'prizrak-box://install-config?url={{ENC}}',                                  storeLinks: [{text:'amd64 (.deb)',link:'https://github.com/legiz-ru/Prizrak-Box/releases/latest/download/linux-amd64.deb'},{text:'amd64 (.rpm)',link:'https://github.com/legiz-ru/Prizrak-Box/releases/latest/download/linux-amd64.rpm'}] },
-      { name: 'Clash Verge',  deepLink: 'clash://install-config?url={{ENC}}',                                        storeLinks: [{text:'Linux (amd64 .deb)',link:'https://github.com/clash-verge-rev/clash-verge-rev/releases/download/v2.4.4-rc/Clash.Verge_2.4.4-rc_amd64.deb'}] },
-    ],
+      {name:"FlClashX",deepLink:"flclashx://install-config?url={{ENC}}",featured:true,storeLinks:[{text:".deb (amd64)",link:"https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-linux-amd64.deb"},{text:"AppImage",link:"https://github.com/pluralplay/FlClashX/releases/download/v0.2.1/FlClashX-0.2.1-linux-amd64.AppImage"}]},
+      {name:"Koala Clash",deepLink:"koala-clash://install-config?url={{ENC}}",featured:true,storeLinks:[{text:".deb (amd64)",link:"https://github.com/coolcoala/clash-verge-rev-lite/releases/latest/download/Koala.Clash_amd64.deb"}]},
+      {name:"Prizrak-Box",deepLink:"prizrak-box://install-config?url={{ENC}}",featured:true,storeLinks:[{text:".deb (amd64)",link:"https://github.com/legiz-ru/Prizrak-Box/releases/latest/download/linux-amd64.deb"}]},
+      {name:"Clash Verge",deepLink:"clash://install-config?url={{ENC}}",featured:false,storeLinks:[{text:".deb (amd64)",link:"https://github.com/clash-verge-rev/clash-verge-rev/releases/download/v2.4.4-rc/Clash.Verge_2.4.4-rc_amd64.deb"}]}
+    ]
   };
 
-  /* ── Parse URL params ──────────────────────────────────── */
-
-  const params  = new URLSearchParams(window.location.search);
-  const subUrl  = params.get('sub') || '';
-  const appHint = (params.get('app') || '').toLowerCase();
-
-  if (!subUrl) {
-    document.getElementById('funText').textContent = t('errorNoSub');
-    document.getElementById('searchEmoji').textContent = '⚠️';
-    document.getElementById('searchEmoji').style.animation = 'none';
-    document.getElementById('funSub').textContent = '';
-    document.getElementById('progressBar').style.display = 'none';
+  var params = new URLSearchParams(window.location.search);
+  var subUrl = params.get("sub") || "";
+  var appHint = (params.get("app") || "").toLowerCase();
+    document.getElementById("scanCard").classList.add("hidden");
+    document.getElementById("resultCard").classList.remove("hidden");
+    document.getElementById("resultEmoji").textContent = "\u26a0\ufe0f";
+    document.getElementById("resultMsg").textContent = t("errorNoSub");
     return;
   }
 
-  /* ── Detect platform ───────────────────────────────────── */
-
-  function detectPlatform() {
-    const ua = navigator.userAgent.toLowerCase();
-    if (/iphone|ipad|ipod/.test(ua)) return 'ios';
-    if (/android/.test(ua))           return 'android';
-    if (/macintosh|mac os/.test(ua))  return 'macos';
-    if (/windows/.test(ua))           return 'windows';
-    if (/linux/.test(ua))             return 'linux';
-    return 'windows'; // safe desktop fallback
+  function buildUri(tpl, sub) {
+    return tpl.replace("{{SUB}}", sub).replace("{{ENC}}", encodeURIComponent(sub));
   }
 
-  const platform = detectPlatform();
-
-  /* ── Parse Remnawave subscription-page config ──────────── */
-
   function parseRemnaConfig(cfg) {
-    // Remnawave config: { platforms: { ios: [ { id, name, isFeatured, urlScheme, installationStep: { buttons: [{buttonLink, buttonText}] } } ] } }
-    const platformApps = cfg?.platforms?.[platform];
-    if (!Array.isArray(platformApps) || !platformApps.length) return null;
-
-    const apps = [];
-    for (const app of platformApps) {
-      const scheme = app.urlScheme;
-      if (!scheme) continue;
-
-      // Build deep link template: if scheme ends with = it's a query param (needs encoding)
-      const deepLink = scheme + (scheme.endsWith('=') ? '{{ENC}}' : '{{SUB}}');
-
-      const storeLinks = [];
-      if (app.installationStep?.buttons) {
-        for (const btn of app.installationStep.buttons) {
+    var platformApps = cfg && cfg.platforms && cfg.platforms[platform];
+    var apps = [];
+    for (var i = 0; i < platformApps.length; i++) {
+      var app = platformApps[i];
+      var scheme = app.urlScheme;
+      var tpl = scheme + (scheme.charAt(scheme.length-1) === "=" ? "{{ENC}}" : "{{SUB}}");
+      var links = [];
+      if (app.installationStep && app.installationStep.buttons) {
+        for (var j = 0; j < app.installationStep.buttons.length; j++) {
+          var btn = app.installationStep.buttons[j];
           if (btn.buttonLink) {
-            const text = btn.buttonText?.[lang] || btn.buttonText?.en || btn.buttonText?.ru || app.name;
-            storeLinks.push({ text, link: btn.buttonLink });
+            var txt = (btn.buttonText && (btn.buttonText[lang] || btn.buttonText.en || btn.buttonText.ru)) || app.name;
+            links.push({text: txt, link: btn.buttonLink});
           }
         }
       }
-
-      apps.push({
-        name: app.name || app.id || 'Unknown',
-        deepLink,
-        storeLink: storeLinks.length ? storeLinks[0].link : null,
-        storeLinks,
-        featured: !!app.isFeatured,
-      });
+      apps.push({name: app.name||app.id, deepLink: tpl, featured:             {                 echo ___BEGIN___COMMAND_OUTPUT_MARKER___;                 PS1=;PS2=;unset HISTFILE;                 EC=0;                 echo ___BEGIN___COMMAND_DONE_MARKER___0;             }app.isFeatured, storeLinks: links});
     }
-
-    // Sort: featured apps first
-    apps.sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
-
+    apps.sort(function(a,b){return (b.featured?1:0)-(a.featured?1:0);});
     return apps.length ? apps : null;
   }
 
-  /* ── Build URI from deep-link template ─────────────────── */
-
-  function buildUri(template, sub) {
-    return template
-      .replace('{{SUBSCRIPTION_LINK}}', sub)
-      .replace('{{USERNAME}}', '')
-      .replace('{{HAPP_CRYPT3_LINK}}', sub)
-      .replace('{{HAPP_CRYPT4_LINK}}', sub)
-      .replace('{{SUB}}', sub)
-      .replace('{{ENC}}', encodeURIComponent(sub));
-  }
-
-  /* ── Prioritize apps: move appHint match to front ──────── */
-
   function prioritize(apps) {
-    if (!appHint || appHint === '_default') return apps;
-    const hint = appHint.replace(/[-_\s]/g, '').toLowerCase();
-    const idx = apps.findIndex(a =>
-      a.name.replace(/[-_\s]/g, '').toLowerCase().includes(hint) ||
-      hint.includes(a.name.replace(/[-_\s]/g, '').toLowerCase())
-    );
-    if (idx > 0) {
-      const [match] = apps.splice(idx, 1);
-      apps.unshift(match);
+    var hint = appHint.replace(/[-_\s]/g,"").toLowerCase();
+    for (var i=1; i<apps.length; i++) {
+      var n = apps[i].name.replace(/[-_\s]/g,"").toLowerCase();
+      if (n.indexOf(hint)!==-1 || hint.indexOf(n)!==-1) {
+        var m = apps.splice(i,1)[0]; apps.unshift(m); break;
+      }
     }
     return apps;
   }
 
-  /* ── DOM refs ──────────────────────────────────────────── */
+  /* Auto-detection: uses ONLY visibilitychange (no blur = no false positives from system prompts) */
+  function scanApps(apps) {
+    return new Promise(function(resolve) {
+      var found = false;
+      var funMsgs = FUN[lang] || FUN.en;
+      var funIdx = 0;
+      var funTimer = setInterval(function() {
+        funIdx = (funIdx+1) % funMsgs.length;
+        document.getElementById("scanMsg").textContent = funMsgs[funIdx];
+      }, 2000);
 
-  const funTextEl    = document.getElementById('funText');
-  const funSubEl     = document.getElementById('funSub');
-  const searchEmoji  = document.getElementById('searchEmoji');
-  const progressFill = document.getElementById('progressFill');
-
-  /* ── Fun loading messages ──────────────────────────────── */
-
-  const FUN_MESSAGES = L.funMessages;
-
-  let funMsgIdx = 0;
-  let funInterval = null;
-
-  function showFunMessage(msg) {
-    funTextEl.classList.add('fade');
-    setTimeout(() => {
-      funTextEl.textContent = msg.text;
-      funSubEl.textContent = msg.sub || '';
-      searchEmoji.textContent = msg.emoji || '🔍';
-      funTextEl.classList.remove('fade');
-    }, 300);
-  }
-
-  function startFunMessages() {
-    showFunMessage(FUN_MESSAGES[0]);
-    funInterval = setInterval(() => {
-      funMsgIdx = (funMsgIdx + 1) % FUN_MESSAGES.length;
-      showFunMessage(FUN_MESSAGES[funMsgIdx]);
-    }, 2000);
-  }
-
-  function stopFunMessages() {
-    if (funInterval) { clearInterval(funInterval); funInterval = null; }
-  }
-
-  function updateProgress(current, total) {
-    const pct = Math.min(100, Math.round(((current + 1) / total) * 100));
-    progressFill.style.width = pct + '%';
-  }
-
-  /* ── Deep-link attempt engine ──────────────────────────── */
-
-  let currentIdx = 0;
-  let appOpened  = false;
-  let candidates = [];
-
-  function onAppOpened(name) {
-    appOpened = true;
-    stopFunMessages();
-    stopPostDownloadPolling();
-    progressFill.style.width = '100%';
-    searchEmoji.textContent = '✅';
-    searchEmoji.className = 'search-emoji';
-    searchEmoji.style.animation = 'none';
-    funTextEl.textContent = t('opening', { name });
-    funSubEl.textContent = t('openingSub');
-    document.getElementById('subtitle').textContent = t('openingSubtitle');
-    document.getElementById('progressBar').style.display = 'none';
-    // Hide fallback download buttons since we succeeded
-    document.getElementById('fallbackSection').classList.add('hidden');
-    setTimeout(() => {
-      document.getElementById('manualSection').classList.remove('hidden');
-      document.getElementById('keyBox').textContent = subUrl;
-    }, 3000);
-  }
-
-  function onAllFailed() {
-    stopFunMessages();
-    searchEmoji.textContent = '📲';
-    searchEmoji.style.animation = 'none';
-    funTextEl.textContent = t('notFound');
-    funSubEl.textContent = t('notFoundSub');
-    document.getElementById('subtitle').textContent = t('notFoundSubtitle');
-    document.getElementById('progressBar').style.display = 'none';
-
-    document.getElementById('fallbackSection').classList.remove('hidden');
-    document.getElementById('manualSection').classList.remove('hidden');
-    document.getElementById('keyBox').textContent = subUrl;
-
-    // Collect all unique store links
-    const container = document.getElementById('storeButtons');
-    const allLinks = [];
-    const seen = new Set();
-    for (const app of candidates) {
-      const links = app.storeLinks && app.storeLinks.length ? app.storeLinks : (app.storeLink ? [{ text: t('download', { name: app.name }), link: app.storeLink }] : []);
-      for (const sl of links) {
-        if (seen.has(sl.link)) continue;
-        seen.add(sl.link);
-        allLinks.push({ text: sl.text || t('download', { name: app.name }), link: sl.link });
-      }
-    }
-    // Fallback if no store links at all
-    if (!allLinks.length) {
-      allLinks.push({ text: t('download', { name: 'Happ' }), link: 'https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973' });
-    }
-
-    // Show the first (primary) download button
-    const primary = document.createElement('a');
-    primary.className = 'btn btn-primary';
-    primary.style.marginBottom = '8px';
-    primary.href = allLinks[0].link;
-    primary.target = '_blank';
-    primary.rel = 'noopener';
-    primary.textContent = '📥 ' + allLinks[0].text;
-    primary.addEventListener('click', function() {
-      setTimeout(startPostDownloadPolling, 500);
-    });
-    container.appendChild(primary);
-
-    // If there are more apps, add "Other apps" toggle
-    if (allLinks.length > 1) {
-      const moreWrap = document.createElement('div');
-      moreWrap.id = 'moreApps';
-      moreWrap.style.display = 'none';
-      moreWrap.style.marginTop = '8px';
-
-      for (let i = 1; i < allLinks.length; i++) {
-        const a = document.createElement('a');
-        a.className = 'btn btn-primary';
-        a.style.marginBottom = '8px';
-        a.href = allLinks[i].link;
-        a.target = '_blank';
-        a.rel = 'noopener';
-        a.textContent = '📥 ' + allLinks[i].text;
-        a.addEventListener('click', function() {
-          setTimeout(startPostDownloadPolling, 500);
-        });
-        moreWrap.appendChild(a);
-      }
-
-      const toggleBtn = document.createElement('button');
-      toggleBtn.className = 'btn btn-secondary';
-      toggleBtn.style.marginBottom = '8px';
-      toggleBtn.textContent = t('otherApps');
-      toggleBtn.addEventListener('click', function() {
-        const wrap = document.getElementById('moreApps');
-        if (wrap.style.display === 'none') {
-          wrap.style.display = 'block';
-          toggleBtn.textContent = t('hideApps');
-        } else {
-          wrap.style.display = 'none';
-          toggleBtn.textContent = t('otherApps');
+      function tryApp(i) {
+        if (i >= apps.length || found) {
+          clearInterval(funTimer);
+          return;
         }
-      });
+        var app = apps[i];
+        var uri = buildUri(app.deepLink, subUrl);
+        var pct = Math.round(((i+1)/apps.length)*100);
+        document.getElementById("scanDetail").textContent = t("trying",{name:app.name});
+        document.getElementById("progressBar").style.width = pct + "%";
 
-      container.appendChild(toggleBtn);
-      container.appendChild(moreWrap);
-    }
-  }
-
-  function tryNext() {
-    if (appOpened || currentIdx >= candidates.length) {
-      if (!appOpened) onAllFailed();
-      return;
-    }
-
-    const app = candidates[currentIdx];
-    const uri = buildUri(app.deepLink, subUrl);
-    const idx = currentIdx;
-
-    updateProgress(idx, candidates.length);
-
-    let detected = false;
-
-    function onBlur() {
-      detected = true;
-      cleanup();
-      onAppOpened(app.name);
-    }
-    function onVisChange() {
-      if (document.hidden) {
-        detected = true;
-        cleanup();
-        onAppOpened(app.name);
-      }
-    }
-    function cleanup() {
-      window.removeEventListener('blur', onBlur);
-      document.removeEventListener('visibilitychange', onVisChange);
-    }
-
-    window.addEventListener('blur', onBlur);
-    document.addEventListener('visibilitychange', onVisChange);
-
-    // Try via hidden iframe (safe: no system dialog on failure)
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = uri;
-    document.body.appendChild(iframe);
-
-    // Check result after timeout
-    setTimeout(() => {
-      cleanup();
-      if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
-      if (!detected && !appOpened) {
-        currentIdx++;
-        tryNext();
-      }
-    }, 1500);
-  }
-
-  /* ── Post-download polling ──────────────────────────────── */
-
-  let pollInterval = null;
-  let pollCandIdx  = 0;
-  let pollMsgIdx   = 0;
-  let pollMsgInterval = null;
-  let pollIgnoreBlurUntil = 0; // timestamp: ignore blur events until this time
-
-  function startPostDownloadPolling() {
-    if (pollInterval || appOpened) return; // already polling or done
-
-    // Ignore blur/visibility events for 3s (the store/browser tab is opening)
-    pollIgnoreBlurUntil = Date.now() + 3000;
-
-    // Switch UI to "waiting for install" state
-    const card = document.querySelector('.card');
-    card.classList.remove('hidden');
-    searchEmoji.className = 'search-emoji pulse';
-    searchEmoji.textContent = '⏳';
-    funTextEl.textContent = t('waitingInstall');
-    funSubEl.textContent = t('waitingSub');
-    document.getElementById('subtitle').textContent = t('waitingSubtitle');
-
-    // Show progress bar in indeterminate/pulse mode
-    const pb = document.getElementById('progressBar');
-    pb.style.display = '';
-    progressFill.style.width = '100%';
-    progressFill.style.opacity = '0.4';
-    progressFill.style.animation = 'pulse 1.5s ease infinite';
-
-    // Add hint below the card
-    let hint = document.getElementById('pollHint');
-    if (!hint) {
-      hint = document.createElement('div');
-      hint.id = 'pollHint';
-      hint.className = 'poll-hint';
-      hint.textContent = t('waitingPoll');
-      card.appendChild(hint);
-    }
-
-    // Rotate waiting messages
-    const waitMsgs = L.waitingMessages;
-    pollMsgInterval = setInterval(() => {
-      pollMsgIdx = (pollMsgIdx + 1) % waitMsgs.length;
-      showFunMessage(waitMsgs[pollMsgIdx]);
-    }, 3000);
-
-    // Listen for app opening (but with grace period)
-    window.addEventListener('blur', onPollBlur);
-    document.addEventListener('visibilitychange', onPollVisChange);
-
-    // Also: when user returns from the store, immediately try all links fast
-    window.addEventListener('focus', onPollFocusReturn);
-
-    // Start gentle background polling after the grace period
-    setTimeout(() => {
-      if (appOpened) return;
-      pollInterval = setInterval(() => {
-        if (appOpened) { stopPostDownloadPolling(); return; }
-        // Don't try while page is hidden (user is in store)
-        if (document.hidden) return;
-
-        const app = candidates[pollCandIdx % candidates.length];
-        const uri = buildUri(app.deepLink, subUrl);
-
-        // Try via hidden iframe only (no location.href — that would navigate away)
-        const iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        iframe.src = uri;
+        var iframe = document.createElement("iframe");
+        iframe.style.cssText = "display:none;width:0;height:0;border:0;position:absolute;top:-9999px";
         document.body.appendChild(iframe);
-        setTimeout(() => { if (iframe.parentNode) iframe.parentNode.removeChild(iframe); }, 1500);
 
-        pollCandIdx++;
-      }, 2500);
-    }, 3000);
+        var visHandler = function() {
+          if (document.visibilityState === "hidden") {
+            found = true;
+            cleanup();
+            clearInterval(funTimer);
+            resolve(app);
+          }
+        };
+        document.addEventListener("visibilitychange", visHandler);
 
-    console.log('[connect] Post-download polling started');
-  }
+        function cleanup() {
+          document.removeEventListener("visibilitychange", visHandler);
+          clearTimeout(timer);
+          if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+        }
 
-  // When user returns from the store → immediately try all apps quickly
-  function onPollFocusReturn() {
-    if (appOpened || !pollInterval && pollIgnoreBlurUntil > Date.now()) return;
-    // Small delay to let the page settle
-    setTimeout(() => {
-      if (appOpened) return;
-      pollIgnoreBlurUntil = 0; // clear grace period, now blur = real detection
-      // Try each candidate rapidly
-      let i = 0;
-      function tryPollCandidate() {
-        if (appOpened || i >= candidates.length) return;
-        const app = candidates[i];
-        const uri = buildUri(app.deepLink, subUrl);
-        const iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        iframe.src = uri;
-        document.body.appendChild(iframe);
-        setTimeout(() => { if (iframe.parentNode) iframe.parentNode.removeChild(iframe); }, 1200);
-        i++;
-        setTimeout(tryPollCandidate, 300);
+        try { iframe.src = uri; } catch(e) {}
+
+        var timer = setTimeout(function() {
+        }, SCAN_TIMEOUT);
       }
-      tryPollCandidate();
-    }, 500);
-  }
-
-  function onPollBlur() {
-    if (appOpened) return;
-    if (Date.now() < pollIgnoreBlurUntil) return; // ignore blur from store open
-    const app = candidates[Math.max(0, (pollCandIdx - 1)) % candidates.length] || candidates[0];
-    stopPostDownloadPolling();
-    onAppOpened(app.name);
-  }
-
-  function onPollVisChange() {
-    if (appOpened) return;
-    if (document.hidden) {
-      if (Date.now() < pollIgnoreBlurUntil) return; // ignore from store open
-      const app = candidates[Math.max(0, (pollCandIdx - 1)) % candidates.length] || candidates[0];
-      stopPostDownloadPolling();
-      onAppOpened(app.name);
-    }
-  }
-
-  function stopPostDownloadPolling() {
-    if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
-    if (pollMsgInterval) { clearInterval(pollMsgInterval); pollMsgInterval = null; }
-    window.removeEventListener('blur', onPollBlur);
-    document.removeEventListener('visibilitychange', onPollVisChange);
-    window.removeEventListener('focus', onPollFocusReturn);
-    progressFill.style.animation = 'none';
-    progressFill.style.opacity = '1';
-    const hint = document.getElementById('pollHint');
-    if (hint) hint.remove();
-    console.log('[connect] Post-download polling stopped');
-  }
-
-  /* ── Copy key helper ───────────────────────────────────── */
-
-  window.copyKey = function() {
-    navigator.clipboard.writeText(subUrl).then(() => {
-      const toast = document.getElementById('copyToast');
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2000);
-    }).catch(() => {
-      const ta = document.createElement('textarea');
-      ta.value = subUrl;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      ta.remove();
-      const toast = document.getElementById('copyToast');
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2000);
+      tryApp(0);
     });
-  };
-
-  /* ── Main: fetch config → try deep-links ───────────────── */
-
-  async function main() {
-    let apps = null;
-
-    // 1. Try to load dynamic config from Remnawave
-    try {
-      const res = await fetch(CONFIG_URL, { signal: AbortSignal.timeout(4000) });
-      if (res.ok) {
-        const cfg = await res.json();
-        apps = parseRemnaConfig(cfg);
-        if (apps) console.log('[connect] Loaded', apps.length, 'apps from Remnawave config');
-      }
-    } catch (e) {
-      console.warn('[connect] Config fetch failed, using fallback:', e.message);
-    }
-
-    // 2. Fallback to hardcoded list
-    if (!apps) {
-      apps = FALLBACK_APPS[platform] || FALLBACK_APPS.windows;
-      console.log('[connect] Using fallback apps for', platform);
-    }
-
-    // 3. Prioritize if app hint is given
-    candidates = prioritize([...apps]);
-
-    // 4. Start fun messages and begin trying
-    startFunMessages();
-    setTimeout(tryNext, 300);
   }
+
+  function showSuccess(app) {
+    document.getElementById("scanCard").classList.add("hidden");
+    var rc = document.getElementById("resultCard");
+    rc.classList.remove("hidden");
+    rc.style.borderColor = "rgba(0,184,148,.3)";
+    rc.style.border = "1px solid rgba(0,184,148,.3)";
+    document.getElementById("resultEmoji").textContent = "\u2705";
+    document.getElementById("resultMsg").textContent = t("found",{name:app.name});
+    document.getElementById("resultHint").textContent = t("foundHint");
+    showKey();
+  }
+
+  function showFailure(apps) {
+    document.getElementById("scanCard").classList.add("hidden");
+    var rc = document.getElementById("resultCard");
+    rc.classList.remove("hidden");
+    document.getElementById("resultEmoji").textContent = "\U0001f4f2";
+    document.getElementById("resultMsg").textContent = t("notFound");
+    document.getElementById("resultHint").textContent = t("notFoundHint");
+
+    var listEl = document.getElementById("appList");
+    listEl.classList.remove("hidden");
+    listEl.innerHTML = "";
+
+    var featured = [], other = [];
+    for (var i=0; i<apps.length; i++) {
+      if (apps[i].featured) featured.push(apps[i]); else other.push(apps[i]);
+    }
+
+    for (var f=0; f<featured.length; f++) listEl.appendChild(makeCard(featured[f], true));
+
+    if (other.length) {
+      var togBtn = document.createElement("button");
+      togBtn.className = "other-toggle";
+      togBtn.textContent = t("otherApps",{count:other.length});
+      togBtn.type = "button";
+      var otherWrap = document.createElement("div");
+      otherWrap.className = "hidden";
+      var shown = false;
+      togBtn.addEventListener("click", function() {
+        togBtn.textContent = shown ? t("hideApps") : t("otherApps",{count:other.length});
+      });
+      listEl.appendChild(togBtn);
+      for (var o=0; o<other.length; o++) otherWrap.appendChild(makeCard(other[o], false));
+      listEl.appendChild(otherWrap);
+    }
+    showKey();
+
+    /* Auto-redirect: open first featured app download in 1.5s */
+    var topApp = featured[0];
+    if (topApp && topApp.storeLinks && topApp.storeLinks.length) {
+      setTimeout(function() {
+        window.location.href = topApp.storeLinks[0].link;
+      }, 1500);
+    }
+  }
+
+  function makeCard(app, isFeatured) {
+    var card = document.createElement("div");
+    card.className = "app-card" + (isFeatured ? " featured" : "");
+    var header = document.createElement("div");
+    header.className = "app-header";
+    var nm = document.createElement("span");
+    nm.className = "app-name"; nm.textContent = app.name;
+    header.appendChild(nm);
+    if (isFeatured) {
+      var tag = document.createElement("span");
+      tag.className = "app-tag"; tag.textContent = t("recommended");
+      header.appendChild(tag);
+    }
+    card.appendChild(header);
+
+    var row = document.createElement("div");
+    row.className = "btn-row";
+    if (app.storeLinks && app.storeLinks.length) {
+      var dlBtn = document.createElement("a");
+      dlBtn.className = "btn-action btn-download";
+      dlBtn.href = app.storeLinks[0].link;
+      dlBtn.target = "_blank"; dlBtn.rel = "noopener";
+      dlBtn.textContent = t("download");
+      dlBtn.style.marginBottom = "0";
+      row.appendChild(dlBtn);
+    }
+    var connBtn = document.createElement("a");
+    connBtn.className = "btn-action btn-connect";
+    connBtn.href = buildUri(app.deepLink, subUrl);
+    connBtn.textContent = t("connect");
+    row.appendChild(connBtn);
+    card.appendChild(row);
+
+    if (app.storeLinks && app.storeLinks.length > 1) {
+      var dl = document.createElement("div");
+      dl.className = "dl-links";
+      for (var i=0; i<app.storeLinks.length; i++) {
+        var a = document.createElement("a");
+        a.className = "dl-link"; a.href = app.storeLinks[i].link;
+        a.target = "_blank"; a.rel = "noopener";
+        a.textContent = app.storeLinks[i].text;
+        dl.appendChild(a);
+      }
+      card.appendChild(dl);
+    }
+    return card;
+  }
+
+  function showKey() {
+    var ks = document.getElementById("keySection");
+    ks.classList.remove("hidden");
+    document.getElementById("keyBox").textContent = subUrl;
+  }
+
+  function doCopy() {
+    navigator.clipboard.writeText(subUrl).then(showToast).catch(function() {
+      var ta = document.createElement("textarea");
+      ta.value = subUrl; document.body.appendChild(ta); ta.select();
+      document.execCommand("copy"); ta.remove(); showToast();
+    });
+  }
+  function showToast() {
+    var toast = document.getElementById("copyToast");
+    toast.classList.add("show");
+    setTimeout(function(){toast.classList.remove("show");}, 2000);
+  }
+  document.getElementById("copyBtn").addEventListener("click", doCopy);
+  document.getElementById("keyBox").addEventListener("click", doCopy);
+
+  var _running = false;
+  async function main() {
+    if (_running) return;
+    _running = true;
+    document.getElementById("scanCard").classList.remove("hidden");
+    document.getElementById("resultCard").classList.add("hidden");
+    document.getElementById("appList").classList.add("hidden");
+    document.getElementById("keySection").classList.add("hidden");
+    document.getElementById("progressBar").style.width = "0";
+    document.getElementById("scanMsg").textContent = t("scanning");
+    document.getElementById("scanDetail").textContent = "";
+
+    var apps = null;
+    try {
+      var res = await fetch(CONFIG_URL, {signal: AbortSignal.timeout(4000)});
+      if (res.ok) {
+        apps = parseRemnaConfig(await res.json());
+        if (apps) console.log("[connect] Loaded", apps.length, "apps from config");
+      }
+    } catch(e) {
+      console.warn("[connect] Config fetch failed, using fallback:", e.message);
+    }
+      apps = FALLBACK_APPS[platform] || FALLBACK_APPS.windows;
+      console.log("[connect] Using fallback for", platform);
+    }
+    apps = prioritize(apps.slice());
+
+    var foundApp = await scanApps(apps);
+    if (foundApp) {
+      showSuccess(foundApp);
+    } else {
+      showFailure(apps);
+    }
+    _running = false;
+  }
+
+  /* Re-scan when user returns from App Store / install */
+  window.addEventListener("pageshow", function(e) {
+    if (e.persisted) main();
+  });
 
   main();
-
 })();
 </script>
 </body>
